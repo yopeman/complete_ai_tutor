@@ -1,4 +1,15 @@
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+from app.config import get_llm
+from langchain_core.prompts import ChatPromptTemplate
+import os
+import uuid
+from gtts import gTTS
+import whisper as whisper_lib
+
+os.makedirs('static', exist_ok=True)
 
 TTS_SYSTEM_PROMPT = """
 You are a professional text normalization engine for Text-to-Speech synthesis.
@@ -68,12 +79,6 @@ You are a professional text normalization engine for Text-to-Speech synthesis.
 
 TTS_USER_PROMPT = "Convert this text to natural spoken English for TTS:\n\n{text}"
 
-llm = ChatGroq(
-    model="qwen/qwen3-32b",
-    temperature=0.7,
-    groq_api_key=settings.groq_api_key
-)
-
 def normalize_text_for_tts(text: str) -> str:
     """
     Normalize raw text (markdown, math, abbreviations, symbols)
@@ -87,11 +92,9 @@ def normalize_text_for_tts(text: str) -> str:
         ]
     )
 
-    chain = prompt | llm
-
+    chain = prompt | get_llm()
     response = chain.invoke({"text": text})
     return response.content.strip()
-
 
 def text_to_speech(text: str) -> str:
     normalized_text = normalize_text_for_tts(text)
@@ -100,8 +103,49 @@ def text_to_speech(text: str) -> str:
     tts.save(ai_audio_path)
     return ai_audio_path
 
-
 def speech_to_text(filepath: str) -> str:
-    model = WhisperModel("base", compute_type="int8")
-    segments, _ = model.transcribe(filepath)
-    return " ".join(segment.text for segment in segments)
+    model = whisper_lib.load_model("base")
+    result = model.transcribe(filepath)
+    return result["text"] if result and "text" in result else ""
+
+
+
+
+
+
+
+
+def test_tts_and_stt():
+    """Test TTS and STT functionality with sample audios."""
+    
+    # Test TTS
+    print("Testing TTS (Text-to-Speech)...")
+    test_text = "Hello, this is a test of the text-to-speech system. It should convert this text into audio."
+    
+    try:
+        audio_path = text_to_speech(test_text)
+        print(f"TTS successful! Audio saved to: {audio_path}")
+    except Exception as e:
+        print(f"TTS failed: {e}")
+    
+    # Test STT with sample audios
+    print("\nTesting STT (Speech-to-Text) with sample audios...")
+    sample_audio_dir = "sample_audios"
+    
+    if os.path.exists(sample_audio_dir):
+        audio_files = [f for f in os.listdir(sample_audio_dir) if f.endswith('.mp3')]
+        
+        for audio_file in audio_files:
+            audio_path = os.path.join(sample_audio_dir, audio_file)
+            print(f"\nProcessing: {audio_file}")
+            
+            try:
+                transcribed_text = speech_to_text(audio_path)
+                print(f"Transcribed text: {transcribed_text}")
+            except Exception as e:
+                print(f"STT failed for {audio_file}: {e}")
+    else:
+        print(f"Sample audio directory '{sample_audio_dir}' not found.")
+
+if __name__ == "__main__":
+    test_tts_and_stt()

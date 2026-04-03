@@ -26,6 +26,9 @@ dependencies = [
     "youtube-search>=2.2.0",
     "googletrans>=4.0.2",
     "duckduckgo-search>=8.1.1",
+    "gtts>=2.5.4",
+    "whispercpp>=0.0.17",
+    "openai-whisper>=20250625",
 ]
 
 [tool.uv]
