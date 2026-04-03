@@ -1,5 +1,6 @@
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, Query, status, Form, File, UploadFile, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
+from app.services.tts_and_stt import transcribe_uploaded_file
 from sqlalchemy import select
 from typing import List, Optional
 from app.database import get_db
@@ -74,12 +75,20 @@ async def get_lesson_interactions(
 @router.post("/{lesson_id}/interactions", response_model=InteractionResponse, status_code=status.HTTP_201_CREATED)
 async def create_interaction(
     lesson_id: int,
-    interaction_data: InteractionCreate,
+    user_question: Optional[str] = Form(None),
+    audio_file: Optional[UploadFile] = File(None),
     current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db),
     settings = Depends(get_settings)
 ):
     """Create a new interaction for a lesson where TutorAgent answers a student question."""
+    if not user_question and not audio_file:
+        raise HTTPException(status_code=400, detail="Either user_question or audio_file must be provided")
+    
+    if not user_question and audio_file:
+        user_question = await transcribe_uploaded_file(audio_file)
+        
+    interaction_data = InteractionCreate(user_question=user_question)
     return await create_interaction_controller(lesson_id, interaction_data, current_user, db, settings)
 
 
