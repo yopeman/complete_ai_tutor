@@ -27,6 +27,9 @@ class Settings(BaseSettings):
     # Base URL for frontend and backend
     frontend_base_url: str
     backend_base_url: str
+
+    # Audio
+    audio_cache_dir: str = "audio_cache"
     
     @property
     def database_url(self) -> str:
