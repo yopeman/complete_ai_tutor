@@ -11,6 +11,7 @@ from app.controllers.chats import (
     get_chats as get_chats_controller,
     create_chat as create_chat_controller,
     get_chat as get_chat_controller,
+    delete_chat as delete_chat_controller,
 )
 
 router = APIRouter(prefix="/chats", tags=["Chats"])
@@ -57,3 +58,13 @@ async def get_chat(
 ):
     """Get a specific chat by ID."""
     return await get_chat_controller(chat_id, current_user, db)
+
+
+@router.delete("/sessions/{session_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_chat(
+    session_id: str,
+    current_user: User = Depends(get_current_active_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Delete all chats for a specific session ID."""
+    return await delete_chat_controller(session_id, current_user, db)

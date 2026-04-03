@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import select, func
 from typing import List
 from app.database import get_db
 from app.dependencies import get_current_active_user
@@ -34,10 +34,20 @@ async def get_chats(
     db: AsyncSession = Depends(get_db)
 ):
     """Get all chats for the current user."""
-    query = select(Chat).where(Chat.user_id == current_user.id)
-    
     if session_id:
-        query = query.where(Chat.session_id == session_id)
+        # Filter by specific session_id
+        query = select(Chat).where(
+            Chat.user_id == current_user.id,
+            Chat.session_id == session_id
+        )
+    else:
+        # Get one record (the latest) per distinct session_id
+        subquery = (
+            select(func.max(Chat.id))
+            .where(Chat.user_id == current_user.id)
+            .group_by(Chat.session_id)
+        )
+        query = select(Chat).where(Chat.id.in_(subquery))
     
     query = query.order_by(Chat.created_at.desc()).offset(skip).limit(limit)
     
@@ -109,3 +119,22 @@ async def get_chat(
     """Get a specific chat by ID."""
     chat = await verify_chat_access(chat_id, current_user.id, db)
     return chat
+
+
+async def delete_chat(
+    session_id: str,
+    current_user: User = Depends(get_current_active_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Delete all chats for a specific session ID belonging to the user."""
+    from sqlalchemy import delete
+    
+    query = delete(Chat).where(
+        Chat.user_id == current_user.id,
+        Chat.session_id == session_id
+    )
+    
+    await db.execute(query)
+    await db.commit()
+    
+    return None
