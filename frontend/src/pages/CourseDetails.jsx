@@ -65,9 +65,12 @@ const CourseDetails = () => {
         setInstalling(true);
         try {
             const response = await api.post(`/courses/${courseId}/install`);
+            // Update lessons with the response from installation
             setLessons(response.data);
+            // Refresh course details to update status (e.g., from 'Draft' to 'Published')
             const courseRes = await api.get(`/courses/${courseId}`);
             setCourse(courseRes.data);
+            // No redirect, stay on the page to show the newly generated syllabus
         } catch (error) {
             console.error('Installation failed:', error);
         } finally {
