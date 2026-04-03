@@ -96,10 +96,12 @@ const CourseDetails = () => {
         if (!aiPrompt.trim()) return;
         setIsUpdating(true);
         try {
-            const response = await api.put(`/courses/${courseId}/plans/ai`, {
-                prompt: aiPrompt,
-                session_id: sessionId
-            });
+            const formData = new FormData();
+            formData.append('prompt', aiPrompt);
+            if (sessionId) {
+                formData.append('session_id', sessionId);
+            }
+            const response = await api.put(`/courses/${courseId}/plans/ai`, formData);
             setCourse(response.data);
             setManualPlan(response.data.course_plan);
             setAiPrompt('');
@@ -116,7 +118,7 @@ const CourseDetails = () => {
         setIsUpdating(true);
         try {
             const formData = new FormData();
-            formData.append('audio', blob, 'voice_input.webm');
+            formData.append('audio_file', blob, 'voice_input.webm');
             if (sessionId) formData.append('session_id', sessionId);
 
             const response = await api.put(`/courses/${courseId}/plans/ai`, formData);
