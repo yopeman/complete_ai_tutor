@@ -76,9 +76,6 @@ const Flashcards = () => {
   const [actionLoading, setActionLoading] = useState(null); // { id, type: 'edit' | 'delete' }
   const [flippedCards, setFlippedCards] = useState(new Set());
 
-  // ── Stats ──
-  const [sessionStats, setSessionStats] = useState({ reviewed: 0, known: 0, studying: 0 });
-
   // ────────────────────────────────────────────
   // Utility Functions
   // ────────────────────────────────────────────
@@ -97,30 +94,6 @@ const Flashcards = () => {
       setCurrentIndex((prev) => prev - 1);
     }
   }, [currentIndex]);
-
-  const markKnown = useCallback(() => {
-    const currentCard = studyDeck?.[currentIndex];
-    if (currentCard) {
-      setSessionStats((prev) => ({
-        ...prev,
-        reviewed: prev.reviewed + 1,
-        known: prev.known + 1,
-      }));
-      goNext();
-    }
-  }, [currentIndex, studyDeck, goNext]);
-
-  const markStudying = useCallback(() => {
-    const currentCard = studyDeck?.[currentIndex];
-    if (currentCard) {
-      setSessionStats((prev) => ({
-        ...prev,
-        reviewed: prev.reviewed + 1,
-        studying: prev.studying + 1,
-      }));
-      goNext();
-    }
-  }, [currentIndex, studyDeck, goNext]);
 
   const exitStudyMode = useCallback(() => {
     setStudyMode(false);
@@ -230,7 +203,6 @@ const Flashcards = () => {
     setStudyDeck([...filteredCards]);
     setCurrentIndex(0);
     setIsFlipped(false);
-    setSessionStats({ reviewed: 0, known: 0, studying: 0 });
     setStudyMode(true);
   }, [filteredCards]);
 
@@ -305,14 +277,6 @@ const Flashcards = () => {
           e.preventDefault();
           flipCard();
           break;
-        case 'ArrowRight':
-          e.preventDefault();
-          markKnown();
-          break;
-        case 'ArrowLeft':
-          e.preventDefault();
-          markStudying();
-          break;
         case 'Escape':
           exitStudyMode();
           break;
@@ -323,7 +287,7 @@ const Flashcards = () => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [studyMode, currentIndex, isFlipped, studyDeck, markKnown, markStudying, flipCard, exitStudyMode]);
+  }, [studyMode, currentIndex, isFlipped, studyDeck, flipCard, exitStudyMode]);
 
   // ────────────────────────────────────────────
   // Study Mode - Full Screen Overlay
@@ -358,16 +322,6 @@ const Flashcards = () => {
           </div>
 
           <div className="flex items-center gap-4">
-            {/* Session Stats */}
-            <div className="hidden md:flex items-center gap-4 text-xs">
-              <div className="flex items-center gap-1.5 text-emerald-400">
-                <Check size={14} /> {sessionStats.known} Known
-              </div>
-              <div className="flex items-center gap-1.5 text-amber-400">
-                <RotateCcw size={14} /> {sessionStats.studying} Studying
-              </div>
-            </div>
-
             <button
               onClick={shuffleDeck}
               className="p-2 text-slate-400 hover:text-indigo-400 hover:bg-slate-800 rounded-lg transition-all"
@@ -479,16 +433,6 @@ const Flashcards = () => {
             <ChevronLeft size={20} />
           </button>
 
-          {/* Still Studying Button */}
-          <button
-            onClick={markStudying}
-            disabled={isLastCard && sessionStats.reviewed >= studyDeck.length}
-            className="px-4 md:px-8 py-3 md:py-4 rounded-xl md:rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 font-bold text-xs md:text-sm hover:bg-amber-500/20 hover:border-amber-500/30 transition-all flex items-center gap-2 md:gap-3 disabled:opacity-30 shadow-lg shadow-amber-500/5 group"
-          >
-            <RotateCcw size={18} className="group-hover:rotate-[-45deg] transition-transform" />
-            <span className="hidden sm:inline whitespace-nowrap">Still Learning</span>
-          </button>
-
           {/* Flip button */}
           <button
             onClick={flipCard}
@@ -498,99 +442,28 @@ const Flashcards = () => {
             <RotateCcw size={24} />
           </button>
 
-          {/* Know It Button */}
+          {/* Next / Finish */}
           <button
-            onClick={markKnown}
-            disabled={isLastCard && sessionStats.reviewed >= studyDeck.length}
-            className="px-4 md:px-8 py-3 md:py-4 rounded-xl md:rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-bold text-xs md:text-sm hover:bg-emerald-500/20 hover:border-emerald-500/30 transition-all flex items-center gap-2 md:gap-3 disabled:opacity-30 shadow-lg shadow-emerald-500/5"
+            onClick={isLastCard ? exitStudyMode : goNext}
+            className={`w-28 h-10 md:h-12 rounded-xl md:rounded-2xl border flex items-center justify-center gap-2 font-bold text-xs md:text-sm transition-all
+              ${isLastCard 
+                ? 'bg-emerald-600 border-emerald-500 text-white hover:bg-emerald-500' 
+                : 'bg-slate-800 border-white/5 text-slate-400 hover:text-white hover:bg-slate-700'}`}
+            title={isLastCard ? "Finish Session" : "Next Card"}
           >
-            <Check size={18} />
-            <span className="hidden sm:inline whitespace-nowrap">Got It!</span>
-          </button>
-
-          {/* Next */}
-          <button
-            onClick={goNext}
-            disabled={isLastCard}
-            className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-slate-800 border border-white/5 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-700 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-            title="Next Card"
-          >
-            <ChevronRight size={20} />
+            {isLastCard ? (
+              <>Finish <Check size={16} /></>
+            ) : (
+              <ChevronRight size={20} />
+            )}
           </button>
         </div>
 
-        {/* Session Complete Overlay */}
-        {isLastCard && sessionStats.reviewed >= studyDeck.length && (
-          <div className="absolute inset-0 z-40 bg-slate-950/90 backdrop-blur-xl flex items-center justify-center animate-in fade-in duration-500">
-            <div className="max-w-lg text-center space-y-8 px-6">
-              <div className="w-24 h-24 rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center mx-auto shadow-2xl shadow-indigo-500/30">
-                <Trophy className="text-white" size={40} />
-              </div>
-              <div>
-                <h2 className="text-4xl font-bold text-white mb-3">Session Complete!</h2>
-                <p className="text-slate-400 text-lg">You've reviewed all cards in this deck.</p>
-              </div>
-
-              <div className="grid grid-cols-3 gap-4">
-                <div className="p-6 bg-slate-800/50 border border-white/5 rounded-2xl">
-                  <p className="text-3xl font-bold text-white mb-1">{studyDeck.length}</p>
-                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Total Cards</p>
-                </div>
-                <div className="p-6 bg-emerald-500/5 border border-emerald-500/20 rounded-2xl">
-                  <p className="text-3xl font-bold text-emerald-400 mb-1">{sessionStats.known}</p>
-                  <p className="text-[10px] font-bold text-emerald-500/50 uppercase tracking-widest">Mastered</p>
-                </div>
-                <div className="p-6 bg-amber-500/5 border border-amber-500/20 rounded-2xl">
-                  <p className="text-3xl font-bold text-amber-400 mb-1">{sessionStats.studying}</p>
-                  <p className="text-[10px] font-bold text-amber-500/50 uppercase tracking-widest">Reviewing</p>
-                </div>
-              </div>
-
-              {/* Mastery Percentage */}
-              <div className="pt-2">
-                <div className="h-2 bg-slate-800 rounded-full overflow-hidden ring-1 ring-white/5">
-                  <div
-                    className="h-full bg-gradient-to-r from-emerald-500 to-emerald-400 transition-all duration-1000"
-                    style={{ width: `${studyDeck.length > 0 ? (sessionStats.known / studyDeck.length) * 100 : 0}%` }}
-                  ></div>
-                </div>
-                <p className="text-sm text-slate-400 mt-3">
-                  <span className="font-bold text-emerald-400">
-                    {studyDeck.length > 0 ? Math.round((sessionStats.known / studyDeck.length) * 100) : 0}%
-                  </span>{' '}
-                  mastery rate
-                </p>
-              </div>
-
-              <div className="flex gap-4 pt-4">
-                <Button
-                  onClick={() => {
-                    setCurrentIndex(0);
-                    setIsFlipped(false);
-                    setSessionStats({ reviewed: 0, known: 0, studying: 0 });
-                  }}
-                  variant="outline"
-                  className="flex-1 py-4 rounded-2xl gap-2 text-sm"
-                >
-                  <RotateCcw size={16} /> Study Again
-                </Button>
-                <Button onClick={exitStudyMode} className="flex-1 py-4 rounded-2xl gap-2 text-sm">
-                  <Check size={16} /> Done
-                </Button>
-              </div>
-
-              <p className="text-[10px] text-slate-600 font-bold uppercase tracking-[0.2em]">
-                Keep practicing to improve your retention
-              </p>
-            </div>
-          </div>
-        )}
+        {/* Session Complete Overlay removed as it relied on removed buttons for progression tracking */}
 
         {/* Keyboard shortcuts hint */}
         <div className="absolute bottom-2 left-1/2 -translate-x-1/2 hidden lg:flex items-center gap-6 text-[10px] text-slate-700 font-bold uppercase tracking-widest">
           <span>Space/Enter: Flip</span>
-          <span>←: Still Learning</span>
-          <span>→: Got It</span>
           <span>Esc: Exit</span>
         </div>
       </div>
