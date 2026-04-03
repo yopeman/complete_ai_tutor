@@ -11,7 +11,8 @@ import {
   CheckCircle2,
   MessageSquare,
   Loader2,
-  BrainCircuit
+  BrainCircuit,
+  Sparkles
 } from 'lucide-react';
 
 const LessonPlayer = () => {
