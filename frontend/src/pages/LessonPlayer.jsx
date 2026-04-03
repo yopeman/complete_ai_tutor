@@ -9,6 +9,7 @@ import {
   ChevronRight,
   ChevronLeft,
   CheckCircle2,
+  XCircle,
   MessageSquare,
   Loader2,
   BrainCircuit,
@@ -30,6 +31,14 @@ const LessonPlayer = () => {
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const chatEndRef = useRef(null);
+
+  // Quiz States
+  const [quizzes, setQuizzes] = useState([]);
+  const [showQuiz, setShowQuiz] = useState(false);
+  const [quizAnswers, setQuizAnswers] = useState({});
+  const [quizResult, setQuizResult] = useState(null);
+  const [isSubmittingQuiz, setIsSubmittingQuiz] = useState(false);
+
   const sessionId = `lesson_${lessonId}`;
 
   useEffect(() => {
@@ -99,11 +108,86 @@ const LessonPlayer = () => {
   const handleComplete = async () => {
     setCompleting(true);
     try {
-      await api.get(`/lessons/${lessonId}/complete`);
+      // Calling complete generates quizzes on the backend
+      const response = await api.get(`/lessons/${lessonId}/complete`);
+      setQuizzes(response.data);
+      setShowQuiz(true);
+
+      // Still refresh lesson for status
       const res = await api.get(`/lessons/${lessonId}`);
       setLesson(res.data);
     } catch (error) {
       console.error('Completion failed:', error);
+    } finally {
+      setCompleting(false);
+    }
+  };
+
+  const handleQuizSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmittingQuiz(true);
+    try {
+      const submission = {
+        session_id: quizzes[0]?.session_id || sessionId,
+        submissions: Object.entries(quizAnswers).map(([qid, ans]) => ({
+          quiz_id: parseInt(qid),
+          student_answer: ans
+        }))
+      };
+
+      const response = await api.post(`/lessons/${lessonId}/quizzes/submit`, submission);
+      setQuizResult(response.data);
+
+      // If passed, refresh lesson to show next/completed status
+      if (response.data.score >= 70) {
+        const res = await api.get(`/lessons/${lessonId}`);
+        setLesson(res.data);
+      }
+    } catch (error) {
+      console.error('Quiz submission failed:', error);
+    } finally {
+      setIsSubmittingQuiz(false);
+    }
+  };
+
+  const goToNextLesson = async () => {
+    try {
+      const response = await api.get(`/courses/${lesson.course_id}`);
+      const courseLessons = response.data.lessons || [];
+      const currentIndex = courseLessons.findIndex(l => l.id === parseInt(lessonId));
+      if (currentIndex !== -1 && currentIndex < courseLessons.length - 1) {
+        navigate(`/lessons/${courseLessons[currentIndex + 1].id}`);
+      } else {
+        navigate(`/courses/${lesson.course_id}`);
+      }
+    } catch (err) {
+      navigate(`/courses/${lesson.course_id}`);
+    }
+  };
+
+  const goToPreviousLesson = async () => {
+    try {
+      const response = await api.get(`/courses/${lesson.course_id}`);
+      const courseLessons = response.data.lessons || [];
+      const currentIndex = courseLessons.findIndex(l => l.id === parseInt(lessonId));
+      if (currentIndex > 0) {
+        navigate(`/lessons/${courseLessons[currentIndex - 1].id}`);
+      }
+    } catch (err) {
+      console.error('Nav failed:', err);
+    }
+  };
+
+  const handleRetakeQuiz = async () => {
+    setCompleting(true);
+    try {
+      const response = await api.get(`/lessons/${lessonId}/quizzes`);
+      setQuizzes(response.data);
+      setQuizAnswers({});
+      setQuizResult(null);
+      setShowQuiz(true);
+    } catch (error) {
+      console.error('Failed to get quizzes:', error);
     } finally {
       setCompleting(false);
     }
@@ -139,15 +223,25 @@ const LessonPlayer = () => {
         </div>
 
         <div className="flex items-center gap-3">
+          {lesson.is_completed && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-2 h-9 border-indigo-500/30 text-indigo-400 hover:bg-indigo-500/10 rounded-xl"
+              onClick={handleRetakeQuiz}
+            >
+              <BrainCircuit size={16} /> Retake Quiz
+            </Button>
+          )}
           <Button
             variant={lesson.is_completed ? 'secondary' : 'primary'}
             size="sm"
-            className="gap-2 h-9"
-            onClick={handleComplete}
+            className="gap-2 h-9 rounded-xl shadow-lg ring-1 ring-white/10"
+            onClick={lesson.is_completed ? goToNextLesson : handleComplete}
             disabled={completing}
           >
             {completing ? <Loader2 className="animate-spin" size={16} /> : (
-              lesson.is_completed ? <><CheckCircle2 size={16} className="text-emerald-400" /> Completed</> : 'Mark Complete'
+              lesson.is_completed ? <><ChevronRight size={16} /> Next Lesson</> : 'Mark Complete & Quiz'
             )}
           </Button>
         </div>
@@ -209,8 +303,8 @@ const LessonPlayer = () => {
                   {msg.role === 'user' ? <UserIcon size={16} /> : <Sparkles size={16} />}
                 </div>
                 <div className={`max-w-[85%] p-4 rounded-2xl text-sm leading-relaxed ${msg.role === 'user'
-                    ? 'bg-indigo-600/10 border border-indigo-500/20 text-indigo-100 rounded-tr-none'
-                    : 'bg-slate-800/50 border border-white/5 text-slate-300 rounded-tl-none prose prose-invert prose-sm max-w-none'
+                  ? 'bg-indigo-600/10 border border-indigo-500/20 text-indigo-100 rounded-tr-none'
+                  : 'bg-slate-800/50 border border-white/5 text-slate-300 rounded-tl-none prose prose-invert prose-sm max-w-none'
                   }`}>
                   {msg.role === 'assistant' ? (
                     <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
@@ -262,9 +356,11 @@ const LessonPlayer = () => {
         </div>
       </div>
 
-      {/* Bottom Navigation */}
       <div className="h-20 border-t border-slate-800 bg-slate-900/80 backdrop-blur-md px-10 flex items-center justify-between shrink-0 z-20">
-        <button className="flex items-center gap-3 text-slate-500 hover:text-white transition-all text-xs font-bold uppercase tracking-widest group">
+        <button
+          onClick={goToPreviousLesson}
+          className="flex items-center gap-3 text-slate-500 hover:text-white transition-all text-xs font-bold uppercase tracking-widest group"
+        >
           <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center group-hover:bg-indigo-500/20 group-hover:text-indigo-400 transition-all">
             <ChevronLeft size={18} className="group-hover:-translate-x-0.5 transition-transform" />
           </div>
@@ -277,13 +373,192 @@ const LessonPlayer = () => {
           </div>
         </div>
 
-        <button className="flex items-center gap-3 text-indigo-400 hover:text-indigo-300 transition-all text-xs font-bold uppercase tracking-widest group">
+        <button
+          onClick={goToNextLesson}
+          className="flex items-center gap-3 text-indigo-400 hover:text-indigo-300 transition-all text-xs font-bold uppercase tracking-widest group"
+        >
           Next
           <div className="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center group-hover:bg-indigo-500 group-hover:text-white transition-all">
             <ChevronRight size={18} className="group-hover:translate-x-0.5 transition-transform" />
           </div>
         </button>
       </div>
+
+      {/* Quiz Overlay */}
+      {showQuiz && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-300">
+          <div className="w-full max-w-4xl bg-slate-900 border border-white/10 rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
+            {/* Quiz Header */}
+            <div className="p-8 border-b border-white/5 bg-indigo-600 flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md">
+                  <BrainCircuit className="text-white" size={24} />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-white leading-tight">Knowledge Validation</h3>
+                  <p className="text-indigo-100 text-xs font-medium uppercase tracking-widest mt-1">Lesson Evaluation • {quizzes.length} Questions</p>
+                </div>
+              </div>
+              <button
+                onClick={() => { setShowQuiz(false); setQuizResult(null); }}
+                className="text-white/50 hover:text-white transition-colors"
+              >
+                <ArrowLeft size={20} />
+              </button>
+            </div>
+
+            {/* Quiz Content Container */}
+            <div className="flex-1 overflow-y-auto p-10 custom-scrollbar bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-indigo-500/5 via-transparent to-transparent">
+              {!quizResult ? (
+                <form onSubmit={handleQuizSubmit} className="space-y-10">
+                  {quizzes.map((quiz, qIdx) => (
+                    <div key={quiz.id} className="space-y-6">
+                      <div className="flex items-start gap-4">
+                        <span className="w-8 h-8 rounded-full bg-slate-800 border border-white/5 flex items-center justify-center text-xs font-bold text-slate-500 shrink-0">
+                          {qIdx + 1}
+                        </span>
+                        <h4 className="text-xl font-bold text-white leading-relaxed">{quiz.question}</h4>
+                      </div>
+
+                      <div className="pl-12">
+                        {quiz.type === 'multiple_choice' || quiz.type === 'true_false' ? (
+                          <div className="grid grid-cols-1 gap-4">
+                            {(quiz.type === 'true_false' ? ['True', 'False'] : quiz.options).map((opt, idx) => (
+                              <button
+                                key={idx}
+                                type="button"
+                                onClick={() => setQuizAnswers(prev => ({ ...prev, [quiz.id]: opt }))}
+                                className={`p-5 rounded-2xl border text-left transition-all duration-300 flex items-center gap-4 ${quizAnswers[quiz.id] === opt
+                                    ? 'bg-indigo-600 border-indigo-400 text-white shadow-lg shadow-indigo-500/20'
+                                    : 'bg-slate-800/40 border-white/5 text-slate-400 hover:border-white/20 hover:bg-slate-800/60'
+                                  }`}
+                              >
+                                <div className={`w-8 h-8 rounded-xl border flex items-center justify-center text-xs font-bold shrink-0 ${quizAnswers[quiz.id] === opt ? 'bg-white text-indigo-600 border-white' : 'border-white/10 text-slate-500 bg-slate-900'
+                                  }`}>
+                                  {String.fromCharCode(65 + idx)}
+                                </div>
+                                <span className="font-medium text-sm md:text-base leading-relaxed">{opt}</span>
+                              </button>
+                            ))}
+                          </div>
+                        ) : quiz.type === 'short_answer' ? (
+                          <div className="relative group">
+                            <textarea
+                              placeholder="Type your detailed answer here..."
+                              className="w-full h-40 bg-slate-900/50 border border-white/10 rounded-2xl p-6 text-white placeholder:text-slate-600 focus:ring-2 focus:ring-indigo-500 outline-none transition-all resize-none shadow-inner"
+                              value={quizAnswers[quiz.id] || ''}
+                              onChange={(e) => setQuizAnswers(prev => ({ ...prev, [quiz.id]: e.target.value }))}
+                            />
+                            <div className="absolute right-4 bottom-4 text-[10px] font-bold text-slate-700 uppercase tracking-widest">Essay Mode</div>
+                          </div>
+                        ) : quiz.type === 'fill_blank' ? (
+                          <div className="relative group max-w-md">
+                            <input
+                              type="text"
+                              placeholder="Complete the statement..."
+                              className="w-full bg-slate-900/50 border border-white/10 rounded-2xl py-5 px-8 text-white placeholder:text-slate-600 focus:ring-2 focus:ring-indigo-500 outline-none transition-all shadow-inner"
+                              value={quizAnswers[quiz.id] || ''}
+                              onChange={(e) => setQuizAnswers(prev => ({ ...prev, [quiz.id]: e.target.value }))}
+                            />
+                            <div className="absolute left-4 -top-3 px-2 bg-slate-900 text-[10px] font-bold text-indigo-400 uppercase tracking-widest">Missing Term</div>
+                          </div>
+                        ) : (
+                          <p className="text-slate-500 italic text-sm">Unsupported question type: {quiz.type}</p>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+
+                  <div className="pt-10 flex justify-center">
+                    <Button
+                      type="submit"
+                      disabled={isSubmittingQuiz || Object.keys(quizAnswers).length < quizzes.length}
+                      className="px-12 py-6 rounded-2xl text-lg font-bold shadow-2xl shadow-indigo-500/20 gap-3"
+                    >
+                      {isSubmittingQuiz ? <Loader2 className="animate-spin" /> : <><Sparkles size={20} /> Submit Evaluation</>}
+                    </Button>
+                  </div>
+                </form>
+              ) : (
+                <div className="max-w-3xl mx-auto space-y-12 animate-in zoom-in-95 duration-500 pb-10">
+                  <div className="text-center relative">
+                    <div className="absolute -inset-4 bg-indigo-500/10 blur-3xl rounded-full"></div>
+                    <div className={`w-32 h-32 rounded-full border-4 flex items-center justify-center mx-auto mb-6 relative transition-all duration-1000 ${quizResult.score >= 70 ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-rose-500/10 border-rose-500/30'
+                      }`}>
+                      <div>
+                        <p className="text-4xl font-display font-bold text-white mb-0">{quizResult.score}%</p>
+                        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest leading-tight">Mastery</p>
+                      </div>
+                    </div>
+                    <h3 className="text-3xl font-bold text-white mb-4">
+                      {quizResult.score >= 70 ? 'Excellent Progress!' : 'Knowledge Gap Detected'}
+                    </h3>
+                    <p className="text-slate-400 text-lg leading-relaxed italic max-w-xl mx-auto">
+                      "{quizResult.feedback}"
+                    </p>
+                  </div>
+
+                  {/* Detailed Question Review */}
+                  <div className="space-y-6 pt-6 border-t border-white/5">
+                    <h4 className="text-xs font-bold text-slate-500 uppercase tracking-[0.2em] mb-8 text-center">Architectural Review</h4>
+                    {quizResult.quizzes && quizResult.quizzes.map((q, idx) => (
+                      <div key={idx} className={`p-8 rounded-3xl border transition-all ${q.is_correct ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-rose-500/5 border-rose-500/20'
+                        }`}>
+                        <div className="flex items-start gap-4 mb-6">
+                          <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 border ${q.is_correct ? 'bg-emerald-500 border-emerald-400 text-white' : 'bg-rose-500 border-rose-400 text-white'
+                            }`}>
+                            {q.is_correct ? <CheckCircle2 size={16} /> : <XCircle size={16} />}
+                          </div>
+                          <h5 className="text-lg font-bold text-white leading-tight mt-1">{q.question}</h5>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pl-12 mb-6">
+                          <div className="p-4 rounded-2xl bg-slate-900 border border-white/5">
+                            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Your Answer</p>
+                            <p className={`text-sm font-bold ${q.is_correct ? 'text-emerald-400' : 'text-rose-400'}`}>{q.student_answer || 'No answer'}</p>
+                          </div>
+                          {!q.is_correct && (
+                            <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20">
+                              <p className="text-[10px] font-bold text-emerald-500/50 uppercase tracking-widest mb-1">Correct Answer</p>
+                              <p className="text-sm font-bold text-emerald-400">{q.correct_answer}</p>
+                            </div>
+                          )}
+                        </div>
+
+                        {q.explanation && (
+                          <div className="pl-12 pt-4 border-t border-white/5">
+                            <p className="text-xs text-slate-400 leading-relaxed">
+                              <span className="font-bold text-indigo-400 uppercase tracking-widest mr-2 text-[10px]">Tutor Note:</span>
+                              {q.explanation}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-10">
+                    <Button
+                      onClick={goToNextLesson}
+                      disabled={quizResult.score < 70}
+                      className={`py-6 rounded-[1.5rem] text-lg font-bold shadow-2xl gap-3 ${quizResult.score >= 70 ? 'bg-indigo-600 shadow-indigo-500/20' : 'opacity-50 grayscale'
+                        }`}
+                    >
+                      Next Lesson <ChevronRight size={22} />
+                    </Button>
+                    <button
+                      onClick={() => { setShowQuiz(false); setQuizResult(null); }}
+                      className="py-4 text-slate-500 hover:text-white transition-all text-xs font-bold uppercase tracking-widest"
+                    >
+                      Back to Module Content
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
