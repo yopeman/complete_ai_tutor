@@ -105,9 +105,9 @@ const TypingDots = () => (
         <span className="text-slate-400 text-sm font-medium">Thinking</span>
         <span className="flex gap-1">
           {[0, 150, 300].map((delay) => (
-            <span 
+            <span
               key={delay}
-              className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce" 
+              className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce"
               style={{ animationDelay: `${delay}ms` }}
             ></span>
           ))}
@@ -128,12 +128,16 @@ const AITutorChat = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  
-  const chatEndRef = useRef(null);
   const textareaRef = useRef(null);
+  const scrollContainerRef = useRef(null);
 
   const scrollToBottom = useCallback(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTo({
+        top: scrollContainerRef.current.scrollHeight,
+        behavior: 'smooth'
+      });
+    }
   }, []);
 
   const fetchAllChats = useCallback(async (isSilent = false) => {
@@ -141,14 +145,14 @@ const AITutorChat = () => {
     try {
       const chats = await chatService.getChats({ limit: 1000 });
       const grouped = {};
-      
+
       // Sort chronologically (oldest first) to build the message history correctly
       const chronologicalChats = [...chats].sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
 
       chronologicalChats.forEach(chat => {
         // Normalize session_id from API; treat each null-session chat as its own entry
         const sid = chat.session_id || `legacy_${chat.id}`;
-        
+
         if (!grouped[sid]) {
           grouped[sid] = {
             id: sid,
@@ -159,7 +163,7 @@ const AITutorChat = () => {
             messages: []
           };
         }
-        
+
         // Update the last message to be the most recent response
         grouped[sid].lastMessage = chat.response.length > 80 ? chat.response.slice(0, 80) + '...' : chat.response;
         grouped[sid].timestamp = new Date(chat.created_at);
@@ -171,17 +175,12 @@ const AITutorChat = () => {
 
       const sortedSessions = Object.values(grouped).sort((a, b) => b.timestamp - a.timestamp);
       setSessions(sortedSessions);
-
-      // If we have a current session selected, update its messages
-      if (currentSessionId && grouped[currentSessionId]) {
-        setMessages(grouped[currentSessionId].messages);
-      } 
     } catch (err) {
       console.error('Failed to fetch chats:', err);
     } finally {
       setIsInitialLoading(false);
     }
-  }, [currentSessionId]);
+  }, []);
 
   useEffect(() => {
     fetchAllChats();
@@ -193,15 +192,17 @@ const AITutorChat = () => {
 
   const handleSend = async (e) => {
     if (e) e.preventDefault();
-    const text = input.trim();
-    if (!text || isLoading) return;
+    if (!input.trim()) return;
 
+    const currentInput = input;
     setInput('');
-    if (textareaRef.current) textareaRef.current.style.height = 'auto';
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+    }
     setIsLoading(true);
 
     // Optimistically add user message if no current messages (starting new)
-    const newUserMsg = { role: 'user', content: text, timestamp: new Date().toISOString() };
+    const newUserMsg = { role: 'user', content: currentInput, timestamp: new Date().toISOString() };
     setMessages(prev => [...prev, newUserMsg]);
 
     try {
@@ -209,14 +210,14 @@ const AITutorChat = () => {
       if (!currentSessionId) setCurrentSessionId(sid);
 
       const formData = new FormData();
-      formData.append('prompt', text);
+      formData.append('prompt', currentInput);
       formData.append('session_id', sid);
 
       const res = await chatService.createChat(formData);
-      
+
       const newBotMsg = { role: 'assistant', content: res.response, timestamp: res.created_at };
       setMessages(prev => [...prev, newBotMsg]);
-      
+
       // Update session list in background
       fetchAllChats(true);
     } catch (err) {
@@ -274,7 +275,7 @@ const AITutorChat = () => {
   const selectSession = async (session) => {
     if (currentSessionId === session.id) return;
     setCurrentSessionId(session.id);
-    
+
     // Clear messages immediately for clean transition
     setMessages([]);
     setInput('');
@@ -284,7 +285,7 @@ const AITutorChat = () => {
       const history = await chatService.getChats({ session_id: session.id, limit: 1000 });
       // Sort chronologically (oldest first) to build the message history correctly
       const sortedHistory = [...history].sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
-      
+
       const sessionMessages = sortedHistory.flatMap(chat => [
         { role: 'user', content: chat.prompt, timestamp: chat.created_at },
         { role: 'assistant', content: chat.response, timestamp: chat.created_at }
@@ -306,10 +307,10 @@ const AITutorChat = () => {
 
     try {
       await chatService.deleteSession(sessionId);
-      
+
       // Update local state
       setSessions(prev => prev.filter(s => s.id !== sessionId));
-      
+
       // If we deleted the current active session, reset state
       if (currentSessionId === sessionId) {
         startNewChat();
@@ -326,8 +327,8 @@ const AITutorChat = () => {
     e.target.style.height = Math.min(e.target.scrollHeight, 150) + 'px';
   };
 
-  const filteredSessions = sessions.filter(s => 
-    s.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+  const filteredSessions = sessions.filter(s =>
+    s.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     s.lastMessage.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -398,8 +399,8 @@ const AITutorChat = () => {
                     onClick={() => selectSession(session)}
                     className={twMerge(
                       "w-full text-left px-4 py-3.5 rounded-2xl transition-all duration-200 group relative overflow-hidden",
-                      isActive 
-                        ? "bg-indigo-600/10 border border-indigo-500/30" 
+                      isActive
+                        ? "bg-indigo-600/10 border border-indigo-500/30"
                         : "hover:bg-white/[0.03] border border-transparent hover:border-white/5"
                     )}
                   >
@@ -425,11 +426,9 @@ const AITutorChat = () => {
                               {session.timestamp.toLocaleDateString([], { month: 'short', day: 'numeric' })}
                             </span>
                           </div>
-                          <span className="w-1 h-1 rounded-full bg-slate-700"></span>
-                          <span className="text-[10px] font-medium">{session.messageTotal * 2} messages</span>
                         </div>
                       </div>
-                      <div className="flex flex-col items-center gap-2">
+                      <div className="flex flex-col items-center gap-2 w-8 shrink-0">
                         <button
                           onClick={(e) => handleDeleteChat(e, session.id)}
                           className="p-1.5 rounded-lg text-slate-700 hover:text-red-400 hover:bg-red-400/10 transition-all opacity-0 group-hover:opacity-100"
@@ -471,10 +470,9 @@ const AITutorChat = () => {
         <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-violet-600/5 rounded-full blur-[100px] translate-y-1/4 -translate-x-1/4 pointer-events-none"></div>
 
         {/* Header */}
-        {/* Header */}
         <header className="h-16 flex items-center justify-between px-6 border-b border-white/5 bg-slate-950/95 backdrop-blur-xl sticky top-0 z-30 shrink-0">
           <div className="flex items-center gap-4">
-            <button 
+            <button
               onClick={() => navigate('/dashboard')}
               className="p-2 hover:bg-white/10 rounded-xl transition-all text-slate-400 hover:text-white hover:scale-105 active:scale-95 flex items-center justify-center bg-white/5 border border-white/10 shadow-sm"
               title="Back to Dashboard"
@@ -485,9 +483,9 @@ const AITutorChat = () => {
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-lg">
                 <Sparkles size={16} className="text-white" />
               </div>
-              <div>
+              <div className="w-48 shrink-0">
                 <h1 className="text-sm font-bold tracking-tight">Academic Tutor</h1>
-                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">
+                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest truncate">
                   {currentSessionId ? `Session active` : 'New Discussion'}
                 </p>
               </div>
@@ -511,11 +509,11 @@ const AITutorChat = () => {
         </header>
 
         {/* Chat Messages */}
-        <div className="flex-1 overflow-y-auto relative z-10 custom-scrollbar">
-          <div className="max-w-4xl mx-auto w-full flex flex-col min-h-full">
-            {messages.length === 0 ? (
-              <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 text-center">
-                <div className="relative mb-8 group">
+        <div ref={scrollContainerRef} className="flex-1 overflow-y-auto relative z-10 custom-scrollbar">
+          <div className="max-w-4xl mx-auto w-full flex flex-col min-h-full relative">
+            {messages.length === 0 && !currentSessionId ? (
+              <div className="flex-1 flex flex-col items-center px-6 pt-28 pb-12 text-center">
+                <div className="relative mb-8 group shrink-0">
                   <div className="absolute inset-0 bg-indigo-500/20 blur-3xl rounded-full scale-150 animate-pulse transition-all group-hover:bg-indigo-500/30"></div>
                   <div className="relative w-24 h-24 rounded-[2rem] bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-2xl shadow-indigo-600/40 transform -rotate-3 transition-transform group-hover:rotate-0">
                     <GraduationCap size={48} className="text-white" />
@@ -569,16 +567,15 @@ const AITutorChat = () => {
                   <ChatBubble key={idx} msg={msg} />
                 ))}
                 {isLoading && <TypingDots />}
-                <div ref={chatEndRef} />
               </div>
             )}
           </div>
         </div>
 
         {/* Input Bar */}
-        <div className="px-6 py-6 border-t border-white/5 bg-slate-900/40 backdrop-blur-xl relative z-20">
-          <form 
-            onSubmit={handleSend} 
+        <div className="px-6 py-4 border-t border-white/5 bg-slate-900/40 backdrop-blur-xl relative z-20">
+          <form
+            onSubmit={handleSend}
             className="max-w-4xl mx-auto relative group"
           >
             <div className="relative flex items-end gap-3 p-3 bg-white/5 border border-white/10 rounded-3xl focus-within:border-indigo-500/50 focus-within:ring-4 focus-within:ring-indigo-500/10 transition-all duration-500 shadow-2xl shadow-black/40">
@@ -598,9 +595,9 @@ const AITutorChat = () => {
                 disabled={isLoading}
               />
               <div className="flex items-center gap-2 pb-1 pr-1">
-                <VoiceInputButton 
-                  onRecordingComplete={handleVoiceComplete} 
-                  isDisabled={isLoading} 
+                <VoiceInputButton
+                  onRecordingComplete={handleVoiceComplete}
+                  isDisabled={isLoading}
                 />
                 <button
                   type="submit"
@@ -623,7 +620,7 @@ const AITutorChat = () => {
                 </button>
               </div>
             </div>
-            <div className="flex items-center justify-between px-6 mt-3">
+            <div className="flex items-center justify-between px-6 mt-2">
               <div className="flex gap-4">
                 <div className="flex items-center gap-1.5 text-slate-600 group-hover:text-slate-500 transition-colors">
                   <kbd className="h-5 px-1.5 flex items-center bg-white/5 border border-white/10 rounded text-[9px] font-mono font-bold">ENTER</kbd>
@@ -640,7 +637,8 @@ const AITutorChat = () => {
         </div>
       </main>
 
-      <style dangerouslySetInnerHTML={{ __html: `
+      <style dangerouslySetInnerHTML={{
+        __html: `
         .custom-scrollbar::-webkit-scrollbar {
           width: 5px;
         }
