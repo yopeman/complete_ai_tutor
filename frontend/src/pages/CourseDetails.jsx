@@ -16,10 +16,9 @@ import {
     Edit3,
     Wand2,
     Save,
-    RotateCcw,
-    ChevronDown,
     ChevronUp,
-    Mic
+    Mic,
+    Trash2
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -130,6 +129,21 @@ const CourseDetails = () => {
         }
     };
 
+    const handleDeleteCourse = async () => {
+        if (!window.confirm('Are you sure you want to delete this course? This action cannot be undone.')) return;
+
+        setIsUpdating(true);
+        try {
+            await api.delete(`/courses/${courseId}`);
+            navigate('/dashboard');
+        } catch (error) {
+            console.error('Error deleting course:', error);
+            alert('Failed to delete course. Please try again.');
+        } finally {
+            setIsUpdating(false);
+        }
+    };
+
     const handleDirectUpdate = async () => {
         setIsUpdating(true);
         try {
@@ -179,6 +193,15 @@ const CourseDetails = () => {
                             <div className="flex items-center gap-1.5 text-slate-500 text-xs font-bold uppercase tracking-widest">
                                 <Calendar size={12} /> {course.estimated_duration_days || '--'} Day Program
                             </div>
+                            <div className="flex-1"></div>
+                            <button
+                                onClick={handleDeleteCourse}
+                                className="flex items-center gap-2 px-4 py-2 rounded-xl text-slate-500 hover:text-red-400 hover:bg-red-400/10 transition-all font-bold uppercase tracking-widest text-[10px]"
+                                disabled={isUpdating}
+                                title="Delete Course"
+                            >
+                                <Trash2 size={14} /> Delete Path
+                            </button>
                         </div>
                         <h1 className="text-5xl font-display font-bold text-white mb-6 leading-tight">{course.title}</h1>
                         <p className="text-slate-400 text-xl leading-relaxed max-w-3xl">

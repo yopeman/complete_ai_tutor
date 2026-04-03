@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import api from '../services/api';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
-import { Sparkles, BookOpen, Clock, ChevronRight, Loader2, XCircle, RotateCcw } from 'lucide-react';
+import { Sparkles, BookOpen, Clock, ChevronRight, Loader2, XCircle, RotateCcw, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -110,6 +110,20 @@ const Dashboard = () => {
             console.error('Voice generation failed:', error);
         } finally {
             setIsGenerating(false);
+        }
+    };
+
+    const handleDeleteCourse = async (e, courseId) => {
+        e.stopPropagation(); // Prevent card click
+        if (!window.confirm('Are you sure you want to delete this course? This action cannot be undone.')) return;
+
+        try {
+            await api.delete(`/courses/${courseId}`);
+            // Remove from local state
+            setCourses(courses.filter(c => c.id !== courseId));
+        } catch (error) {
+            console.error('Error deleting course:', error);
+            alert('Failed to delete course. Please try again.');
         }
     };
 
@@ -255,9 +269,18 @@ const Dashboard = () => {
                                         <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${course.status === 'completed' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-indigo-500/10 text-indigo-100'}`}>
                                             {course.status || 'In Progress'}
                                         </span>
-                                        <button className="text-white/20 group-hover:text-white transition-colors">
-                                            <ChevronRight size={20} />
-                                        </button>
+                                        <div className="flex items-center gap-2">
+                                            <button
+                                                onClick={(e) => handleDeleteCourse(e, course.id)}
+                                                className="p-1.5 rounded-lg text-white/20 hover:text-red-400 hover:bg-red-400/10 transition-all duration-200"
+                                                title="Delete Course"
+                                            >
+                                                <Trash2 size={16} />
+                                            </button>
+                                            <button className="text-white/20 group-hover:text-white transition-colors">
+                                                <ChevronRight size={20} />
+                                            </button>
+                                        </div>
                                     </div>
                                     <h3 className="text-xl font-bold text-white mb-6 group-hover:text-indigo-400 transition-colors line-clamp-2 leading-tight">
                                         {course.title}
