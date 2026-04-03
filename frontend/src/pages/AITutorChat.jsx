@@ -19,7 +19,11 @@ import {
   Code2,
   Brain,
   ArrowLeft,
-  Trash2
+  Trash2,
+  Volume2,
+  Square,
+  Play,
+  Pause
 } from 'lucide-react';
 import chatService from '../services/chatService';
 import ReactMarkdown from 'react-markdown';
@@ -41,10 +45,48 @@ const SUGGESTIONS = [
 
 // ─── Single message bubble ───
 const ChatBubble = ({ msg }) => {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
   const isUser = msg.role === 'user';
   const time = msg.timestamp
     ? new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     : '';
+
+  const handleSpeak = () => {
+    if (isPlaying) {
+      if (isPaused) {
+        window.speechSynthesis.resume();
+        setIsPaused(false);
+      } else {
+        window.speechSynthesis.pause();
+        setIsPaused(true);
+      }
+    } else {
+      window.speechSynthesis.cancel(); // Cancel any current speech
+      const utterance = new SpeechSynthesisUtterance(msg.content);
+      
+      utterance.onend = () => {
+        setIsPlaying(false);
+        setIsPaused(false);
+      };
+      utterance.onerror = () => {
+        setIsPlaying(false);
+        setIsPaused(false);
+      };
+      
+      window.speechSynthesis.speak(utterance);
+      setIsPlaying(true);
+      setIsPaused(false);
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      if (isPlaying) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, [isPlaying]);
 
   return (
     <div className={twMerge('flex gap-3 mb-4', isUser ? 'flex-row-reverse' : 'flex-row')}>
@@ -73,19 +115,43 @@ const ChatBubble = ({ msg }) => {
           {isUser ? (
             <p className="text-sm md:text-base leading-relaxed whitespace-pre-wrap">{msg.content}</p>
           ) : (
-            <div
-              className="prose prose-invert prose-sm md:prose-base max-w-none
-                prose-p:text-slate-200 prose-p:my-1.5 prose-p:leading-relaxed
-                prose-headings:text-white prose-headings:font-semibold prose-headings:mt-4 prose-headings:mb-2
-                prose-strong:text-white prose-strong:font-bold
-                prose-code:bg-slate-900/90 prose-code:text-emerald-400 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-xs md:prose-code:text-sm prose-code:before:content-none prose-code:after:content-none
-                prose-pre:bg-slate-900 prose-pre:border prose-pre:border-slate-800 prose-pre:rounded-xl prose-pre:my-3 prose-pre:p-4
-                prose-ul:my-2 prose-li:text-slate-300 prose-li:my-0.5
-                prose-blockquote:border-indigo-500/50 prose-blockquote:bg-indigo-500/5 prose-blockquote:py-1 prose-blockquote:px-4 prose-blockquote:rounded-r-lg
-                prose-a:text-indigo-400 prose-a:no-underline hover:prose-a:underline"
-            >
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
-            </div>
+            <>
+              <div
+                className="prose prose-invert prose-sm md:prose-base max-w-none
+                  prose-p:text-slate-200 prose-p:my-1.5 prose-p:leading-relaxed
+                  prose-headings:text-white prose-headings:font-semibold prose-headings:mt-4 prose-headings:mb-2
+                  prose-strong:text-white prose-strong:font-bold
+                  prose-code:bg-slate-900/90 prose-code:text-emerald-400 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-xs md:prose-code:text-sm prose-code:before:content-none prose-code:after:content-none
+                  prose-pre:bg-slate-900 prose-pre:border prose-pre:border-slate-800 prose-pre:rounded-xl prose-pre:my-3 prose-pre:p-4
+                  prose-ul:my-2 prose-li:text-slate-300 prose-li:my-0.5
+                  prose-blockquote:border-indigo-500/50 prose-blockquote:bg-indigo-500/5 prose-blockquote:py-1 prose-blockquote:px-4 prose-blockquote:rounded-r-lg
+                  prose-a:text-indigo-400 prose-a:no-underline hover:prose-a:underline"
+              >
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
+              </div>
+              <div className="flex justify-end mt-3 -mr-2 -mb-1 border-t border-white/5 pt-2">
+                <button
+                  onClick={handleSpeak}
+                  className={twMerge(
+                    "p-1.5 rounded-md transition-all flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider",
+                    isPlaying 
+                      ? "text-indigo-400 bg-indigo-500/10" 
+                      : "text-slate-400 hover:text-indigo-300 hover:bg-white/5"
+                  )}
+                  title={isPlaying ? (isPaused ? "Resume reading" : "Pause reading") : "Listen to response"}
+                >
+                  {isPlaying ? (
+                    isPaused ? (
+                      <><Play size={12} fill="currentColor" /> Resume</>
+                    ) : (
+                      <><Pause size={12} fill="currentColor" /> Pause</>
+                    )
+                  ) : (
+                    <><Volume2 size={12} /> Read Aloud</>
+                  )}
+                </button>
+              </div>
+            </>
           )}
         </div>
         {time && <span className="text-[10px] text-slate-500 mt-1.5 px-1 font-medium">{time}</span>}
