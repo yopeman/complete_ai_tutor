@@ -3,7 +3,7 @@ import api from '../services/api';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import { Sparkles, BookOpen, Clock, ChevronRight, Loader2, XCircle, RotateCcw, Trash2 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import VoiceInputButton from '../components/chat/VoiceInputButton';
@@ -17,7 +17,14 @@ const Dashboard = () => {
     const [sessionId, setSessionId] = useState(null);
 
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    const searchQuery = searchParams.get('search') || '';
     const inputRef = useRef(null);
+
+    const filteredCourses = courses.filter(course =>
+        course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (course.description && course.description.toLowerCase().includes(searchQuery.toLowerCase()))
+    );
 
     useEffect(() => {
         fetchCourses();
@@ -260,9 +267,9 @@ const Dashboard = () => {
                             <div key={i} className="h-64 bg-slate-800/20 rounded-3xl animate-pulse border border-slate-800"></div>
                         ))}
                     </div>
-                ) : courses.length > 0 ? (
+                ) : filteredCourses.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {courses.map((course) => (
+                        {filteredCourses.map((course) => (
                             <Card key={course.id} className="group flex flex-col h-full cursor-pointer hover:ring-2 hover:ring-indigo-500/50 transition-all duration-300" onClick={() => navigate(`/courses/${course.id}`)}>
                                 <div className="flex-1">
                                     <div className="flex items-center justify-between mb-4">
@@ -303,6 +310,15 @@ const Dashboard = () => {
                                 </div>
                             </Card>
                         ))}
+                    </div>
+                ) : searchQuery ? (
+                    <div className="text-center py-20 bg-slate-800/10 border-2 border-dashed border-slate-800 rounded-[2.5rem]">
+                        <div className="w-16 h-16 bg-slate-800 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                            <XCircle className="text-slate-600" size={32} />
+                        </div>
+                        <h3 className="text-xl font-bold text-white mb-2">No Matches Found</h3>
+                        <p className="text-slate-500">We couldn't find any courses matching "{searchQuery}"</p>
+                        <button onClick={() => navigate('/dashboard')} className="mt-6 text-indigo-400 hover:text-indigo-300 font-bold uppercase tracking-widest text-xs">Clear Search</button>
                     </div>
                 ) : (
                     <div className="text-center py-20 bg-slate-800/10 border-2 border-dashed border-slate-800 rounded-[2.5rem]">
