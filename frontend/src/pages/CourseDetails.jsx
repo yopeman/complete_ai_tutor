@@ -152,98 +152,100 @@ const CourseDetails = () => {
                         </p>
                     </section>
 
-                    {/* Course Architecture Refinement (New Feature) */}
-                    <section className="bg-slate-900/50 border border-white/5 rounded-[2.5rem] overflow-hidden">
-                        <div className="p-8 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
+                    {/* Course Architecture Refinement (Hackathon-Winning Layout) */}
+                    <section className="bg-slate-900/40 border border-white/5 rounded-[2.5rem] overflow-hidden shadow-2xl">
+                        <div className="p-8 border-b border-white/5 bg-white/[0.01] flex items-center justify-between">
                             <h2 className="text-xl font-bold text-white flex items-center gap-3">
-                                <Sparkles className="text-indigo-400" size={24} /> Course Architecture
+                                <Sparkles className="text-indigo-400 animate-pulse" size={24} /> Course Blueprint
                             </h2>
-                            <div className="flex gap-2">
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => { setIsEditingAi(!isEditingAi); setIsEditingDirect(false); }}
-                                    className={`gap-2 ${isEditingAi ? 'bg-indigo-500/10 border-indigo-500/50 text-indigo-400' : ''}`}
-                                >
-                                    <Wand2 size={16} /> Refine with AI
-                                </Button>
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => { setIsEditingDirect(!isEditingDirect); setIsEditingAi(false); }}
-                                    className={`gap-2 ${isEditingDirect ? 'bg-indigo-500/10 border-indigo-500/50 text-indigo-400' : ''}`}
-                                >
-                                    <Edit3 size={16} /> Manual Edit
-                                </Button>
-                            </div>
-                        </div>
-
-                        {/* AI Refinement Panel */}
-                        {isEditingAi && (
-                            <div className="p-8 bg-indigo-500/5 border-b border-white/5 animate-in slide-in-from-top-4 duration-300">
-                                <form onSubmit={handleAiUpdate} className="space-y-4">
-                                    <label className="text-xs font-bold text-indigo-300 uppercase tracking-widest">How should we improve this course?</label>
-                                    <div className="relative group">
-                                        <input
-                                            type="text"
-                                            placeholder="e.g. Add more focus on advanced async patterns or make it intensive for 3 days..."
-                                            className="w-full bg-slate-950 border border-white/10 rounded-2xl py-4 pl-5 pr-32 text-white placeholder:text-slate-600 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
-                                            value={aiPrompt}
-                                            onChange={(e) => setAiPrompt(e.target.value)}
-                                            disabled={isUpdating}
-                                        />
-                                        <div className="absolute right-2 top-2 bottom-2">
-                                            <Button type="submit" disabled={isUpdating || !aiPrompt.trim()} className="h-full px-6 rounded-xl gap-2 shadow-lg">
-                                                {isUpdating ? <Loader2 className="animate-spin" size={18} /> : <><Sparkles size={16} /> Refine</>}
-                                            </Button>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                        )}
-
-                        {/* Direct Edit Panel */}
-                        {isEditingDirect && (
-                            <div className="p-8 bg-slate-950/50 border-b border-white/5 animate-in slide-in-from-top-4 duration-300">
-                                <div className="space-y-4">
-                                    <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">Manual Markdown Course Plan</label>
-                                    <textarea
-                                        className="w-full h-80 bg-slate-950 border border-white/10 rounded-2xl p-6 text-slate-300 font-mono text-sm focus:ring-2 focus:ring-indigo-500 outline-none transition-all resize-none"
-                                        value={manualPlan}
-                                        onChange={(e) => setManualPlan(e.target.value)}
-                                        disabled={isUpdating}
-                                    />
-                                    <div className="flex justify-end gap-3">
-                                        <Button variant="outline" onClick={() => setIsEditingDirect(false)}>Cancel</Button>
-                                        <Button onClick={handleDirectUpdate} disabled={isUpdating} className="gap-2 px-8">
-                                            {isUpdating ? <Loader2 className="animate-spin" /> : <><Save size={18} /> Save Plan</>}
-                                        </Button>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-
-                        <div className="p-8">
                             <button
                                 onClick={() => setShowPlan(!showPlan)}
-                                className="flex items-center gap-2 text-slate-500 hover:text-white transition-colors text-sm font-bold uppercase tracking-widest mb-4"
+                                className="flex items-center gap-2 text-indigo-400 hover:text-indigo-300 transition-all text-xs font-bold uppercase tracking-[0.2em] group"
                             >
-                                {showPlan ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                                {showPlan ? 'Hide Blueprint' : 'View Architecture Blueprint'}
+                                {showPlan ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                                <span className="group-hover:translate-x-1 transition-transform">{showPlan ? 'Hide Draft' : 'View Blueprint'}</span>
                             </button>
+                        </div>
 
+                        {/* Blueprint Visualization */}
+                        <div className="p-8 space-y-8">
                             {showPlan && (
-                                <div className="p-8 bg-slate-950/40 rounded-[2.5rem] border border-white/5 animate-in fade-in slide-in-from-top-4 duration-500 overflow-hidden shadow-inner">
+                                <div className="p-8 bg-slate-950/60 rounded-[2rem] border border-white/5 animate-in zoom-in-95 fade-in duration-500 shadow-inner">
                                     <div className="prose prose-invert prose-indigo max-w-none 
                                         prose-headings:font-display prose-headings:font-bold prose-headings:tracking-tight
-                                        prose-h1:text-3xl prose-h1:mb-8 prose-h2:text-xl prose-h2:mt-10 prose-h2:mb-4 prose-h2:text-indigo-400 prose-h2:pb-2 prose-h2:border-b prose-h2:border-white/5
-                                        prose-p:text-slate-400 prose-p:leading-relaxed prose-p:mb-6
-                                        prose-ul:list-disc prose-ul:pl-6 prose-li:text-slate-400 prose-li:my-2
-                                        prose-strong:text-white prose-strong:font-bold
-                                        prose-code:text-indigo-300 prose-code:bg-indigo-500/10 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-md prose-code:before:content-none prose-code:after:content-none
+                                        prose-h2:text-xl prose-h2:mt-10 prose-h2:mb-4 prose-h2:text-indigo-400 prose-h2:pb-2 prose-h2:border-b prose-h2:border-white/5
+                                        prose-p:text-slate-400 prose-p:leading-relaxed
+                                        prose-li:text-slate-400 prose-code:text-indigo-300
                                     ">
                                         <ReactMarkdown remarkPlugins={[remarkGfm]}>{course.course_plan || "*No blueprint drafted.*"}</ReactMarkdown>
                                     </div>
+                                </div>
+                            )}
+
+                            {/* Refinement Controls (BELOW the blueprint) - Only show if not deployed */}
+                            {lessons.length === 0 && (
+                                <div className="pt-6 border-t border-white/5">
+                                    <div className="flex flex-wrap gap-4 items-center mb-6">
+                                        <div className="flex items-center gap-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest mr-4">
+                                            <div className="w-1 h-1 bg-indigo-500 rounded-full animate-ping"></div>
+                                            Architectural Refinement
+                                        </div>
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => { setIsEditingAi(!isEditingAi); setIsEditingDirect(false); }}
+                                            className={`gap-2 rounded-xl transition-all ${isEditingAi ? 'bg-indigo-500 text-white border-indigo-500 shadow-lg shadow-indigo-500/20' : 'hover:bg-white/5'}`}
+                                        >
+                                            <Wand2 size={16} /> Refine with AI
+                                        </Button>
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => { setIsEditingDirect(!isEditingDirect); setIsEditingAi(false); }}
+                                            className={`gap-2 rounded-xl transition-all ${isEditingDirect ? 'bg-indigo-500 text-white border-indigo-500 shadow-lg shadow-indigo-500/20' : 'hover:bg-white/5'}`}
+                                        >
+                                            <Edit3 size={16} /> Manual Blueprint Edit
+                                        </Button>
+                                    </div>
+
+                                    {/* AI Refinement Panel */}
+                                    {isEditingAi && (
+                                        <div className="p-6 bg-indigo-500/5 border border-indigo-500/10 rounded-3xl animate-in slide-in-from-bottom-4 duration-300">
+                                            <form onSubmit={handleAiUpdate} className="relative group">
+                                                <input
+                                                    type="text"
+                                                    placeholder="Ask the AI Architect to add, remove, or modify topics..."
+                                                    className="w-full bg-slate-950 border border-white/10 rounded-2xl py-5 pl-6 pr-40 text-white placeholder:text-slate-600 focus:ring-2 focus:ring-indigo-500 outline-none transition-all shadow-xl"
+                                                    value={aiPrompt}
+                                                    onChange={(e) => setAiPrompt(e.target.value)}
+                                                    disabled={isUpdating}
+                                                />
+                                                <div className="absolute right-2 top-2 bottom-2">
+                                                    <Button type="submit" disabled={isUpdating || !aiPrompt.trim()} className="h-full px-8 rounded-xl gap-2 font-bold uppercase tracking-widest text-xs">
+                                                        {isUpdating ? <Loader2 className="animate-spin" size={18} /> : 'Process Update'}
+                                                    </Button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    )}
+
+                                    {/* Direct Edit Panel */}
+                                    {isEditingDirect && (
+                                        <div className="p-6 bg-slate-950/80 border border-white/10 rounded-3xl animate-in slide-in-from-bottom-4 duration-300">
+                                            <textarea
+                                                className="w-full h-80 bg-slate-950 border border-white/10 rounded-2xl p-6 text-slate-300 font-mono text-sm focus:ring-2 focus:ring-indigo-500 outline-none transition-all resize-none shadow-xl"
+                                                value={manualPlan}
+                                                onChange={(e) => setManualPlan(e.target.value)}
+                                                disabled={isUpdating}
+                                            />
+                                            <div className="flex justify-end gap-3 pt-4">
+                                                <Button variant="outline" size="sm" onClick={() => setIsEditingDirect(false)}>Cancel</Button>
+                                                <Button onClick={handleDirectUpdate} disabled={isUpdating} className="gap-2 px-8 rounded-xl font-bold uppercase tracking-widest text-xs">
+                                                    {isUpdating ? <Loader2 className="animate-spin" /> : <><Save size={18} /> Save & Apply Blueprint</>}
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             )}
                         </div>
