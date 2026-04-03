@@ -45,7 +45,7 @@ async def create_chat(
         prompt = await transcribe_uploaded_file(audio_file)
         
     chat_data = ChatCreate(prompt=prompt, session_id=session_id)
-    return await create_chat_controller(chat_data, current_user, db, settings)
+    return await create_chat_controller(chat_data, current_user, db)
 
 
 @router.get("/{chat_id}", response_model=ChatResponse)
