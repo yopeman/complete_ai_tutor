@@ -1,5 +1,6 @@
-from fastapi import APIRouter, Depends, status, Query
+from fastapi import APIRouter, Depends, status, Query, Form, File, UploadFile, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
+from app.services.tts_and_stt import transcribe_uploaded_file
 from typing import List, Optional
 from app.database import get_db
 from app.dependencies import get_current_active_user
@@ -33,11 +34,20 @@ router = APIRouter(prefix="/courses", tags=["Courses"])
 
 @router.post("", response_model=ChatWithCourseResponse, status_code=status.HTTP_201_CREATED)
 async def create_course(
-    chat_data: ChatCreate,
+    prompt: Optional[str] = Form(None),
+    session_id: Optional[str] = Form(None),
+    audio_file: Optional[UploadFile] = File(None),
     current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db)
 ):
     """Create a new course using the Initialize Agent."""
+    if not prompt and not audio_file:
+        raise HTTPException(status_code=400, detail="Either prompt or audio_file must be provided")
+    
+    if not prompt and audio_file:
+        prompt = await transcribe_uploaded_file(audio_file)
+        
+    chat_data = ChatCreate(prompt=prompt, session_id=session_id)
     return await create_course_controller(chat_data, current_user, db)
 
 
@@ -65,11 +75,20 @@ async def get_course(
 @router.put("/{course_id}/plans/ai", response_model=CourseResponse)
 async def update_course_plan_ai(
     course_id: int,
-    chat_data: ChatCreate,
+    prompt: Optional[str] = Form(None),
+    session_id: Optional[str] = Form(None),
+    audio_file: Optional[UploadFile] = File(None),
     current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db)
 ):
     """Update a course plan by using prompt and AI."""
+    if not prompt and not audio_file:
+        raise HTTPException(status_code=400, detail="Either prompt or audio_file must be provided")
+    
+    if not prompt and audio_file:
+        prompt = await transcribe_uploaded_file(audio_file)
+        
+    chat_data = ChatCreate(prompt=prompt, session_id=session_id)
     return await update_course_plan_ai_controller(course_id, chat_data, current_user, db)
 
 

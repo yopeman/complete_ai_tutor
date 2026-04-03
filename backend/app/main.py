@@ -1,9 +1,15 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
-
 from app.database import engine, Base
-from app.routers import auth, courses, lessons, interactions, quizzes, progress, flashcards, chats
+from app.routers import auth, courses, lessons, interactions, quizzes, progress, flashcards, chats, tts_and_stt
+import sys
+import os
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+AUDIO_CACHE_DIR = 'audio_cache'
+os.makedirs(AUDIO_CACHE_DIR, exist_ok=True)
 
 
 @asynccontextmanager
@@ -45,6 +51,10 @@ app.include_router(quizzes.router, tags=["Quizzes"])
 app.include_router(progress.router, tags=["Progress"])
 app.include_router(flashcards.router, tags=["Flashcards"])
 app.include_router(chats.router, tags=["Chats"])
+app.include_router(tts_and_stt.router, tags=["TTS and STT"])
+
+# Serve static files
+app.mount("/audio_cache", StaticFiles(directory=AUDIO_CACHE_DIR), name="audio_cache")
 
 
 @app.get("/")
