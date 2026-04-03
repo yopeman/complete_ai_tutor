@@ -34,6 +34,16 @@ const chatService = {
     const response = await api.get(`/chats/${chatId}`);
     return response.data;
   },
+
+  /**
+   * Delete a specific chat session by ID.
+   * @param {string} sessionId - The session ID to delete
+   * @returns {Promise} - Resolves to 204 No Content
+   */
+  deleteSession: async (sessionId) => {
+    const response = await api.delete(`/chats/sessions/${sessionId}`);
+    return response.data;
+  },
 };
 
 export default chatService;
