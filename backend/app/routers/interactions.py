@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Query
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from typing import List
@@ -6,27 +6,12 @@ from app.database import get_db
 from app.dependencies import get_current_active_user
 from app.models import User, Interaction, Lesson, Course
 from app.schemas import InteractionCreate, InteractionResponse
+from app.controllers.interactions import (
+    get_interactions as get_interactions_controller,
+    get_interaction as get_interaction_controller,
+)
 
 router = APIRouter(prefix="/interactions", tags=["Interactions"])
-
-
-async def verify_interaction_access(interaction_id: int, user_id: int, db: AsyncSession) -> Interaction:
-    """Verify that an interaction belongs to the user's course."""
-    result = await db.execute(
-        select(Interaction)
-        .join(Lesson)
-        .join(Course)
-        .where(Interaction.id == interaction_id, Course.user_id == user_id)
-    )
-    interaction = result.scalar_one_or_none()
-    
-    if not interaction:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Interaction not found"
-        )
-    
-    return interaction
 
 
 @router.get("", response_model=List[InteractionResponse])
@@ -37,23 +22,8 @@ async def get_interactions(
     current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db)
 ):
-    """Get all interactions for the current user."""
-    query = (
-        select(Interaction)
-        .join(Lesson)
-        .join(Course)
-        .where(Course.user_id == current_user.id)
-    )
-    
-    if lesson_id:
-        query = query.where(Interaction.lesson_id == lesson_id)
-    
-    query = query.order_by(Interaction.created_at).offset(skip).limit(limit)
-    
-    result = await db.execute(query)
-    interactions = result.scalars().all()
-    
-    return interactions
+    """Get all interactions for current user."""
+    return await get_interactions_controller(lesson_id, skip, limit, current_user, db)
 
 
 @router.get("/{interaction_id}", response_model=InteractionResponse)
@@ -63,5 +33,4 @@ async def get_interaction(
     db: AsyncSession = Depends(get_db)
 ):
     """Get a specific interaction by ID."""
-    interaction = await verify_interaction_access(interaction_id, current_user.id, db)
-    return interaction
+    return await get_interaction_controller(interaction_id, current_user, db)
