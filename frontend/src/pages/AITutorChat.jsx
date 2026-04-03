@@ -1,28 +1,30 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
-    Send,
-    Sparkles,
-    User,
-    Plus,
-    MessageCircle,
-    History,
-    Search,
-    Loader2,
-    Clock,
-    Bot,
-    Zap,
-    BookOpen,
-    GraduationCap,
-    Lightbulb,
-    RotateCcw,
-    ChevronRight,
-    Code2,
-    Brain
+  Send,
+  Sparkles,
+  User,
+  Plus,
+  MessageCircle,
+  History,
+  Search,
+  Loader2,
+  Clock,
+  Bot,
+  Zap,
+  BookOpen,
+  GraduationCap,
+  Lightbulb,
+  RotateCcw,
+  ChevronRight,
+  Code2,
+  Brain,
+  ArrowLeft
 } from 'lucide-react';
 import chatService from '../services/chatService';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import { twMerge } from 'tailwind-merge';
 
 // ─── Suggestion prompts for empty state ───
@@ -37,47 +39,47 @@ const SUGGESTIONS = [
 
 // ─── Single message bubble ───
 const ChatBubble = ({ msg }) => {
-    const isUser = msg.role === 'user';
-    const time = msg.timestamp
-        ? new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        : '';
+  const isUser = msg.role === 'user';
+  const time = msg.timestamp
+    ? new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    : '';
 
-    return (
-        <div className={twMerge('flex gap-3', isUser ? 'flex-row-reverse' : 'flex-row')}>
-            {/* Avatar */}
+  return (
+    <div className={twMerge('flex gap-3', isUser ? 'flex-row-reverse' : 'flex-row')}>
+      {/* Avatar */}
+      <div
+        className={twMerge(
+          'w-9 h-9 rounded-xl flex items-center justify-center shrink-0 mt-1 shadow-lg',
+          isUser
+            ? 'bg-gradient-to-br from-indigo-500 to-violet-600'
+            : 'bg-gradient-to-br from-emerald-500 to-teal-600'
+        )}
+      >
+        {isUser ? <User size={16} className="text-white" /> : <Bot size={16} className="text-white" />}
+      </div>
+
+      {/* Content */}
+      <div className={twMerge('flex flex-col max-w-[95%]', isUser ? 'items-end' : 'items-start')}>
+        <div
+          className={twMerge(
+            'px-5 py-3.5 rounded-2xl shadow-md',
+            isUser
+              ? 'bg-indigo-600 text-white rounded-tr-sm'
+              : 'bg-white/[0.02] border border-white/5 backdrop-blur-sm text-slate-200 rounded-tl-sm'
+          )}
+        >
+          {isUser ? (
+            <p className="text-base leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+          ) : (
             <div
-                className={twMerge(
-                    'w-9 h-9 rounded-xl flex items-center justify-center shrink-0 mt-1 shadow-lg',
-                    isUser
-                        ? 'bg-gradient-to-br from-indigo-500 to-violet-600'
-                        : 'bg-gradient-to-br from-emerald-500 to-teal-600'
-                )}
-            >
-                {isUser ? <User size={16} className="text-white" /> : <Bot size={16} className="text-white" />}
-            </div>
-
-            {/* Content */}
-            <div className={twMerge('flex flex-col max-w-[75%]', isUser ? 'items-end' : 'items-start')}>
-                <div
-                    className={twMerge(
-                        'px-5 py-3.5 rounded-2xl shadow-md',
-                        isUser
-                            ? 'bg-indigo-600 text-white rounded-tr-sm'
-                            : 'bg-slate-800 border border-slate-700/80 text-slate-200 rounded-tl-sm'
-                    )}
-                >
-                    {isUser ? (
-                        <p className="text-[15px] leading-relaxed whitespace-pre-wrap">{msg.content}</p>
-                    ) : (
-                        <div
-                            className="prose prose-invert prose-sm max-w-none
-                prose-p:text-[15px] prose-p:leading-relaxed prose-p:text-slate-200 prose-p:my-1.5
+              className="prose prose-invert prose-base max-w-none
+                prose-p:text-base prose-p:leading-relaxed prose-p:text-slate-200 prose-p:my-1.5
                 prose-headings:text-white prose-headings:font-bold prose-headings:mt-4 prose-headings:mb-2
                 prose-h1:text-xl prose-h2:text-lg prose-h3:text-base
                 prose-strong:text-white
                 prose-code:bg-slate-900/80 prose-code:text-emerald-400 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm prose-code:before:content-none prose-code:after:content-none
                 prose-pre:bg-slate-900 prose-pre:border prose-pre:border-slate-700 prose-pre:rounded-xl prose-pre:my-3
-                prose-ul:my-2 prose-li:text-slate-200 prose-li:text-[15px] prose-li:my-0.5
+                prose-ul:my-2 prose-li:text-slate-200 prose-li:text-base prose-li:my-0.5
                 prose-ol:my-2
                 prose-blockquote:border-indigo-500 prose-blockquote:text-slate-300
                 prose-a:text-indigo-400 prose-a:no-underline hover:prose-a:underline"
@@ -94,20 +96,19 @@ const ChatBubble = ({ msg }) => {
 
 // ─── Typing dots ───
 const TypingDots = () => (
-    <div className="flex gap-3">
-        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shrink-0 mt-1 shadow-lg">
-            <Bot size={16} className="text-white" />
-        </div>
-        <div className="bg-slate-800 border border-slate-700/80 px-5 py-3.5 rounded-2xl rounded-tl-sm shadow-md">
-            <div className="flex items-center gap-2">
-                <span className="text-slate-400 text-sm">Thinking</span>
-                <span className="flex gap-1">
-                    <span className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
-                    <span className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
-                    <span className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
-                </span>
-            </div>
-        </div>
+  <div className="flex gap-3">
+    <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shrink-0 mt-1 shadow-lg">
+      <Bot size={16} className="text-white" />
+    </div>
+    <div className="bg-white/[0.02] border border-white/5 backdrop-blur-sm px-5 py-3.5 rounded-2xl rounded-tl-sm shadow-md">
+      <div className="flex items-center gap-2">
+        <span className="text-slate-400 text-sm">Thinking</span>
+        <span className="flex gap-1">
+          <span className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+          <span className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
+          <span className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+        </span>
+      </div>
     </div>
 );
 
@@ -115,64 +116,42 @@ const TypingDots = () => (
 // ─── Main Component ───
 // ═══════════════════════════════════════════════
 const AITutorChat = () => {
-    const { user } = useAuth();
-    const [sessions, setSessions] = useState([]);
-    const [currentSessionId, setCurrentSessionId] = useState(null);
-    const [messages, setMessages] = useState([]);
-    const [input, setInput] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
-    const [isInitialLoading, setIsInitialLoading] = useState(true);
-    const [searchQuery, setSearchQuery] = useState('');
-    const chatEndRef = useRef(null);
-    const textareaRef = useRef(null);
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [sessions, setSessions] = useState([]);
+  const [currentSessionId, setCurrentSessionId] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const chatEndRef = useRef(null);
+  const textareaRef = useRef(null);
 
-    // ─── Scroll to newest message ───
-    const scrollToBottom = useCallback(() => {
-        setTimeout(() => {
-            chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-        }, 100);
-    }, []);
+  // ─── Scroll to newest message ───
+  const scrollToBottom = useCallback(() => {
+    setTimeout(() => {
+      chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
+  }, []);
 
-    // ─── Load all chats and group by session ───
-    const fetchAllChats = useCallback(async () => {
-        try {
-            const chats = await chatService.getChats({ limit: 1000 });
+  // ─── Load all chats and group by session ───
+  const fetchAllChats = useCallback(async () => {
+    try {
+      const chats = await chatService.getChats({ limit: 1000 });
 
-            const grouped = {};
-            for (const chat of chats) {
-                const sid = chat.session_id || 'default';
-                if (!grouped[sid]) {
-                    grouped[sid] = {
-                        id: sid,
-                        title: chat.prompt.length > 50 ? chat.prompt.slice(0, 50) + '…' : chat.prompt,
-                        lastMessage: chat.response.length > 90 ? chat.response.slice(0, 90) + '…' : chat.response,
-                        timestamp: new Date(chat.created_at),
-                        messageCount: 0,
-                        messages: [],
-                    };
-                }
-                grouped[sid].messages.push({ role: 'user', content: chat.prompt, timestamp: chat.created_at });
-                grouped[sid].messages.push({ role: 'assistant', content: chat.response, timestamp: chat.created_at });
-                grouped[sid].messageCount += 1;
-                // keep latest timestamp
-                const ts = new Date(chat.created_at);
-                if (ts > grouped[sid].timestamp) {
-                    grouped[sid].timestamp = ts;
-                    grouped[sid].lastMessage = chat.response.length > 90 ? chat.response.slice(0, 90) + '…' : chat.response;
-                }
-            }
-
-            const list = Object.values(grouped).sort((a, b) => b.timestamp - a.timestamp);
-            setSessions(list);
-
-            if (list.length > 0 && !currentSessionId) {
-                setCurrentSessionId(list[0].id);
-                setMessages(list[0].messages);
-            }
-        } catch (err) {
-            console.error('Failed to fetch chats:', err);
-        } finally {
-            setIsInitialLoading(false);
+      const grouped = {};
+      for (const chat of chats) {
+        const sid = chat.session_id || 'default';
+        if (!grouped[sid]) {
+          grouped[sid] = {
+            id: sid,
+            title: chat.prompt.length > 50 ? chat.prompt.slice(0, 50) + '…' : chat.prompt,
+            lastMessage: chat.response.length > 90 ? chat.response.slice(0, 90) + '…' : chat.response,
+            timestamp: new Date(chat.created_at),
+            messageCount: 0,
+            messages: [],
+          };
         }
     }, [currentSessionId]);
 
@@ -233,21 +212,28 @@ const AITutorChat = () => {
             s.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
             s.lastMessage.toLowerCase().includes(searchQuery.toLowerCase())
     );
+  }
 
-    // ─── Loading state ───
-    if (isInitialLoading) {
-        return (
-            <div className="flex items-center justify-center min-h-[60vh]">
-                <div className="flex flex-col items-center gap-5 text-center">
-                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-xl shadow-indigo-500/25">
-                        <Bot size={30} className="text-white" />
-                    </div>
-                    <div>
-                        <p className="text-white font-bold text-lg mb-1">Loading AI Tutor</p>
-                        <p className="text-slate-400 text-sm">Fetching your conversations…</p>
-                    </div>
-                    <Loader2 className="text-indigo-400 animate-spin" size={28} />
-                </div>
+  // ═══════════════════════════════════════════════
+  // ─── Render ───
+  // ═══════════════════════════════════════════════
+  return (
+    <div className="flex h-screen bg-slate-950">
+
+      {/* ═══ SIDEBAR ═══ */}
+      <aside className="w-[280px] bg-slate-900 border-r border-slate-800 flex flex-col shrink-0">
+        {/* Header */}
+        <div className="p-4 border-b border-slate-800">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-lg">
+              <Bot size={20} className="text-white" />
+            </div>
+            <div>
+              <h2 className="text-white font-bold text-base">AI Tutor Chat</h2>
+              <div className="flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span className="text-emerald-400 text-xs font-semibold">Online</span>
+              </div>
             </div>
         );
     }
@@ -414,6 +400,85 @@ const AITutorChat = () => {
                             <span className="text-emerald-400 text-[11px] font-semibold">Live</span>
                         </div>
                     </div>
+                  </button>
+                );
+              })}
+            </>
+          )}
+        </div>
+
+        {/* User card */}
+        <div className="p-3 border-t border-slate-800">
+          <div className="flex items-center gap-3 px-3 py-2 rounded-xl bg-slate-800/50">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-white text-sm font-bold shrink-0">
+              {user?.username?.charAt(0)?.toUpperCase() || 'U'}
+            </div>
+            <div className="min-w-0">
+              <p className="text-sm font-semibold text-white truncate">{user?.username || 'User'}</p>
+              <p className="text-xs text-slate-500">Student</p>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      {/* ═══ MAIN AREA ═══ */}
+      <main className="flex-1 flex flex-col bg-slate-950 overflow-hidden relative">
+        {/* Subtle ambient glow */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500/[0.04] rounded-full blur-[100px] pointer-events-none"></div>
+        <div className="absolute bottom-0 left-0 w-80 h-80 bg-emerald-500/[0.03] rounded-full blur-[100px] pointer-events-none"></div>
+
+        {/* Header */}
+        <div className="relative z-10 h-16 border-b border-slate-800 bg-slate-900/60 backdrop-blur-sm px-5 flex items-center justify-between shrink-0">
+          <div className="flex items-center gap-6">
+            <button
+              onClick={() => navigate('/dashboard')}
+              className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-all flex items-center gap-2 group"
+            >
+              <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
+              <span className="text-xs font-bold uppercase tracking-widest hidden sm:block">Dashboard</span>
+            </button>
+            <div className="h-6 w-px bg-slate-800"></div>
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-lg">
+                <Sparkles size={15} className="text-white" />
+              </div>
+              <div>
+                <h1 className="text-white font-bold text-sm leading-tight">AI Academic Tutor</h1>
+                <p className="text-slate-500 text-[10px] uppercase font-bold tracking-widest">
+                  {currentSessionId ? `Immersive Session` : 'Studio Mode'}
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            {messages.length > 0 && (
+              <button
+                onClick={startNewChat}
+                className="flex items-center gap-1.5 text-slate-400 hover:text-white text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-slate-800 transition-colors"
+              >
+                <RotateCcw size={12} /> New Chat
+              </button>
+            )}
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span className="text-emerald-400 text-[11px] font-semibold">Live</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex-1 overflow-y-auto relative z-10">
+          {messages.length === 0 ? (
+            // ─── Welcome screen ───
+            <div className="h-full flex flex-col items-center justify-center px-6 py-10">
+              <div className="max-w-4xl w-full text-center">
+                {/* Hero icon */}
+                <div className="relative inline-block mb-6">
+                  <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-2xl shadow-indigo-500/30">
+                    <GraduationCap size={36} className="text-white" />
+                  </div>
+                  <div className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-emerald-500 border-2 border-slate-950 flex items-center justify-center">
+                    <Sparkles size={11} className="text-white" />
+                  </div>
                 </div>
 
                 {/* Messages or welcome */}
@@ -472,42 +537,53 @@ const AITutorChat = () => {
                         </div>
                     )}
                 </div>
+              </div>
+            </div>
+          ) : (
+            // ─── Chat messages ───
+            <div className="flex flex-col gap-5 px-5 py-6 max-w-5xl mx-auto w-full">
+              {messages.map((msg, idx) => (
+                <ChatBubble key={idx} msg={msg} />
+              ))}
+              {isLoading && <TypingDots />}
+              <div ref={chatEndRef} />
+            </div>
+          )}
+        </div>
 
-                {/* Input bar */}
-                <div className="relative z-10 border-t border-slate-800 bg-slate-900/80 backdrop-blur-sm px-5 py-4 shrink-0">
-                    <form onSubmit={handleSend} className="max-w-3xl mx-auto">
-                        <div className="flex items-end gap-2 bg-slate-800 border border-slate-700 focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500/30 rounded-2xl px-4 py-2.5 transition-all duration-200 shadow-lg">
-                            <textarea
-                                ref={textareaRef}
-                                rows={1}
-                                placeholder="Ask anything — concepts, code, study plans…"
-                                className="flex-1 bg-transparent text-white placeholder-slate-500 text-[15px] resize-none outline-none leading-relaxed min-h-[26px] max-h-[150px] py-1"
-                                value={input}
-                                onChange={handleTextareaChange}
-                                onKeyDown={(e) => {
-                                    if (e.key === 'Enter' && !e.shiftKey) {
-                                        e.preventDefault();
-                                        handleSend(e);
-                                    }
-                                }}
-                                disabled={isLoading}
-                            />
-                            <button
-                                type="submit"
-                                disabled={!input.trim() || isLoading}
-                                className="w-9 h-9 flex items-center justify-center rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-700 disabled:text-slate-500 text-white transition-all duration-150 active:scale-90 shadow-lg shadow-indigo-600/25 disabled:shadow-none shrink-0"
-                            >
-                                {isLoading ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
-                            </button>
-                        </div>
-                        <p className="text-center text-slate-600 text-[11px] mt-2 font-medium">
-                            <kbd className="bg-slate-800 border border-slate-700 rounded px-1 py-0.5 text-slate-400 font-mono text-[10px]">Enter</kbd> to send
-                            <span className="mx-1.5">·</span>
-                            <kbd className="bg-slate-800 border border-slate-700 rounded px-1 py-0.5 text-slate-400 font-mono text-[10px]">Shift + Enter</kbd> for new line
-                        </p>
-                    </form>
-                </div>
-            </main>
+        {/* Input bar */}
+        <div className="relative z-10 border-t border-slate-800 bg-slate-900/80 backdrop-blur-sm px-5 py-4 shrink-0">
+          <form onSubmit={handleSend} className="max-w-5xl mx-auto">
+            <div className="flex items-end gap-2 bg-slate-900/50 border border-white/10 focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500/30 rounded-2xl px-4 py-2.5 transition-all duration-200 shadow-lg">
+              <textarea
+                ref={textareaRef}
+                rows={1}
+                placeholder="Ask anything — concepts, code, study plans…"
+                className="flex-1 bg-transparent text-white placeholder-slate-500 text-[15px] resize-none outline-none leading-relaxed min-h-[26px] max-h-[150px] py-1"
+                value={input}
+                onChange={handleTextareaChange}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSend(e);
+                  }
+                }}
+                disabled={isLoading}
+              />
+              <button
+                type="submit"
+                disabled={!input.trim() || isLoading}
+                className="w-9 h-9 flex items-center justify-center rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-700 disabled:text-slate-500 text-white transition-all duration-150 active:scale-90 shadow-lg shadow-indigo-600/25 disabled:shadow-none shrink-0"
+              >
+                {isLoading ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
+              </button>
+            </div>
+            <p className="text-center text-slate-600 text-[11px] mt-2 font-medium">
+              <kbd className="bg-slate-800 border border-slate-700 rounded px-1 py-0.5 text-slate-400 font-mono text-[10px]">Enter</kbd> to send
+              <span className="mx-1.5">·</span>
+              <kbd className="bg-slate-800 border border-slate-700 rounded px-1 py-0.5 text-slate-400 font-mono text-[10px]">Shift + Enter</kbd> for new line
+            </p>
+          </form>
         </div>
     );
 };
