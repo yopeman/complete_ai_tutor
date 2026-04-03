@@ -121,37 +121,6 @@ async def get_course(
     
     return course
 
-
-@router.put("/{course_id}", response_model=CourseResponse)
-async def update_course(
-    course_id: int,
-    course_data: CourseUpdate,
-    current_user: User = Depends(get_current_active_user),
-    db: AsyncSession = Depends(get_db)
-):
-    """Update a course."""
-    result = await db.execute(
-        select(Course).where(Course.id == course_id, Course.user_id == current_user.id)
-    )
-    course = result.scalar_one_or_none()
-    
-    if not course:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Course not found"
-        )
-    
-    # Update fields
-    update_data = course_data.model_dump(exclude_unset=True)
-    for field, value in update_data.items():
-        setattr(course, field, value)
-    
-    await db.commit()
-    await db.refresh(course)
-    
-    return course
-
-
 @router.put("/{course_id}/plans/ai", response_model=CourseResponse)
 async def update_course_plan_ai(
     course_id: int,
@@ -297,8 +266,6 @@ async def install_course_plan(
             detail="Course plan is empty"
         )
         
-    settings = get_settings()
-    from langchain_groq import ChatGroq
     from langchain_core.messages import SystemMessage, HumanMessage
     from pydantic import BaseModel, Field
     
