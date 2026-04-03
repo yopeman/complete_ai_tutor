@@ -26,6 +26,7 @@ import remarkGfm from 'remark-gfm';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { twMerge } from 'tailwind-merge';
+import VoiceInputButton from '../components/chat/VoiceInputButton';
 
 // ─── Suggestion prompts for empty state ───
 const SUGGESTIONS = [
@@ -211,6 +212,37 @@ const AITutorChat = () => {
       setMessages(prev => [
         ...prev,
         { role: 'assistant', content: '⚠️ Sorry, I encountered an error. Please try again.', timestamp: new Date().toISOString() }
+      ]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleVoiceComplete = async (blob) => {
+    setIsLoading(true);
+    // Optimistic user message for voice
+    setMessages((prev) => [...prev, { role: 'user', content: '🎤 Spoken message...', timestamp: new Date().toISOString() }]);
+
+    try {
+      const formData = new FormData();
+      formData.append('audio_file', blob, 'voice_input.webm');
+
+      const sid = currentSessionId || `chat_${Date.now()}`;
+      if (!currentSessionId) setCurrentSessionId(sid);
+      formData.append('session_id', sid);
+
+      const res = await chatService.createChat(formData);
+      setMessages((prev) => [
+        ...prev.filter(m => m.content !== '🎤 Spoken message...'), // Remove placeholder
+        { role: 'user', content: res.prompt, timestamp: res.created_at }, // Show transcribed text
+        { role: 'assistant', content: res.response, timestamp: res.created_at }
+      ]);
+      fetchAllChats();
+    } catch (err) {
+      console.error('Voice send failed:', err);
+      setMessages((prev) => [
+        ...prev.filter(m => m.content !== '🎤 Spoken message...'),
+        { role: 'assistant', content: '⚠️ Voice processing failed. Please try text input.', timestamp: new Date().toISOString() },
       ]);
     } finally {
       setIsLoading(false);
