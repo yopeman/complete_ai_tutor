@@ -89,14 +89,12 @@ async def complete_lesson(
             detail="Failed to generate quizzes for the lesson"
         )
 
-    quizzes_data = []
     for quiz in quizzes:
         quiz.explanation = None
         quiz.correct_answer = None
         quiz.is_correct = None
-        quizzes_data.append(quiz)
     
-    return quizzes_data
+    return quizzes
 
 # ============== Interactions Endpoints ==============
 
