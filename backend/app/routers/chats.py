@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Query, status, Form, File, UploadFile, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.services.tts_and_stt import transcribe_uploaded_file
-from typing import List
+from typing import List, Optional
 from app.database import get_db
 from app.dependencies import get_current_active_user
 from app.models import User
@@ -29,7 +29,6 @@ async def get_chats(
     return await get_chats_controller(session_id, skip, limit, current_user, db)
 
 
-# ..._@
 @router.post("", response_model=ChatResponse, status_code=status.HTTP_201_CREATED)
 async def create_chat(
     prompt: Optional[str] = Form(None),

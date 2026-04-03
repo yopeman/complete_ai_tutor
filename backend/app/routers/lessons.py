@@ -71,7 +71,6 @@ async def get_lesson_interactions(
     return await get_lesson_interactions_controller(lesson_id, skip, limit, current_user, db)
 
 
-# ..._@
 @router.post("/{lesson_id}/interactions", response_model=InteractionResponse, status_code=status.HTTP_201_CREATED)
 async def create_interaction(
     lesson_id: int,
