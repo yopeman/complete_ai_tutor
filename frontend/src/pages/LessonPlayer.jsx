@@ -306,9 +306,9 @@ const LessonPlayer = () => {
                 <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 border ${msg.role === 'user' ? 'bg-indigo-600 border-indigo-500 text-white' : 'bg-slate-800 border-white/5 text-indigo-400'}`}>
                   {msg.role === 'user' ? <UserIcon size={16} /> : <Sparkles size={16} />}
                 </div>
-                <div className={`max-w-[85%] p-4 rounded-2xl text-sm leading-relaxed ${msg.role === 'user'
+                <div className={`max-w-[95%] p-4 rounded-2xl text-base leading-relaxed ${msg.role === 'user'
                   ? 'bg-indigo-600/10 border border-indigo-500/20 text-indigo-100 rounded-tr-none'
-                  : 'bg-slate-800/50 border border-white/5 text-slate-300 rounded-tl-none prose prose-invert prose-sm max-w-none'
+                  : 'bg-white/[0.03] border border-white/5 backdrop-blur-sm text-slate-300 rounded-tl-none prose prose-invert prose-base max-w-none'
                   }`}>
                   {msg.role === 'assistant' ? (
                     <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
