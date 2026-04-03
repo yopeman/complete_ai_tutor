@@ -103,7 +103,12 @@ const Dashboard = () => {
                                 <div className="w-10 h-10 rounded-2xl bg-white flex items-center justify-center shrink-0">
                                     <Sparkles className="text-indigo-600" size={24} />
                                 </div>
-                                <div className="flex-1 text-indigo-50 prose prose-invert max-w-none prose-p:leading-relaxed prose-li:my-1">
+                                <div className="flex-1 text-indigo-50 prose prose-invert max-w-none 
+                                    prose-p:leading-relaxed prose-p:text-indigo-100/80
+                                    prose-headings:text-white prose-headings:font-display
+                                    prose-li:my-1 prose-li:text-indigo-100/70
+                                    prose-strong:text-white prose-strong:font-bold
+                                ">
                                     <ReactMarkdown remarkPlugins={[remarkGfm]}>{aiResponse}</ReactMarkdown>
                                 </div>
                             </div>
