@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import ReactMarkdown from 'react-markdown';
@@ -47,7 +47,7 @@ const LessonPlayer = () => {
   useEffect(() => {
     fetchLesson();
     fetchChatHistory();
-  }, [lessonId]);
+  }, [fetchLesson, fetchChatHistory]);
 
   useEffect(() => {
     scrollToBottom();
@@ -57,7 +57,7 @@ const LessonPlayer = () => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const fetchLesson = async () => {
+  const fetchLesson = useCallback(async () => {
     setLoading(true);
     try {
       const response = await api.get(`/lessons/${lessonId}`);
@@ -71,9 +71,9 @@ const LessonPlayer = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [lessonId]);
 
-  const fetchChatHistory = async () => {
+  const fetchChatHistory = useCallback(async () => {
     try {
       const response = await api.get(`/chats?session_id=${sessionId}`);
       // The backend returns chats in reverse chronological order
@@ -85,7 +85,7 @@ const LessonPlayer = () => {
     } catch (error) {
       console.error('Error fetching chat history:', error);
     }
-  };
+  }, [sessionId]);
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
@@ -97,10 +97,11 @@ const LessonPlayer = () => {
     setIsTyping(true);
 
     try {
-      const response = await api.post('/chats', {
-        prompt: input,
-        session_id: sessionId
-      });
+      const formData = new FormData();
+      formData.append('prompt', input);
+      formData.append('session_id', sessionId);
+
+      const response = await api.post('/chats', formData);
 
       const aiMessage = { role: 'assistant', content: response.data.response };
       setMessages(prev => [...prev, aiMessage]);
@@ -112,13 +113,13 @@ const LessonPlayer = () => {
     }
   };
 
-  const handleVoiceComplete = async (blob) => {
+  const handleVoiceComplete = useCallback(async (blob) => {
     setIsTyping(true);
     setMessages(prev => [...prev, { role: 'user', content: '🎤 Spoken message...' }]);
 
     try {
       const formData = new FormData();
-      formData.append('audio', blob, 'voice_input.webm');
+      formData.append('audio_file', blob, 'voice_input.webm');
       formData.append('session_id', sessionId);
 
       const response = await api.post('/chats', formData);
@@ -137,7 +138,7 @@ const LessonPlayer = () => {
     } finally {
       setIsTyping(false);
     }
-  };
+  }, [sessionId, fetchChatHistory]);
 
   const handleComplete = async () => {
     setCompleting(true);

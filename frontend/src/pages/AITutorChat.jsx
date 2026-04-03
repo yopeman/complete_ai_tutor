@@ -177,7 +177,7 @@ const AITutorChat = () => {
 
   useEffect(() => {
     fetchAllChats();
-  }, []); // Once on mount
+  }, [fetchAllChats]); // Once on mount
 
   useEffect(() => {
     scrollToBottom();
@@ -200,7 +200,11 @@ const AITutorChat = () => {
       const sid = currentSessionId || `session_${Date.now()}`;
       if (!currentSessionId) setCurrentSessionId(sid);
 
-      const res = await chatService.createChat({ prompt: text, session_id: sid });
+      const formData = new FormData();
+      formData.append('prompt', text);
+      formData.append('session_id', sid);
+
+      const res = await chatService.createChat(formData);
       
       const newBotMsg = { role: 'assistant', content: res.response, timestamp: res.created_at };
       setMessages(prev => [...prev, newBotMsg]);
@@ -218,7 +222,7 @@ const AITutorChat = () => {
     }
   };
 
-  const handleVoiceComplete = async (blob) => {
+  const handleVoiceComplete = useCallback(async (blob) => {
     setIsLoading(true);
     // Optimistic user message for voice
     setMessages((prev) => [...prev, { role: 'user', content: '🎤 Spoken message...', timestamp: new Date().toISOString() }]);
@@ -227,7 +231,7 @@ const AITutorChat = () => {
       const formData = new FormData();
       formData.append('audio_file', blob, 'voice_input.webm');
 
-      const sid = currentSessionId || `chat_${Date.now()}`;
+      const sid = currentSessionId || `session_${Date.now()}`;
       if (!currentSessionId) setCurrentSessionId(sid);
       formData.append('session_id', sid);
 
@@ -247,7 +251,7 @@ const AITutorChat = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [currentSessionId, fetchAllChats]);
 
   const startNewChat = () => {
     setCurrentSessionId(null);
@@ -407,11 +411,12 @@ const AITutorChat = () => {
           <div className="flex items-center gap-4">
             <button 
               onClick={() => navigate('/dashboard')}
-              className="lg:hidden p-2 hover:bg-white/5 rounded-lg transition-colors"
+              className="p-2 hover:bg-white/10 rounded-xl transition-all text-slate-400 hover:text-white hover:scale-105 active:scale-95 flex items-center justify-center bg-white/5 border border-white/10 shadow-sm"
+              title="Back to Dashboard"
             >
               <ArrowLeft size={20} />
             </button>
-            <div className="hidden sm:flex items-center gap-3">
+            <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-lg">
                 <Sparkles size={16} className="text-white" />
               </div>
@@ -528,6 +533,10 @@ const AITutorChat = () => {
                 disabled={isLoading}
               />
               <div className="flex items-center gap-2 pb-1 pr-1">
+                <VoiceInputButton 
+                  onRecordingComplete={handleVoiceComplete} 
+                  isDisabled={isLoading} 
+                />
                 <button
                   type="submit"
                   disabled={!input.trim() || isLoading}
