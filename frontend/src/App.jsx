@@ -3,10 +3,6 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
-import Dashboard from './pages/Dashboard';
-import CourseDetails from './pages/CourseDetails';
-import LessonPlayer from './pages/LessonPlayer';
-import AppLayout from './components/layout/AppLayout';
 import { useAuth } from './context/AuthContext';
 
 function App() {
@@ -25,17 +21,7 @@ function App() {
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={!user ? <LoginPage /> : <Navigate to="/dashboard" />} />
       <Route path="/register" element={!user ? <RegisterPage /> : <Navigate to="/dashboard" />} />
-
-      {/* Authenticated Routes */}
-      <Route element={user ? <AppLayout /> : <Navigate to="/login" />}>
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/courses" element={<div className="text-white">My Courses List (Phase 4)</div>} />
-        <Route path="/courses/:courseId" element={<CourseDetails />} />
-        <Route path="/lessons/:lessonId" element={<LessonPlayer />} />
-        <Route path="/chat" element={<div className="text-white">AI Tutor Chat Page (Phase 6)</div>} />
-        <Route path="/flashcards" element={<div className="text-white">Flashcards Deck Page (Phase 8)</div>} />
-        <Route path="/progress" element={<div className="text-white">Learning Progress Page (Phase 9)</div>} />
-      </Route>
+      <Route path="/dashboard" element={user ? <div className="text-white p-10">Dashboard Coming Soon (Phase 4)</div> : <Navigate to="/login" />} />
     </Routes>
   );
 }

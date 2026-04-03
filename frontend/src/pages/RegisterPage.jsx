@@ -5,7 +5,7 @@ import api from '../services/api';
 import { Mail, Lock, User, ArrowRight, Loader2 } from 'lucide-react';
 
 const RegisterPage = () => {
-    const [formData, setFormData] = useState({ username: '', password: '', native_language: '' });
+    const [formData, setFormData] = useState({ username: '', password: '', native_language: 'Turkish' });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const { login } = useAuth();
