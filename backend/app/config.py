@@ -36,3 +36,13 @@ class Settings(BaseSettings):
 @lru_cache()
 def get_settings() -> Settings:
     return Settings()
+
+@lru_cache()
+def get_llm():
+    from langchain_groq import ChatGroq
+    settings = get_settings()
+    return ChatGroq(
+        model="qwen/qwen3-32b",
+        temperature=0.7,
+        groq_api_key=settings.groq_api_key
+    )

@@ -19,7 +19,7 @@ from app.schemas import (
     ChatWithCourseResponse,
 )
 from app.services.architect_agent import ArchitectAgent
-from app.config import get_settings
+from app.config import get_llm
 
 router = APIRouter(prefix="/courses", tags=["Courses"])
 
@@ -33,9 +33,7 @@ async def create_course(
     """Create a new course using the Initialize Agent."""
     try:
         # Initialize architect agent
-        settings = get_settings()
         architect = ArchitectAgent(
-            groq_api_key=settings.groq_api_key,
             db=db,
             user_id=current_user.id
         )
@@ -173,17 +171,11 @@ async def update_course_plan_ai(
             detail="Course not found"
         )
 
-    settings = get_settings()
     
-    from langchain_groq import ChatGroq
     from langchain_core.messages import SystemMessage, HumanMessage
     import uuid
     
-    llm = ChatGroq(
-        model="qwen/qwen3-32b",
-        temperature=0.7,
-        groq_api_key=settings.groq_api_key
-    )
+    llm = get_llm()
     
     system_message = (
         "You are an expert educational content designer. Your task is to update "
@@ -318,11 +310,7 @@ async def install_course_plan(
     class LessonsExtraction(BaseModel):
         lessons: List[LessonExtraction]
         
-    llm = ChatGroq(
-        model="qwen/qwen3-32b",
-        temperature=0.1,
-        groq_api_key=settings.groq_api_key
-    )
+    llm = get_llm()
     
     structured_llm = llm.with_structured_output(LessonsExtraction)
     

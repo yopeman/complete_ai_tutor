@@ -58,7 +58,6 @@ async def get_lesson(
     # If the lesson doesn't have content, generate it using the TutorAgent
     if not lesson.content or not lesson.daily_plan:
         tutor_agent = TutorAgent(
-            groq_api_key=settings.groq_api_key,
             db=db,
             user_id=current_user.id
         )
@@ -81,7 +80,6 @@ async def complete_lesson(
     lesson = await verify_lesson_access(lesson_id, current_user.id, db)
     
     tutor_agent = TutorAgent(
-        groq_api_key=settings.groq_api_key,
         db=db,
         user_id=current_user.id
     )
@@ -134,7 +132,6 @@ async def create_interaction(
     await verify_lesson_access(lesson_id, current_user.id, db)
     
     tutor_agent = TutorAgent(
-        groq_api_key=settings.groq_api_key,
         db=db,
         user_id=current_user.id
     )
@@ -189,7 +186,6 @@ async def submit_quizzes(
     await verify_lesson_access(lesson_id, current_user.id, db)
     
     tutor_agent = TutorAgent(
-        groq_api_key=settings.groq_api_key,
         db=db,
         user_id=current_user.id
     )

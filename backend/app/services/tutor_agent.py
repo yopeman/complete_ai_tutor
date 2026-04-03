@@ -1,15 +1,16 @@
 from typing import Dict, Any, Optional, List
 from pydantic import BaseModel, Field
-from langchain_groq import ChatGroq
 from langchain_core.messages import HumanMessage
 from langchain.agents import create_agent
 from langchain.tools import tool
+from app.services.tutor_tools import TUTOR_TOOLS
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
 import uuid
 from app.models import Course, Lesson, Progress, User, Flashcard, Quiz, Interaction
 from app.models.enums import LessonStatus
+from app.config import get_llm
 
 class FlashcardStructure(BaseModel):
     front: str = Field(description="The front of the flashcard (question/term)")
@@ -58,12 +59,8 @@ class EvaluationStructure(BaseModel):
 class TutorAgent:
     """LangChain agent for teaching a student, generating lesson plans and content."""
     
-    def __init__(self, groq_api_key: str, db: AsyncSession, user_id: int):
-        self.llm = ChatGroq(
-            model="qwen/qwen3-32b", 
-            temperature=0.7,
-            groq_api_key=groq_api_key
-        )
+    def __init__(self, db: AsyncSession, user_id: int):
+        self.llm = get_llm()
         self.db = db
         self.user_id = user_id
         
@@ -98,44 +95,9 @@ class TutorAgent:
                 print(f"Error saving class output: {e}")
                 return f"Failed to save class due to error: {str(e)}"
 
-        @tool
-        def calculator(expression: str) -> str:
-            """A simple calculator tool. Use this for math expressions. Examples: '2 + 2', '3 * 4'"""
-            try:
-                allowed_names = {"__builtins__": None}
-                result = eval(expression, allowed_names)
-                return str(result)
-            except Exception as e:
-                return f"Error calculating the expression: {str(e)}"
-                
-        @tool
-        def web_search(query: str) -> str:
-            """Search the web for information about a topic."""
-            # Placeholder for actual web search API integration
-            return f"Search results for '{query}': Found highly relevant educational resources online to include in the lesson."
-
-        @tool
-        def image_search(query: str) -> str:
-            """Search for images related to a topic."""
-            return f"Found informative images related to '{query}'."
-            
-        @tool
-        def youtube_video_search(query: str) -> str:
-            """Search for informational YouTube videos about a topic."""
-            return f"Found a relevant, high-quality educational video about '{query}'."
-            
-        @tool
-        def google_translator(text: str, target_language: str) -> str:
-            """Translate text into the student's native language."""
-            return f"Successfully translated to {target_language}."
-
         tools = [
             generate_and_save_class_tool,
-            calculator,
-            web_search,
-            image_search,
-            youtube_video_search,
-            google_translator
+            *TUTOR_TOOLS
         ]
         
         system_prompt = """You are an expert AI Tutor Agent designed to teach a student.
@@ -233,6 +195,7 @@ class TutorAgent:
             
         except Exception as e:
             return {"error": f"An error occurred while generating the class: {str(e)}"}
+    
     async def generate_lesson_quizzes(
         self,
         lesson_id: int,
