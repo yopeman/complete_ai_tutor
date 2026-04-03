@@ -59,27 +59,27 @@ const ChatBubble = ({ msg }) => {
       </div>
 
       {/* Content */}
-      <div className={twMerge('flex flex-col max-w-[75%]', isUser ? 'items-end' : 'items-start')}>
+      <div className={twMerge('flex flex-col max-w-[95%]', isUser ? 'items-end' : 'items-start')}>
         <div
           className={twMerge(
             'px-5 py-3.5 rounded-2xl shadow-md',
             isUser
               ? 'bg-indigo-600 text-white rounded-tr-sm'
-              : 'bg-slate-800 border border-slate-700/80 text-slate-200 rounded-tl-sm'
+              : 'bg-white/[0.02] border border-white/5 backdrop-blur-sm text-slate-200 rounded-tl-sm'
           )}
         >
           {isUser ? (
-            <p className="text-[15px] leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+            <p className="text-base leading-relaxed whitespace-pre-wrap">{msg.content}</p>
           ) : (
             <div
-              className="prose prose-invert prose-sm max-w-none
-                prose-p:text-[15px] prose-p:leading-relaxed prose-p:text-slate-200 prose-p:my-1.5
+              className="prose prose-invert prose-base max-w-none
+                prose-p:text-base prose-p:leading-relaxed prose-p:text-slate-200 prose-p:my-1.5
                 prose-headings:text-white prose-headings:font-bold prose-headings:mt-4 prose-headings:mb-2
                 prose-h1:text-xl prose-h2:text-lg prose-h3:text-base
                 prose-strong:text-white
                 prose-code:bg-slate-900/80 prose-code:text-emerald-400 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm prose-code:before:content-none prose-code:after:content-none
                 prose-pre:bg-slate-900 prose-pre:border prose-pre:border-slate-700 prose-pre:rounded-xl prose-pre:my-3
-                prose-ul:my-2 prose-li:text-slate-200 prose-li:text-[15px] prose-li:my-0.5
+                prose-ul:my-2 prose-li:text-slate-200 prose-li:text-base prose-li:my-0.5
                 prose-ol:my-2
                 prose-blockquote:border-indigo-500 prose-blockquote:text-slate-300
                 prose-a:text-indigo-400 prose-a:no-underline hover:prose-a:underline"
@@ -100,7 +100,7 @@ const TypingDots = () => (
     <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shrink-0 mt-1 shadow-lg">
       <Bot size={16} className="text-white" />
     </div>
-    <div className="bg-slate-800 border border-slate-700/80 px-5 py-3.5 rounded-2xl rounded-tl-sm shadow-md">
+    <div className="bg-white/[0.02] border border-white/5 backdrop-blur-sm px-5 py-3.5 rounded-2xl rounded-tl-sm shadow-md">
       <div className="flex items-center gap-2">
         <span className="text-slate-400 text-sm">Thinking</span>
         <span className="flex gap-1">
@@ -429,12 +429,11 @@ const AITutorChat = () => {
           </div>
         </div>
 
-        {/* Messages or welcome */}
         <div className="flex-1 overflow-y-auto relative z-10">
           {messages.length === 0 ? (
             // ─── Welcome screen ───
             <div className="h-full flex flex-col items-center justify-center px-6 py-10">
-              <div className="max-w-2xl w-full text-center">
+              <div className="max-w-4xl w-full text-center">
                 {/* Hero icon */}
                 <div className="relative inline-block mb-6">
                   <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-2xl shadow-indigo-500/30">
@@ -476,7 +475,7 @@ const AITutorChat = () => {
             </div>
           ) : (
             // ─── Chat messages ───
-            <div className="flex flex-col gap-5 px-5 py-6 max-w-3xl mx-auto w-full">
+            <div className="flex flex-col gap-5 px-5 py-6 max-w-5xl mx-auto w-full">
               {messages.map((msg, idx) => (
                 <ChatBubble key={idx} msg={msg} />
               ))}
@@ -488,8 +487,8 @@ const AITutorChat = () => {
 
         {/* Input bar */}
         <div className="relative z-10 border-t border-slate-800 bg-slate-900/80 backdrop-blur-sm px-5 py-4 shrink-0">
-          <form onSubmit={handleSend} className="max-w-3xl mx-auto">
-            <div className="flex items-end gap-2 bg-slate-800 border border-slate-700 focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500/30 rounded-2xl px-4 py-2.5 transition-all duration-200 shadow-lg">
+          <form onSubmit={handleSend} className="max-w-5xl mx-auto">
+            <div className="flex items-end gap-2 bg-slate-900/50 border border-white/10 focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500/30 rounded-2xl px-4 py-2.5 transition-all duration-200 shadow-lg">
               <textarea
                 ref={textareaRef}
                 rows={1}
