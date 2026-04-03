@@ -4,8 +4,7 @@ import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import { Sparkles, BookOpen, Clock, ChevronRight, Loader2, XCircle, RotateCcw, Trash2 } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
+import SmartMarkdown from '../components/ui/SmartMarkdown';
 import VoiceInputButton from '../components/chat/VoiceInputButton';
 
 const Dashboard = () => {
@@ -192,7 +191,7 @@ const Dashboard = () => {
                                             prose-strong:text-white prose-strong:font-bold
                                             prose-li:text-indigo-100/80
                                         ">
-                                            <ReactMarkdown remarkPlugins={[remarkGfm]}>{aiResponse}</ReactMarkdown>
+                                            <SmartMarkdown>{aiResponse}</SmartMarkdown>
                                         </div>
                                         <div className="mt-6 pt-6 border-t border-white/10 flex justify-between items-center">
                                             <span className="text-[10px] font-bold text-indigo-200/50 uppercase tracking-widest italic">Awaiting your response...</span>
