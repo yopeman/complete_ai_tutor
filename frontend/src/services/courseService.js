@@ -16,6 +16,14 @@ const courseService = {
     const response = await api.get(`/courses/${courseId}/lessons`);
     return response.data;
   },
+
+  /**
+   * Delete a specific course.
+   */
+  deleteCourse: async (courseId) => {
+    const response = await api.delete(`/courses/${courseId}`);
+    return response.data;
+  },
 };
 
 export default courseService;
