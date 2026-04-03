@@ -6,6 +6,7 @@ import RegisterPage from './pages/RegisterPage';
 import Dashboard from './pages/Dashboard';
 import CourseDetails from './pages/CourseDetails';
 import LessonPlayer from './pages/LessonPlayer';
+import AITutorChat from './pages/AITutorChat';
 import AppLayout from './components/layout/AppLayout';
 import { useAuth } from './context/AuthContext';
 
@@ -32,7 +33,7 @@ function App() {
         <Route path="/courses" element={<Dashboard />} /> {/* Use Dashboard as the course list too */}
         <Route path="/courses/:courseId" element={<CourseDetails />} />
         <Route path="/lessons/:lessonId" element={<LessonPlayer />} />
-        <Route path="/chat" element={<div className="text-white p-10">AI Tutor Chat Page (Phase 6)</div>} />
+        <Route path="/chat" element={<AITutorChat />} />
         <Route path="/flashcards" element={<div className="text-white p-10">Flashcards Deck Page (Phase 8)</div>} />
         <Route path="/progress" element={<div className="text-white p-10">Learning Progress Page (Phase 9)</div>} />
       </Route>
