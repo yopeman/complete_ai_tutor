@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
-const Sidebar = () => {
+const Sidebar = ({ onMenuClick }) => {
     const { logout, user } = useAuth();
 
     const menuItems = [
@@ -34,6 +34,7 @@ const Sidebar = () => {
                     <NavLink
                         key={item.path}
                         to={item.path}
+                        onClick={onMenuClick}
                         className={({ isActive }) => `
               flex items-center justify-between px-4 py-3 rounded-xl transition-all group
               ${isActive

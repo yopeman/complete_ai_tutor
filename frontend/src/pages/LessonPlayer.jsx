@@ -29,6 +29,7 @@ const LessonPlayer = () => {
   const [courseLessons, setCourseLessons] = useState([]);
   const [loading, setLoading] = useState(true);
   const [completing, setCompleting] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
   // Chat States
   const [messages, setMessages] = useState([]);
@@ -258,6 +259,14 @@ const LessonPlayer = () => {
         </div>
 
         <div className="flex items-center gap-3">
+          <button
+            onClick={() => setIsChatOpen(true)}
+            className="xl:hidden p-2 text-indigo-400 bg-indigo-500/10 hover:bg-indigo-500/20 hover:text-indigo-300 rounded-xl transition-all shadow-sm ring-1 ring-indigo-500/20"
+            title="Open AI Tutor"
+          >
+            <MessageSquare size={18} />
+          </button>
+
           {lesson.is_completed && (
             <Button
               variant="outline"
@@ -302,8 +311,16 @@ const LessonPlayer = () => {
           </div>
         </div>
 
+        {/* Mobile Chat Overlay */}
+        {isChatOpen && (
+          <div
+            className="fixed inset-0 bg-black/60 z-30 xl:hidden backdrop-blur-sm"
+            onClick={() => setIsChatOpen(false)}
+          />
+        )}
+
         {/* Right: AI Tutor Chat Sidebar */}
-        <div className="w-[450px] border-l border-slate-800 bg-slate-900/50 backdrop-blur-3xl hidden xl:flex flex-col shrink-0">
+        <div className={`fixed inset-y-0 right-0 transform ${isChatOpen ? 'translate-x-0' : 'translate-x-full'} xl:relative xl:translate-x-0 transition duration-300 ease-in-out z-40 w-full sm:w-[450px] border-l border-slate-800 bg-slate-900/95 xl:bg-slate-900/50 backdrop-blur-3xl flex flex-col shrink-0`}>
           <div className="p-6 border-b border-white/5 bg-slate-900/80 backdrop-blur-xl flex items-center justify-between sticky top-0 z-20 shrink-0">
             <h3 className="font-bold text-white flex items-center gap-3">
               <div className="w-8 h-8 rounded-xl bg-indigo-500/10 flex items-center justify-center">
@@ -311,9 +328,14 @@ const LessonPlayer = () => {
               </div>
               AI Study Assistant
             </h3>
-            <button className="text-slate-500 hover:text-white transition-colors" title="Reset Chat">
-              <RotateCcw size={16} />
-            </button>
+            <div className="flex items-center gap-3">
+              <button onClick={() => setIsChatOpen(false)} className="xl:hidden text-slate-500 hover:text-white transition-colors">
+                <XCircle size={20} />
+              </button>
+              <button onClick={() => setMessages([])} className="text-slate-500 hover:text-white transition-colors" title="Reset Chat">
+                <RotateCcw size={16} />
+              </button>
+            </div>
           </div>
 
           {/* Chat Messages */}
