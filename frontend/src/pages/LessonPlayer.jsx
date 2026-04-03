@@ -17,9 +17,11 @@ import {
   Send,
   User as UserIcon,
   RotateCcw,
-  Mic
+  Mic,
+  Volume2
 } from 'lucide-react';
 import VoiceInputButton from '../components/chat/VoiceInputButton';
+import TTSButton from '../components/ui/TTSButton';
 
 const LessonPlayer = () => {
   const { lessonId } = useParams();
@@ -285,7 +287,7 @@ const LessonPlayer = () => {
       <div className="flex-1 flex overflow-hidden">
         {/* Left: Content Area */}
         <div className="flex-1 overflow-y-auto p-12 bg-slate-900/50 bg-[radial-gradient(circle_at_bottom_left,_var(--tw-gradient-stops))] from-indigo-900/10 via-transparent to-transparent custom-scrollbar">
-          <div className="max-w-3xl mx-auto">
+          <div className="max-w-3xl mx-auto relative group">
             <div className="prose prose-invert prose-indigo max-w-none 
               prose-headings:font-display prose-headings:font-bold prose-headings:tracking-tight
               prose-h1:text-4xl prose-h1:mb-10 prose-h2:text-2xl prose-h2:mt-12 prose-h2:mb-6 prose-h2:text-indigo-400
@@ -297,6 +299,11 @@ const LessonPlayer = () => {
               <ReactMarkdown remarkPlugins={[remarkGfm]}>
                 {lesson.content || '# Generating Content...\n\nPlease wait while the AI Tutor creates your lesson for this topic.'}
               </ReactMarkdown>
+              {lesson.content && (
+                <div className="flex justify-end mt-8 border-t border-white/5 pt-4">
+                  <TTSButton text={lesson.content} />
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -341,7 +348,12 @@ const LessonPlayer = () => {
                   : 'bg-white/[0.03] border border-white/5 backdrop-blur-sm text-slate-300 rounded-tl-none prose prose-invert prose-base max-w-none'
                   }`}>
                   {msg.role === 'assistant' ? (
-                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
+                    <>
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
+                      <div className="flex justify-end mt-3 -mr-2 -mb-1 border-t border-white/5 pt-2">
+                        <TTSButton text={msg.content} />
+                      </div>
+                    </>
                   ) : msg.content}
                 </div>
               </div>

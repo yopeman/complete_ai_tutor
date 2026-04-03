@@ -10,6 +10,7 @@ import AITutorChat from './pages/AITutorChat';
 import Progress from './pages/Progress';
 import Flashcards from './pages/Flashcards';
 import AppLayout from './components/layout/AppLayout';
+import TextToSpeech from './pages/TextToSpeech';
 import { useAuth } from './context/AuthContext';
 
 function App() {
@@ -41,6 +42,7 @@ function App() {
 
       {/* Full Screen Immersive Routes */}
       <Route path="/chat" element={user ? <AITutorChat /> : <Navigate to="/login" />} />
+      <Route path="/text-to-speech" element={user ? <TextToSpeech /> : <Navigate to="/login" />} />
     </Routes>
   );
 }
