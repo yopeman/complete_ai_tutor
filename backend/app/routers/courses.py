@@ -31,6 +31,7 @@ from app.controllers.courses import (
 router = APIRouter(prefix="/courses", tags=["Courses"])
 
 
+# ..._@
 @router.post("", response_model=ChatWithCourseResponse, status_code=status.HTTP_201_CREATED)
 async def create_course(
     chat_data: ChatCreate,
@@ -62,6 +63,7 @@ async def get_course(
     """Get a specific course by ID."""
     return await get_course_controller(course_id, current_user, db)
 
+# ..._@
 @router.put("/{course_id}/plans/ai", response_model=CourseResponse)
 async def update_course_plan_ai(
     course_id: int,

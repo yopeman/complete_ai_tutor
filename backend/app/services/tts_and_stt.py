@@ -4,13 +4,12 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.config import get_llm
 from langchain_core.prompts import ChatPromptTemplate
-import os
 import uuid
 from gtts import gTTS
 import whisper as whisper_lib
+from fastapi import UploadFile
 
-TTS_CACHE_DIR = 'tts_cache'
-os.makedirs(TTS_CACHE_DIR, exist_ok=True)
+AUDIO_CACHE_DIR = 'audio_cache'
 
 TTS_SYSTEM_PROMPT = """
 You are a professional text normalization engine for Text-to-Speech synthesis.
@@ -99,7 +98,7 @@ def normalize_text_for_tts(text: str) -> str:
 
 def text_to_speech(text: str) -> str:
     normalized_text = normalize_text_for_tts(text)
-    ai_audio_path = f"{TTS_CACHE_DIR}/{uuid.uuid4()}.mp3"
+    ai_audio_path = f"{AUDIO_CACHE_DIR}/{uuid.uuid4()}.mp3"
     tts = gTTS(normalized_text)
     tts.save(ai_audio_path)
     return ai_audio_path
@@ -108,3 +107,54 @@ def speech_to_text(filepath: str) -> str:
     model = whisper_lib.load_model("base")
     result = model.transcribe(filepath)
     return result["text"] if result and "text" in result else ""
+
+async def save_uploaded_audio_file(audio_file: UploadFile) -> str:
+    """
+    Save uploaded audio file to local disk and return the file path.
+    
+    Args:
+        audio_file: The uploaded audio file
+        
+    Returns:
+        str: The path to the saved file
+        
+    Raises:
+        ValueError: If the file is not an audio file
+    """
+    # Validate file type
+    if not audio_file.content_type.startswith('audio/'):
+        raise ValueError("File must be an audio file")
+    
+    # Get file extension from original filename or default to .wav
+    file_extension = os.path.splitext(audio_file.filename)[1]
+    if not file_extension:
+        file_extension = ".wav"
+    
+    # Generate unique filename
+    temp_filename = f"{uuid.uuid4()}{file_extension}"
+    temp_filepath = os.path.join(AUDIO_CACHE_DIR, temp_filename)
+    
+    # Save the uploaded file
+    with open(temp_filepath, "wb") as buffer:
+        content = await audio_file.read()
+        buffer.write(content)
+    
+    return temp_filepath
+
+async def transcribe_uploaded_file(audio_file: UploadFile) -> str:
+    """
+    Transcribe an uploaded audio file using Whisper.
+    
+    Args:
+        audio_file: The uploaded audio file
+        
+    Returns:
+        str: The transcribed text
+    """
+    # Save the uploaded file
+    temp_filepath = await save_uploaded_audio_file(audio_file)
+    
+    # Transcribe the file
+    transcribed_text = speech_to_text(temp_filepath)
+    
+    return transcribed_text

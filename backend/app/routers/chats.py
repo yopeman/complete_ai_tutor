@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List
 from app.database import get_db
@@ -28,6 +28,7 @@ async def get_chats(
     return await get_chats_controller(session_id, skip, limit, current_user, db)
 
 
+# ..._@
 @router.post("", response_model=ChatResponse, status_code=status.HTTP_201_CREATED)
 async def create_chat(
     chat_data: ChatCreate,

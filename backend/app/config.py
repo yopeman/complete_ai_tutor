@@ -23,6 +23,10 @@ class Settings(BaseSettings):
     
     # Groq
     groq_api_key: str
+
+    # Base URL for frontend and backend
+    frontend_base_url: str
+    backend_base_url: str
     
     @property
     def database_url(self) -> str:
