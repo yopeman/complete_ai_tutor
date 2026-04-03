@@ -16,6 +16,8 @@ import {
     Edit3,
     Wand2,
     Save,
+    RotateCcw,
+    ChevronDown,
     ChevronUp,
     Mic,
     Trash2
