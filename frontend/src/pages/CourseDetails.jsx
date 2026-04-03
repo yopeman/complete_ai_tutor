@@ -28,6 +28,7 @@ const CourseDetails = () => {
     const navigate = useNavigate();
     const [course, setCourse] = useState(null);
     const [lessons, setLessons] = useState([]);
+    const [progressRecords, setProgressRecords] = useState([]);
     const [loading, setLoading] = useState(true);
     const [installing, setInstalling] = useState(false);
 
@@ -47,12 +48,15 @@ const CourseDetails = () => {
     const fetchCourseData = async () => {
         setLoading(true);
         try {
-            const [courseRes, lessonsRes] = await Promise.all([
+            const [courseRes, lessonsRes, progressRes] = await Promise.all([
                 api.get(`/courses/${courseId}`),
-                api.get(`/courses/${courseId}/lessons`).catch(() => ({ data: [] }))
+                api.get(`/courses/${courseId}/lessons`).catch(() => ({ data: [] })),
+                api.get('/progress').catch(() => ({ data: [] }))
             ]);
+
             setCourse(courseRes.data);
             setLessons(lessonsRes.data);
+            setProgressRecords(progressRes.data);
             setManualPlan(courseRes.data.course_plan || '');
         } catch (error) {
             console.error('Error fetching course data:', error);
@@ -60,6 +64,15 @@ const CourseDetails = () => {
             setLoading(false);
         }
     };
+
+    // Calculate actual progress percentage
+    const calculateProgress = () => {
+        if (!lessons.length) return 0;
+        const completed = lessons.filter(l => l.status === 'completed').length;
+        return Math.round((completed / lessons.length) * 100);
+    };
+
+    const courseProgress = calculateProgress();
 
     const handleInstall = async () => {
         setInstalling(true);
@@ -259,35 +272,46 @@ const CourseDetails = () => {
 
                         {lessons.length > 0 ? (
                             <div className="space-y-4">
-                                {lessons.map((lesson, index) => (
-                                    <Card
-                                        key={lesson.id}
-                                        className="flex items-center justify-between py-5 px-8 group cursor-pointer hover:bg-white/[0.02]"
-                                        onClick={() => navigate(`/lessons/${lesson.id}`)}
-                                    >
-                                        <div className="flex items-center gap-6">
-                                            <div className="w-10 h-10 rounded-2xl bg-slate-900 border border-white/5 flex items-center justify-center text-sm font-bold text-slate-500 group-hover:text-indigo-400 group-hover:border-indigo-500/30 transition-all">
-                                                {index + 1}
-                                            </div>
-                                            <div>
-                                                <h4 className="font-bold text-white group-hover:text-indigo-400 transition-colors text-lg">{lesson.title}</h4>
-                                                <p className="text-xs text-slate-500 font-medium uppercase tracking-widest mt-1">Lesson {lesson.day_number}</p>
-                                            </div>
-                                        </div>
-                                        <div className="flex items-center gap-8">
-                                            {lesson.status === 'completed' ? (
-                                                <div className="flex items-center gap-2 text-emerald-500 text-xs font-bold uppercase tracking-widest">
-                                                    <CheckCircle2 size={18} /> Done
+                                {lessons.map((lesson, index) => {
+                                    const progress = progressRecords.find(p => p.lesson_id === lesson.id);
+                                    return (
+                                        <Card
+                                            key={lesson.id}
+                                            className="flex items-center justify-between py-5 px-8 group cursor-pointer hover:bg-white/[0.02]"
+                                            onClick={() => navigate(`/lessons/${lesson.id}`)}
+                                        >
+                                            <div className="flex items-center gap-6">
+                                                <div className="w-10 h-10 rounded-2xl bg-slate-900 border border-white/5 flex items-center justify-center text-sm font-bold text-slate-500 group-hover:text-indigo-400 group-hover:border-indigo-500/30 transition-all">
+                                                    {index + 1}
                                                 </div>
-                                            ) : (
-                                                <Circle className="text-slate-800" size={20} />
-                                            )}
-                                            <div className="w-10 h-10 rounded-full flex items-center justify-center bg-white/5 group-hover:bg-indigo-500 group-hover:text-white transition-all">
-                                                <Play className="text-slate-400 group-hover:text-white" size={18} fill="currentColor" />
+                                                <div>
+                                                    <h4 className="font-bold text-white group-hover:text-indigo-400 transition-colors text-lg">{lesson.title}</h4>
+                                                    <div className="flex items-center gap-3 mt-1">
+                                                        <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Lesson {lesson.day_number}</p>
+                                                        {progress && (
+                                                            <>
+                                                                <div className="h-2 w-2 rounded-full bg-slate-800"></div>
+                                                                <p className="text-[10px] text-indigo-400 font-bold uppercase tracking-widest">Score: {progress.quiz_score}%</p>
+                                                            </>
+                                                        )}
+                                                    </div>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </Card>
-                                ))}
+                                            <div className="flex items-center gap-8">
+                                                {lesson.status === 'completed' ? (
+                                                    <div className="flex items-center gap-2 text-emerald-500 text-xs font-bold uppercase tracking-widest">
+                                                        <CheckCircle2 size={18} /> Passed
+                                                    </div>
+                                                ) : (
+                                                    <Circle className="text-slate-800" size={20} />
+                                                )}
+                                                <div className="w-10 h-10 rounded-full flex items-center justify-center bg-white/5 group-hover:bg-indigo-500 group-hover:text-white transition-all">
+                                                    <Play className="text-slate-400 group-hover:text-white" size={18} fill="currentColor" />
+                                                </div>
+                                            </div>
+                                        </Card>
+                                    );
+                                })}
                             </div>
                         ) : (
                             <div className="bg-slate-900/50 border-2 border-dashed border-white/5 rounded-[2.5rem] p-16 text-center">
@@ -338,14 +362,14 @@ const CourseDetails = () => {
                             <div className="flex justify-between items-end mb-4">
                                 <div>
                                     <p className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest mb-1">Your Mastery</p>
-                                    <span className="text-4xl font-display font-bold text-white">{course.progress || 0}%</span>
+                                    <span className="text-4xl font-display font-bold text-white">{courseProgress}%</span>
                                 </div>
                                 <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Target 100%</span>
                             </div>
                             <div className="h-2.5 bg-slate-800 rounded-full overflow-hidden ring-4 ring-white/[0.02]">
                                 <div
                                     className="h-full bg-gradient-to-r from-indigo-500 to-indigo-400 shadow-[0_0_20px_rgba(99,102,241,0.3)]"
-                                    style={{ width: `${course.progress || 0}%` }}
+                                    style={{ width: `${courseProgress}%` }}
                                 ></div>
                             </div>
                         </div>

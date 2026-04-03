@@ -23,6 +23,7 @@ const LessonPlayer = () => {
   const { lessonId } = useParams();
   const navigate = useNavigate();
   const [lesson, setLesson] = useState(null);
+  const [courseLessons, setCourseLessons] = useState([]);
   const [loading, setLoading] = useState(true);
   const [completing, setCompleting] = useState(false);
 
@@ -59,6 +60,10 @@ const LessonPlayer = () => {
     try {
       const response = await api.get(`/lessons/${lessonId}`);
       setLesson(response.data);
+
+      // Also fetch all lessons for this course to calculate overall progress
+      const lessonsRes = await api.get(`/courses/${response.data.course_id}/lessons`);
+      setCourseLessons(lessonsRes.data);
     } catch (error) {
       console.error('Error fetching lesson:', error);
     } finally {
@@ -151,30 +156,24 @@ const LessonPlayer = () => {
   };
 
   const goToNextLesson = async () => {
-    try {
-      const response = await api.get(`/courses/${lesson.course_id}`);
-      const courseLessons = response.data.lessons || [];
-      const currentIndex = courseLessons.findIndex(l => l.id === parseInt(lessonId));
-      if (currentIndex !== -1 && currentIndex < courseLessons.length - 1) {
-        navigate(`/lessons/${courseLessons[currentIndex + 1].id}`);
-      } else {
-        navigate(`/courses/${lesson.course_id}`);
-      }
-    } catch (err) {
+    const currentIndex = courseLessons.length > 0
+      ? courseLessons.findIndex(l => l.id === parseInt(lessonId))
+      : -1;
+
+    if (currentIndex !== -1 && currentIndex < courseLessons.length - 1) {
+      navigate(`/lessons/${courseLessons[currentIndex + 1].id}`);
+    } else {
       navigate(`/courses/${lesson.course_id}`);
     }
   };
 
   const goToPreviousLesson = async () => {
-    try {
-      const response = await api.get(`/courses/${lesson.course_id}`);
-      const courseLessons = response.data.lessons || [];
-      const currentIndex = courseLessons.findIndex(l => l.id === parseInt(lessonId));
-      if (currentIndex > 0) {
-        navigate(`/lessons/${courseLessons[currentIndex - 1].id}`);
-      }
-    } catch (err) {
-      console.error('Nav failed:', err);
+    const currentIndex = courseLessons.length > 0
+      ? courseLessons.findIndex(l => l.id === parseInt(lessonId))
+      : -1;
+
+    if (currentIndex > 0) {
+      navigate(`/lessons/${courseLessons[currentIndex - 1].id}`);
     }
   };
 
@@ -202,6 +201,11 @@ const LessonPlayer = () => {
     );
   }
 
+  const completedCount = courseLessons.filter(l => l.status === 'completed').length;
+  const progressPercent = courseLessons.length > 0 ? Math.round((completedCount / courseLessons.length) * 100) : 0;
+  const currentModuleIndex = courseLessons.findIndex(l => l.id === parseInt(lessonId)) + 1;
+  const totalModules = courseLessons.length;
+
   if (!lesson) return <div className="text-white p-10">Lesson not found.</div>;
 
   return (
@@ -218,7 +222,7 @@ const LessonPlayer = () => {
           <div className="h-4 w-px bg-slate-800"></div>
           <div>
             <h2 className="text-sm font-bold text-white line-clamp-1">{lesson.title}</h2>
-            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest leading-none">Module {lesson.order || 1}</p>
+            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest leading-none">Module {currentModuleIndex || 1} of {totalModules || '--'}</p>
           </div>
         </div>
 
@@ -369,7 +373,7 @@ const LessonPlayer = () => {
 
         <div className="flex items-center gap-6">
           <div className="text-[10px] text-slate-600 font-bold uppercase tracking-widest hidden sm:block">
-            Course Progress: {lesson.course_progress || 0}%
+            Course Progress: {progressPercent}%
           </div>
         </div>
 
@@ -429,8 +433,8 @@ const LessonPlayer = () => {
                                 type="button"
                                 onClick={() => setQuizAnswers(prev => ({ ...prev, [quiz.id]: opt }))}
                                 className={`p-5 rounded-2xl border text-left transition-all duration-300 flex items-center gap-4 ${quizAnswers[quiz.id] === opt
-                                    ? 'bg-indigo-600 border-indigo-400 text-white shadow-lg shadow-indigo-500/20'
-                                    : 'bg-slate-800/40 border-white/5 text-slate-400 hover:border-white/20 hover:bg-slate-800/60'
+                                  ? 'bg-indigo-600 border-indigo-400 text-white shadow-lg shadow-indigo-500/20'
+                                  : 'bg-slate-800/40 border-white/5 text-slate-400 hover:border-white/20 hover:bg-slate-800/60'
                                   }`}
                               >
                                 <div className={`w-8 h-8 rounded-xl border flex items-center justify-center text-xs font-bold shrink-0 ${quizAnswers[quiz.id] === opt ? 'bg-white text-indigo-600 border-white' : 'border-white/10 text-slate-500 bg-slate-900'

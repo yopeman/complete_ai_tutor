@@ -7,6 +7,7 @@ import Dashboard from './pages/Dashboard';
 import CourseDetails from './pages/CourseDetails';
 import LessonPlayer from './pages/LessonPlayer';
 import AITutorChat from './pages/AITutorChat';
+import Progress from './pages/Progress';
 import AppLayout from './components/layout/AppLayout';
 import { useAuth } from './context/AuthContext';
 
@@ -35,7 +36,7 @@ function App() {
         <Route path="/lessons/:lessonId" element={<LessonPlayer />} />
         <Route path="/chat" element={<AITutorChat />} />
         <Route path="/flashcards" element={<div className="text-white p-10">Flashcards Deck Page (Phase 8)</div>} />
-        <Route path="/progress" element={<div className="text-white p-10">Learning Progress Page (Phase 9)</div>} />
+        <Route path="/progress" element={<Progress />} />
       </Route>
     </Routes>
   );
