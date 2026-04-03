@@ -1,32 +1,18 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Query
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
 from typing import List
 from app.database import get_db
 from app.dependencies import get_current_active_user
-from app.models import User, Flashcard, Lesson, Course
+from app.models import User
 from app.schemas import FlashcardUpdate, FlashcardResponse
+from app.controllers.flashcards import (
+    get_flashcards as get_flashcards_controller,
+    get_flashcard as get_flashcard_controller,
+    update_flashcard as update_flashcard_controller,
+    delete_flashcard as delete_flashcard_controller,
+)
 
 router = APIRouter(prefix="/flashcards", tags=["Flashcards"])
-
-
-async def verify_flashcard_access(flashcard_id: int, user_id: int, db: AsyncSession):
-    """Verify that a flashcard belongs to the user's course."""
-    result = await db.execute(
-        select(Flashcard)
-        .join(Lesson)
-        .join(Course)
-        .where(Flashcard.id == flashcard_id, Course.user_id == user_id)
-    )
-    flashcard = result.scalar_one_or_none()
-    
-    if not flashcard:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Flashcard not found"
-        )
-    
-    return flashcard
 
 
 @router.get("", response_model=List[FlashcardResponse])
@@ -39,25 +25,7 @@ async def get_flashcards(
     db: AsyncSession = Depends(get_db)
 ):
     """Get all flashcards for the current user."""
-    query = (
-        select(Flashcard)
-        .join(Lesson)
-        .join(Course)
-        .where(Course.user_id == current_user.id)
-    )
-    
-    if lesson_id:
-        query = query.where(Flashcard.lesson_id == lesson_id)
-    
-    if difficulty:
-        query = query.where(Flashcard.difficulty == difficulty)
-    
-    query = query.order_by(Flashcard.created_at).offset(skip).limit(limit)
-    
-    result = await db.execute(query)
-    flashcards = result.scalars().all()
-    
-    return flashcards
+    return await get_flashcards_controller(lesson_id, difficulty, skip, limit, current_user, db)
 
 
 @router.get("/{flashcard_id}", response_model=FlashcardResponse)
@@ -67,8 +35,7 @@ async def get_flashcard(
     db: AsyncSession = Depends(get_db)
 ):
     """Get a specific flashcard by ID."""
-    flashcard = await verify_flashcard_access(flashcard_id, current_user.id, db)
-    return flashcard
+    return await get_flashcard_controller(flashcard_id, current_user, db)
 
 
 @router.put("/{flashcard_id}", response_model=FlashcardResponse)
@@ -79,16 +46,7 @@ async def update_flashcard(
     db: AsyncSession = Depends(get_db)
 ):
     """Update a flashcard."""
-    flashcard = await verify_flashcard_access(flashcard_id, current_user.id, db)
-    
-    update_data = flashcard_data.model_dump(exclude_unset=True)
-    for field, value in update_data.items():
-        setattr(flashcard, field, value)
-    
-    await db.commit()
-    await db.refresh(flashcard)
-    
-    return flashcard
+    return await update_flashcard_controller(flashcard_id, flashcard_data, current_user, db)
 
 
 @router.delete("/{flashcard_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -98,9 +56,4 @@ async def delete_flashcard(
     db: AsyncSession = Depends(get_db)
 ):
     """Delete a flashcard."""
-    flashcard = await verify_flashcard_access(flashcard_id, current_user.id, db)
-    
-    await db.delete(flashcard)
-    await db.commit()
-    
-    return None
+    return await delete_flashcard_controller(flashcard_id, current_user, db)
