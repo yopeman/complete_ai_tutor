@@ -1,8 +1,4 @@
 #!/home/yope/.projects/code/complete_ai_tutor_platform/backend/.venv/bin/python
-"""
-AI Tutor Platform - Entry Point
-Run with: uv run python main.py
-"""
 
 import uvicorn
 from app.config import get_settings
