@@ -6,8 +6,7 @@ from app.database import get_db
 from app.dependencies import get_current_active_user
 from app.models import User, Chat
 from app.schemas import ChatCreate, ChatResponse, ChatListResponse
-from app.config import get_settings
-from langchain_groq import ChatGroq
+from app.config import get_settings, get_llm
 from langchain_core.messages import HumanMessage, AIMessage
 
 router = APIRouter(prefix="/chats", tags=["Chats"])
@@ -61,11 +60,7 @@ async def create_chat(
     """Create a new chat and generate an AI response using Groq."""
     
     # 1. Initialize Groq LLM
-    llm = ChatGroq(
-        model="qwen/qwen3-32b",
-        temperature=0.7,
-        groq_api_key=settings.groq_api_key
-    )
+    llm = get_llm()
     
     # 2. Fetch conversation history from the same session
     history_query = select(Chat).where(

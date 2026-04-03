@@ -1,6 +1,5 @@
 from typing import Dict, Any, Optional, List
 from pydantic import BaseModel, Field
-from langchain_groq import ChatGroq
 from langchain_core.messages import HumanMessage
 from langchain.agents import create_agent
 from langchain.tools import tool
@@ -11,6 +10,7 @@ from sqlalchemy import select
 import uuid
 from app.models import Course, Lesson, Progress, User, Flashcard, Quiz, Interaction
 from app.models.enums import LessonStatus
+from backend.app.config import get_llm
 
 class FlashcardStructure(BaseModel):
     front: str = Field(description="The front of the flashcard (question/term)")
@@ -59,12 +59,8 @@ class EvaluationStructure(BaseModel):
 class TutorAgent:
     """LangChain agent for teaching a student, generating lesson plans and content."""
     
-    def __init__(self, groq_api_key: str, db: AsyncSession, user_id: int):
-        self.llm = ChatGroq(
-            model="qwen/qwen3-32b", 
-            temperature=0.7,
-            groq_api_key=groq_api_key
-        )
+    def __init__(self, db: AsyncSession, user_id: int):
+        self.llm = get_llm()
         self.db = db
         self.user_id = user_id
         

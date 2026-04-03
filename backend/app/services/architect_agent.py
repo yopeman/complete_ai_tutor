@@ -1,6 +1,6 @@
 from typing import List, Dict, Any, Optional, Literal
+from backend.app.config import get_llm
 from pydantic import BaseModel, Field
-from langchain_groq import ChatGroq
 from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 from langchain.agents import create_agent
 from langchain.tools import tool
@@ -25,12 +25,8 @@ class CourseStructure(BaseModel):
 class ArchitectAgent:
     """LangChain agent for creating courses based on user prompts."""
     
-    def __init__(self, groq_api_key: str, db: AsyncSession, user_id: int):
-        self.llm = ChatGroq(
-            model="qwen/qwen3-32b",
-            temperature=0.7,
-            groq_api_key=groq_api_key
-        )
+    def __init__(self, db: AsyncSession, user_id: int):
+        self.llm = get_llm()
         self.db = db
         self.user_id = user_id
         self.created_course = None
