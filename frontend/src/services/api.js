@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const API_BASE_URL = 'https://brittny-reprehensible-joel.ngrok-free.dev';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -9,7 +9,6 @@ const api = axios.create({
   },
 });
 
-// Request interceptor for adding JWT token
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
@@ -23,14 +22,11 @@ api.interceptors.request.use(
   }
 );
 
-// Response interceptor for handling common errors
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Handle unauthorized (e.g., redirect to login or refresh token)
       localStorage.removeItem('token');
-      // window.location.href = '/login';
     }
     return Promise.reject(error);
   }
