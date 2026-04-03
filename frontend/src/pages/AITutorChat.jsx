@@ -29,12 +29,12 @@ import { twMerge } from 'tailwind-merge';
 
 // ─── Suggestion prompts for empty state ───
 const SUGGESTIONS = [
-    { text: 'Explain Quantum Physics in simple terms', icon: Lightbulb, gradient: 'from-amber-500 to-orange-600' },
-    { text: 'Build a REST API with Python Flask', icon: Code2, gradient: 'from-blue-500 to-cyan-600' },
-    { text: 'Help me understand Machine Learning basics', icon: Brain, gradient: 'from-emerald-500 to-teal-600' },
-    { text: 'Create a 7-day JavaScript learning plan', icon: BookOpen, gradient: 'from-violet-500 to-purple-600' },
-    { text: 'Explain React hooks with code examples', icon: GraduationCap, gradient: 'from-pink-500 to-rose-600' },
-    { text: 'What is Big O notation? Explain with visuals', icon: Zap, gradient: 'from-indigo-500 to-blue-600' },
+  { text: 'Explain Quantum Physics in simple terms', icon: Lightbulb, gradient: 'from-amber-500 to-orange-600' },
+  { text: 'Build a REST API with Python Flask', icon: Code2, gradient: 'from-blue-500 to-cyan-600' },
+  { text: 'Help me understand Machine Learning basics', icon: Brain, gradient: 'from-emerald-500 to-teal-600' },
+  { text: 'Create a 7-day JavaScript learning plan', icon: BookOpen, gradient: 'from-violet-500 to-purple-600' },
+  { text: 'Explain React hooks with code examples', icon: GraduationCap, gradient: 'from-pink-500 to-rose-600' },
+  { text: 'What is Big O notation?', icon: Zap, gradient: 'from-indigo-500 to-blue-600' },
 ];
 
 // ─── Single message bubble ───
@@ -45,7 +45,7 @@ const ChatBubble = ({ msg }) => {
     : '';
 
   return (
-    <div className={twMerge('flex gap-3', isUser ? 'flex-row-reverse' : 'flex-row')}>
+    <div className={twMerge('flex gap-3 mb-4', isUser ? 'flex-row-reverse' : 'flex-row')}>
       {/* Avatar */}
       <div
         className={twMerge(
@@ -59,62 +59,63 @@ const ChatBubble = ({ msg }) => {
       </div>
 
       {/* Content */}
-      <div className={twMerge('flex flex-col max-w-[95%]', isUser ? 'items-end' : 'items-start')}>
+      <div className={twMerge('flex flex-col max-w-[85%]', isUser ? 'items-end' : 'items-start')}>
         <div
           className={twMerge(
-            'px-5 py-3.5 rounded-2xl shadow-md',
+            'px-5 py-3 rounded-2xl shadow-md transition-all duration-300',
             isUser
-              ? 'bg-indigo-600 text-white rounded-tr-sm'
-              : 'bg-white/[0.02] border border-white/5 backdrop-blur-sm text-slate-200 rounded-tl-sm'
+              ? 'bg-indigo-600 text-white rounded-tr-sm hover:bg-indigo-500'
+              : 'bg-white/[0.03] border border-white/10 backdrop-blur-md text-slate-200 rounded-tl-sm hover:bg-white/[0.05]'
           )}
         >
           {isUser ? (
-            <p className="text-base leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+            <p className="text-sm md:text-base leading-relaxed whitespace-pre-wrap">{msg.content}</p>
           ) : (
             <div
-              className="prose prose-invert prose-base max-w-none
-                prose-p:text-base prose-p:leading-relaxed prose-p:text-slate-200 prose-p:my-1.5
-                prose-headings:text-white prose-headings:font-bold prose-headings:mt-4 prose-headings:mb-2
-                prose-h1:text-xl prose-h2:text-lg prose-h3:text-base
-                prose-strong:text-white
-                prose-code:bg-slate-900/80 prose-code:text-emerald-400 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm prose-code:before:content-none prose-code:after:content-none
-                prose-pre:bg-slate-900 prose-pre:border prose-pre:border-slate-700 prose-pre:rounded-xl prose-pre:my-3
-                prose-ul:my-2 prose-li:text-slate-200 prose-li:text-base prose-li:my-0.5
-                prose-ol:my-2
-                prose-blockquote:border-indigo-500 prose-blockquote:text-slate-300
+              className="prose prose-invert prose-sm md:prose-base max-w-none
+                prose-p:text-slate-200 prose-p:my-1.5 prose-p:leading-relaxed
+                prose-headings:text-white prose-headings:font-semibold prose-headings:mt-4 prose-headings:mb-2
+                prose-strong:text-white prose-strong:font-bold
+                prose-code:bg-slate-900/90 prose-code:text-emerald-400 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-xs md:prose-code:text-sm prose-code:before:content-none prose-code:after:content-none
+                prose-pre:bg-slate-900 prose-pre:border prose-pre:border-slate-800 prose-pre:rounded-xl prose-pre:my-3 prose-pre:p-4
+                prose-ul:my-2 prose-li:text-slate-300 prose-li:my-0.5
+                prose-blockquote:border-indigo-500/50 prose-blockquote:bg-indigo-500/5 prose-blockquote:py-1 prose-blockquote:px-4 prose-blockquote:rounded-r-lg
                 prose-a:text-indigo-400 prose-a:no-underline hover:prose-a:underline"
-                        >
-                            <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
-                        </div>
-                    )}
-                </div>
-                {time && <span className="text-[11px] text-slate-500 mt-1 px-1">{time}</span>}
+            >
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
             </div>
+          )}
         </div>
-    );
+        {time && <span className="text-[10px] text-slate-500 mt-1.5 px-1 font-medium">{time}</span>}
+      </div>
+    </div>
+  );
 };
 
 // ─── Typing dots ───
 const TypingDots = () => (
-  <div className="flex gap-3">
+  <div className="flex gap-3 mb-6">
     <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shrink-0 mt-1 shadow-lg">
       <Bot size={16} className="text-white" />
     </div>
-    <div className="bg-white/[0.02] border border-white/5 backdrop-blur-sm px-5 py-3.5 rounded-2xl rounded-tl-sm shadow-md">
+    <div className="bg-white/[0.03] border border-white/10 backdrop-blur-md px-5 py-3 rounded-2xl rounded-tl-sm shadow-md">
       <div className="flex items-center gap-2">
-        <span className="text-slate-400 text-sm">Thinking</span>
+        <span className="text-slate-400 text-sm font-medium">Thinking</span>
         <span className="flex gap-1">
-          <span className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
-          <span className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
-          <span className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+          {[0, 150, 300].map((delay) => (
+            <span 
+              key={delay}
+              className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce" 
+              style={{ animationDelay: `${delay}ms` }}
+            ></span>
+          ))}
         </span>
       </div>
     </div>
+  </div>
 );
 
-// ═══════════════════════════════════════════════
 // ─── Main Component ───
-// ═══════════════════════════════════════════════
 const AITutorChat = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -125,280 +126,222 @@ const AITutorChat = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  
   const chatEndRef = useRef(null);
   const textareaRef = useRef(null);
 
-  // ─── Scroll to newest message ───
   const scrollToBottom = useCallback(() => {
-    setTimeout(() => {
-      chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, 100);
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, []);
 
-  // ─── Load all chats and group by session ───
-  const fetchAllChats = useCallback(async () => {
+  const fetchAllChats = useCallback(async (isSilent = false) => {
+    if (!isSilent) setIsInitialLoading(true);
     try {
       const chats = await chatService.getChats({ limit: 1000 });
-
       const grouped = {};
-      for (const chat of chats) {
-        const sid = chat.session_id || 'default';
+      
+      // Group chats into sessions
+      chats.forEach(chat => {
+        const sid = chat.session_id || 'default_session';
         if (!grouped[sid]) {
           grouped[sid] = {
             id: sid,
-            title: chat.prompt.length > 50 ? chat.prompt.slice(0, 50) + '…' : chat.prompt,
-            lastMessage: chat.response.length > 90 ? chat.response.slice(0, 90) + '…' : chat.response,
+            title: chat.prompt.length > 40 ? chat.prompt.slice(0, 40) + '...' : chat.prompt,
+            lastMessage: chat.response.length > 80 ? chat.response.slice(0, 80) + '...' : chat.response,
             timestamp: new Date(chat.created_at),
             messageCount: 0,
-            messages: [],
+            messages: []
           };
         }
-    }, [currentSessionId]);
+        // Chats are usually ordered by ID descending or created_at descending from API
+        // We want them in chronological order for the chat window
+        grouped[sid].messages.push({ role: 'user', content: chat.prompt, timestamp: chat.created_at });
+        grouped[sid].messages.push({ role: 'assistant', content: chat.response, timestamp: chat.created_at });
+        grouped[sid].messageCount += 2;
+      });
 
-    useEffect(() => { fetchAllChats(); }, [fetchAllChats]);
-    useEffect(() => { scrollToBottom(); }, [messages, scrollToBottom]);
+      const sortedSessions = Object.values(grouped).sort((a, b) => b.timestamp - a.timestamp);
+      setSessions(sortedSessions);
 
-    // ─── Send a message ───
-    const handleSend = async (e) => {
-        e.preventDefault();
-        const text = input.trim();
-        if (!text || isLoading) return;
+      // If we have a current session selected, update its messages
+      if (currentSessionId && grouped[currentSessionId]) {
+        setMessages(grouped[currentSessionId].messages);
+      }
+    } catch (err) {
+      console.error('Failed to fetch chats:', err);
+    } finally {
+      setIsInitialLoading(false);
+    }
+  }, [currentSessionId]);
 
-        setInput('');
-        if (textareaRef.current) textareaRef.current.style.height = 'auto';
-        setIsLoading(true);
+  useEffect(() => {
+    fetchAllChats();
+  }, []); // Once on mount
 
-        // Optimistic user message
-        setMessages((prev) => [...prev, { role: 'user', content: text, timestamp: new Date().toISOString() }]);
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, isLoading, scrollToBottom]);
 
-        try {
-            const sid = currentSessionId || `chat_${Date.now()}`;
-            if (!currentSessionId) setCurrentSessionId(sid);
+  const handleSend = async (e) => {
+    if (e) e.preventDefault();
+    const text = input.trim();
+    if (!text || isLoading) return;
 
-            const res = await chatService.createChat({ prompt: text, session_id: sid });
-            setMessages((prev) => [...prev, { role: 'assistant', content: res.response, timestamp: res.created_at }]);
-            fetchAllChats();
-        } catch (err) {
-            console.error('Send failed:', err);
-            setMessages((prev) => [
-                ...prev,
-                { role: 'assistant', content: '⚠️ Sorry, something went wrong. Please try again.', timestamp: new Date().toISOString() },
-            ]);
-        } finally {
-            setIsLoading(false);
-        }
-    };
+    setInput('');
+    if (textareaRef.current) textareaRef.current.style.height = 'auto';
+    setIsLoading(true);
 
-    const startNewChat = () => {
-        setCurrentSessionId(null);
-        setMessages([]);
-        setInput('');
-    };
+    // Optimistically add user message if no current messages (starting new)
+    const newUserMsg = { role: 'user', content: text, timestamp: new Date().toISOString() };
+    setMessages(prev => [...prev, newUserMsg]);
 
-    const selectSession = (session) => {
-        setCurrentSessionId(session.id);
-        setMessages(session.messages);
-    };
+    try {
+      const sid = currentSessionId || `session_${Date.now()}`;
+      if (!currentSessionId) setCurrentSessionId(sid);
 
-    const handleTextareaChange = (e) => {
-        setInput(e.target.value);
-        const el = e.target;
-        el.style.height = 'auto';
-        el.style.height = Math.min(el.scrollHeight, 150) + 'px';
-    };
+      const res = await chatService.createChat({ prompt: text, session_id: sid });
+      
+      const newBotMsg = { role: 'assistant', content: res.response, timestamp: res.created_at };
+      setMessages(prev => [...prev, newBotMsg]);
+      
+      // Update session list in background
+      fetchAllChats(true);
+    } catch (err) {
+      console.error('Send failed:', err);
+      setMessages(prev => [
+        ...prev,
+        { role: 'assistant', content: '⚠️ Sorry, I encountered an error. Please try again.', timestamp: new Date().toISOString() }
+      ]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-    const filteredSessions = sessions.filter(
-        (s) =>
-            s.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            s.lastMessage.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  }
+  const startNewChat = () => {
+    setCurrentSessionId(null);
+    setMessages([]);
+    setInput('');
+    if (textareaRef.current) textareaRef.current.focus();
+  };
 
-  // ═══════════════════════════════════════════════
-  // ─── Render ───
-  // ═══════════════════════════════════════════════
+  const selectSession = (session) => {
+    setCurrentSessionId(session.id);
+    setMessages(session.messages);
+  };
+
+  const handleTextareaChange = (e) => {
+    setInput(e.target.value);
+    e.target.style.height = 'auto';
+    e.target.style.height = Math.min(e.target.scrollHeight, 150) + 'px';
+  };
+
+  const filteredSessions = sessions.filter(s => 
+    s.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    s.lastMessage.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
-    <div className="flex h-screen bg-slate-950">
-
-      {/* ═══ SIDEBAR ═══ */}
-      <aside className="w-[280px] bg-slate-900 border-r border-slate-800 flex flex-col shrink-0">
-        {/* Header */}
-        <div className="p-4 border-b border-slate-800">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-lg">
-              <Bot size={20} className="text-white" />
+    <div className="flex h-screen bg-slate-950 text-white overflow-hidden font-inter">
+      {/* ─── Sidebar ─── */}
+      <aside className="hidden lg:flex w-80 bg-slate-900/50 backdrop-blur-xl border-r border-white/5 flex-col shrink-0">
+        <div className="p-6 border-b border-white/5">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+              <Bot size={22} className="text-white" />
             </div>
             <div>
-              <h2 className="text-white font-bold text-base">AI Tutor Chat</h2>
-              <div className="flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span className="text-emerald-400 text-xs font-semibold">Online</span>
+              <h2 className="font-bold text-lg leading-tight">AI Tutor</h2>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span className="text-[10px] uppercase font-bold tracking-widest text-emerald-500/80">Active Learning</span>
               </div>
             </div>
-        );
-    }
+          </div>
 
-    // ═══════════════════════════════════════════════
-    // ─── Render ───
-    // ═══════════════════════════════════════════════
-    return (
-        <div className="flex rounded-2xl overflow-hidden border border-slate-700/60 shadow-2xl shadow-black/30" style={{ height: 'calc(100vh - 180px)' }}>
+          <button
+            onClick={startNewChat}
+            className="w-full flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-semibold text-sm py-2.5 rounded-xl transition-all active:scale-[0.98] group"
+          >
+            <Plus size={18} className="text-indigo-400 group-hover:rotate-90 transition-transform duration-300" />
+            New Conversation
+          </button>
+        </div>
 
-            {/* ═══ SIDEBAR ═══ */}
-            <aside className="w-[280px] bg-slate-900 border-r border-slate-800 flex flex-col shrink-0">
-                {/* Header */}
-                <div className="p-4 border-b border-slate-800">
-                    <div className="flex items-center gap-3 mb-4">
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-lg">
-                            <Bot size={20} className="text-white" />
-                        </div>
-                        <div>
-                            <h2 className="text-white font-bold text-base">AI Tutor Chat</h2>
-                            <div className="flex items-center gap-1.5">
-                                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                                <span className="text-emerald-400 text-xs font-semibold">Online</span>
-                            </div>
-                        </div>
-                    </div>
+        {/* Search */}
+        <div className="px-4 py-3">
+          <div className="relative group">
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-indigo-400 transition-colors" />
+            <input
+              type="text"
+              placeholder="Search conversations..."
+              className="w-full bg-slate-800/40 border border-white/5 rounded-xl py-2 pl-9 pr-3 text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/20 transition-all"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+        </div>
 
-                    <button
-                        onClick={startNewChat}
-                        className="w-full flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm py-2.5 rounded-xl transition-all duration-200 shadow-lg shadow-indigo-600/20 active:scale-[0.97] group"
-                    >
-                        <Plus size={18} className="transition-transform duration-300 group-hover:rotate-90" />
-                        New Conversation
-                    </button>
-                </div>
-
-                {/* Search */}
-                <div className="px-4 py-3">
-                    <div className="relative">
-                        <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
-                        <input
-                            type="text"
-                            placeholder="Search chats…"
-                            className="w-full bg-slate-800/80 text-slate-200 placeholder-slate-500 text-sm rounded-lg py-2 pl-9 pr-3 border border-slate-700 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/30 outline-none transition-all"
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                        />
-                    </div>
-                </div>
-
-                {/* Session list */}
-                <div className="flex-1 overflow-y-auto px-2 pb-2 space-y-0.5">
-                    {sessions.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
-                            <div className="w-12 h-12 rounded-2xl bg-slate-800 flex items-center justify-center mb-3">
-                                <History size={20} className="text-slate-600" />
-                            </div>
-                            <p className="text-slate-400 font-semibold text-sm">No chats yet</p>
-                            <p className="text-slate-600 text-xs mt-1">Start a conversation above!</p>
-                        </div>
-                    ) : (
-                        <>
-                            <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider px-3 pt-1 pb-2">
-                                Conversations · {filteredSessions.length}
-                            </p>
-                            {filteredSessions.map((session) => {
-                                const isActive = currentSessionId === session.id;
-                                return (
-                                    <button
-                                        key={session.id}
-                                        onClick={() => selectSession(session)}
-                                        className={twMerge(
-                                            'w-full text-left px-3 py-2.5 rounded-xl transition-all duration-150 group relative',
-                                            isActive
-                                                ? 'bg-indigo-500/10 border border-indigo-500/25'
-                                                : 'hover:bg-slate-800/70 border border-transparent'
-                                        )}
-                                    >
-                                        {isActive && (
-                                            <div className="absolute left-0 top-2 bottom-2 w-[3px] bg-indigo-500 rounded-r-full"></div>
-                                        )}
-                                        <div className="flex items-start gap-2.5">
-                                            <div
-                                                className={twMerge(
-                                                    'w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5 transition-colors',
-                                                    isActive ? 'bg-indigo-500/20 text-indigo-400' : 'bg-slate-800 text-slate-500 group-hover:text-slate-400'
-                                                )}
-                                            >
-                                                <MessageCircle size={13} />
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                                <p className={twMerge('text-sm font-semibold truncate', isActive ? 'text-indigo-300' : 'text-slate-200')}>
-                                                    {session.title}
-                                                </p>
-                                                <p className="text-xs text-slate-500 truncate mt-0.5">{session.lastMessage}</p>
-                                                <div className="flex items-center gap-2 mt-1">
-                                                    <Clock size={10} className="text-slate-600" />
-                                                    <span className="text-[10px] text-slate-600">
-                                                        {session.timestamp.toLocaleDateString([], { month: 'short', day: 'numeric' })}
-                                                    </span>
-                                                    <span className="text-[10px] text-slate-700">·</span>
-                                                    <span className="text-[10px] text-slate-600">{session.messageCount} msgs</span>
-                                                </div>
-                                            </div>
-                                            <ChevronRight
-                                                size={14}
-                                                className={twMerge(
-                                                    'shrink-0 mt-1.5 transition-opacity',
-                                                    isActive ? 'text-indigo-400 opacity-100' : 'text-slate-700 opacity-0 group-hover:opacity-100'
-                                                )}
-                                            />
-                                        </div>
-                                    </button>
-                                );
-                            })}
-                        </>
+        {/* Session List */}
+        <div className="flex-1 overflow-y-auto px-2 space-y-1 custom-scrollbar">
+          {isInitialLoading && sessions.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-20 animate-pulse">
+              <Loader2 className="w-6 h-6 text-slate-700 animate-spin mb-2" />
+              <p className="text-xs text-slate-600 font-bold uppercase tracking-widest">Loading Chats</p>
+            </div>
+          ) : sessions.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
+              <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center mb-3">
+                <History className="text-slate-700" size={24} />
+              </div>
+              <p className="text-slate-500 font-semibold text-sm">No recent chats</p>
+              <p className="text-slate-700 text-xs mt-1">Your conversations will appear here.</p>
+            </div>
+          ) : (
+            <>
+              <p className="text-[10px] font-bold text-slate-600 uppercase tracking-[0.2em] px-4 pt-2 pb-3">History</p>
+              {filteredSessions.map((session) => {
+                const isActive = currentSessionId === session.id;
+                return (
+                  <button
+                    key={session.id}
+                    onClick={() => selectSession(session)}
+                    className={twMerge(
+                      "w-full text-left px-4 py-3.5 rounded-2xl transition-all duration-200 group relative overflow-hidden",
+                      isActive 
+                        ? "bg-indigo-600/10 border border-indigo-500/30" 
+                        : "hover:bg-white/[0.03] border border-transparent hover:border-white/5"
                     )}
-                </div>
-
-                {/* User card */}
-                <div className="p-3 border-t border-slate-800">
-                    <div className="flex items-center gap-3 px-3 py-2 rounded-xl bg-slate-800/50">
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-white text-sm font-bold shrink-0">
-                            {user?.username?.charAt(0)?.toUpperCase() || 'U'}
+                  >
+                    {isActive && <div className="absolute left-0 top-3 bottom-3 w-1 bg-indigo-500 rounded-r-full shadow-[0_0_10px_rgba(99,102,241,0.5)]"></div>}
+                    <div className="flex items-start gap-3">
+                      <div className={twMerge(
+                        "w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5 shadow-inner",
+                        isActive ? "bg-indigo-500/20 text-indigo-400" : "bg-slate-800/80 text-slate-600 group-hover:text-slate-400"
+                      )}>
+                        <MessageCircle size={14} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className={twMerge("text-sm font-semibold truncate", isActive ? "text-indigo-300" : "text-slate-200")}>
+                          {session.title}
+                        </p>
+                        <p className="text-xs text-slate-500 truncate mt-1 line-clamp-1 opacity-70 italic">
+                          {session.lastMessage}
+                        </p>
+                        <div className="flex items-center gap-2.5 mt-2 opacity-50">
+                          <div className="flex items-center gap-1">
+                            <Clock size={10} />
+                            <span className="text-[10px] font-medium">
+                              {session.timestamp.toLocaleDateString([], { month: 'short', day: 'numeric' })}
+                            </span>
+                          </div>
+                          <span className="w-1 h-1 rounded-full bg-slate-700"></span>
+                          <span className="text-[10px] font-medium">{session.messageCount} messages</span>
                         </div>
-                        <div className="min-w-0">
-                            <p className="text-sm font-semibold text-white truncate">{user?.username || 'User'}</p>
-                            <p className="text-xs text-slate-500">Student</p>
-                        </div>
-                    </div>
-                </div>
-            </aside>
-
-            {/* ═══ MAIN AREA ═══ */}
-            <main className="flex-1 flex flex-col bg-slate-950 overflow-hidden relative">
-                {/* Subtle ambient glow */}
-                <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500/[0.04] rounded-full blur-[100px] pointer-events-none"></div>
-                <div className="absolute bottom-0 left-0 w-80 h-80 bg-emerald-500/[0.03] rounded-full blur-[100px] pointer-events-none"></div>
-
-                {/* Header */}
-                <div className="relative z-10 h-14 border-b border-slate-800 bg-slate-900/60 backdrop-blur-sm px-5 flex items-center justify-between shrink-0">
-                    <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center">
-                            <Sparkles size={15} className="text-white" />
-                        </div>
-                        <div>
-                            <h1 className="text-white font-bold text-sm leading-tight">AI Academic Tutor</h1>
-                            <p className="text-slate-500 text-xs">
-                                {currentSessionId ? `Active session` : 'Start a new conversation'}
-                            </p>
-                        </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        {messages.length > 0 && (
-                            <button
-                                onClick={startNewChat}
-                                className="flex items-center gap-1.5 text-slate-400 hover:text-white text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-slate-800 transition-colors"
-                            >
-                                <RotateCcw size={12} /> New Chat
-                            </button>
-                        )}
-                        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20">
-                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                            <span className="text-emerald-400 text-[11px] font-semibold">Live</span>
-                        </div>
+                      </div>
+                      <ChevronRight size={14} className={twMerge(
+                        "shrink-0 mt-2 transition-all",
+                        isActive ? "text-indigo-400 translate-x-0" : "text-slate-800 opacity-0 group-hover:opacity-100 group-hover:translate-x-1"
+                      )} />
                     </div>
                   </button>
                 );
@@ -407,185 +350,211 @@ const AITutorChat = () => {
           )}
         </div>
 
-        {/* User card */}
-        <div className="p-3 border-t border-slate-800">
-          <div className="flex items-center gap-3 px-3 py-2 rounded-xl bg-slate-800/50">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-white text-sm font-bold shrink-0">
+        {/* User Footer */}
+        <div className="p-4 border-t border-white/5 bg-slate-900/60">
+          <div className="flex items-center gap-3 p-3 rounded-2xl bg-white/5 border border-white/5 shadow-inner">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-white font-bold shadow-lg">
               {user?.username?.charAt(0)?.toUpperCase() || 'U'}
             </div>
             <div className="min-w-0">
-              <p className="text-sm font-semibold text-white truncate">{user?.username || 'User'}</p>
-              <p className="text-xs text-slate-500">Student</p>
+              <p className="text-sm font-bold text-white truncate">{user?.username || 'Learner'}</p>
+              <p className="text-[10px] uppercase font-bold tracking-widest text-slate-500 px-0.5">Premium Plan</p>
             </div>
           </div>
         </div>
       </aside>
 
-      {/* ═══ MAIN AREA ═══ */}
-      <main className="flex-1 flex flex-col bg-slate-950 overflow-hidden relative">
-        {/* Subtle ambient glow */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500/[0.04] rounded-full blur-[100px] pointer-events-none"></div>
-        <div className="absolute bottom-0 left-0 w-80 h-80 bg-emerald-500/[0.03] rounded-full blur-[100px] pointer-events-none"></div>
+      {/* ─── Main Chat Area ─── */}
+      <main className="flex-1 flex flex-col relative bg-[#020617]">
+        {/* Decorative Background Elements */}
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-600/10 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/4 pointer-events-none"></div>
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-violet-600/5 rounded-full blur-[100px] translate-y-1/4 -translate-x-1/4 pointer-events-none"></div>
 
         {/* Header */}
-        <div className="relative z-10 h-16 border-b border-slate-800 bg-slate-900/60 backdrop-blur-sm px-5 flex items-center justify-between shrink-0">
-          <div className="flex items-center gap-6">
-            <button
+        <header className="h-16 flex items-center justify-between px-6 border-b border-white/5 bg-slate-900/40 backdrop-blur-md relative z-20">
+          <div className="flex items-center gap-4">
+            <button 
               onClick={() => navigate('/dashboard')}
-              className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-all flex items-center gap-2 group"
+              className="lg:hidden p-2 hover:bg-white/5 rounded-lg transition-colors"
             >
-              <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
-              <span className="text-xs font-bold uppercase tracking-widest hidden sm:block">Dashboard</span>
+              <ArrowLeft size={20} />
             </button>
-            <div className="h-6 w-px bg-slate-800"></div>
-            <div className="flex items-center gap-3">
+            <div className="hidden sm:flex items-center gap-3">
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-lg">
-                <Sparkles size={15} className="text-white" />
+                <Sparkles size={16} className="text-white" />
               </div>
               <div>
-                <h1 className="text-white font-bold text-sm leading-tight">AI Academic Tutor</h1>
-                <p className="text-slate-500 text-[10px] uppercase font-bold tracking-widest">
-                  {currentSessionId ? `Immersive Session` : 'Studio Mode'}
+                <h1 className="text-sm font-bold tracking-tight">Academic Tutor</h1>
+                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">
+                  {currentSessionId ? `Session active` : 'New Discussion'}
                 </p>
               </div>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+
+          <div className="flex items-center gap-3">
             {messages.length > 0 && (
               <button
                 onClick={startNewChat}
-                className="flex items-center gap-1.5 text-slate-400 hover:text-white text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-slate-800 transition-colors"
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold transition-all"
               >
-                <RotateCcw size={12} /> New Chat
+                <RotateCcw size={12} /> <span className="hidden sm:block">New Chat</span>
               </button>
             )}
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-              <span className="text-emerald-400 text-[11px] font-semibold">Live</span>
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 border-dotted">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span className="text-emerald-500 text-[10px] font-bold uppercase tracking-widest">Sync Live</span>
             </div>
+          </div>
+        </header>
+
+        {/* Chat Messages */}
+        <div className="flex-1 overflow-y-auto relative z-10 custom-scrollbar">
+          <div className="max-w-4xl mx-auto w-full flex flex-col min-h-full">
+            {messages.length === 0 ? (
+              <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 text-center">
+                <div className="relative mb-8 group">
+                  <div className="absolute inset-0 bg-indigo-500/20 blur-3xl rounded-full scale-150 animate-pulse transition-all group-hover:bg-indigo-500/30"></div>
+                  <div className="relative w-24 h-24 rounded-[2rem] bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-2xl shadow-indigo-600/40 transform -rotate-3 transition-transform group-hover:rotate-0">
+                    <GraduationCap size={48} className="text-white" />
+                  </div>
+                  <div className="absolute -bottom-2 -right-2 w-10 h-10 rounded-2xl bg-slate-900 border border-white/10 flex items-center justify-center shadow-xl">
+                    <Zap size={20} className="text-amber-400" />
+                  </div>
+                </div>
+
+                <div className="max-w-md mx-auto space-y-4">
+                  <h2 className="text-3xl font-display font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white via-indigo-200 to-slate-400">
+                    Welcome, {user?.username?.split(' ')[0] || 'Learner'}!
+                  </h2>
+                  <p className="text-slate-400 text-base leading-relaxed">
+                    I'm your deep-learning study companion. How can I help you accelerate your knowledge today?
+                  </p>
+                </div>
+
+                <div className="mt-12 w-full max-w-2xl">
+                  <p className="text-[10px] font-bold text-slate-600 uppercase tracking-[0.2em] mb-6">Quick Start Prompts</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {SUGGESTIONS.map((s, i) => (
+                      <button
+                        key={i}
+                        onClick={() => {
+                          setInput(s.text);
+                          if (textareaRef.current) textareaRef.current.focus();
+                        }}
+                        className="group flex items-start gap-4 p-4 rounded-2xl bg-white/[0.02] border border-white/[0.05] hover:bg-white/[0.05] hover:border-indigo-500/30 transition-all duration-300 text-left active:scale-[0.98]"
+                      >
+                        <div className={twMerge(
+                          "w-10 h-10 rounded-xl bg-gradient-to-br flex items-center justify-center shrink-0 shadow-lg group-hover:scale-110 transition-transform duration-300",
+                          s.gradient
+                        )}>
+                          <s.icon size={18} className="text-white/90" />
+                        </div>
+                        <div className="pt-0.5">
+                          <p className="text-sm font-semibold text-slate-200 group-hover:text-white transition-colors line-clamp-2">
+                            {s.text}
+                          </p>
+                          <p className="text-[10px] text-slate-600 mt-1 uppercase font-bold tracking-tight group-hover:text-indigo-400 transition-colors">Start Discussion →</p>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="px-5 py-10 space-y-2">
+                {messages.map((msg, idx) => (
+                  <ChatBubble key={idx} msg={msg} />
+                ))}
+                {isLoading && <TypingDots />}
+                <div ref={chatEndRef} />
+              </div>
+            )}
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto relative z-10">
-          {messages.length === 0 ? (
-            // ─── Welcome screen ───
-            <div className="h-full flex flex-col items-center justify-center px-6 py-10">
-              <div className="max-w-4xl w-full text-center">
-                {/* Hero icon */}
-                <div className="relative inline-block mb-6">
-                  <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-2xl shadow-indigo-500/30">
-                    <GraduationCap size={36} className="text-white" />
-                  </div>
-                  <div className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-emerald-500 border-2 border-slate-950 flex items-center justify-center">
-                    <Sparkles size={11} className="text-white" />
-                  </div>
-                </div>
-
-                {/* Messages or welcome */}
-                <div className="flex-1 overflow-y-auto relative z-10">
-                    {messages.length === 0 ? (
-                        // ─── Welcome screen ───
-                        <div className="h-full flex flex-col items-center justify-center px-6 py-10">
-                            <div className="max-w-2xl w-full text-center">
-                                {/* Hero icon */}
-                                <div className="relative inline-block mb-6">
-                                    <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-2xl shadow-indigo-500/30">
-                                        <GraduationCap size={36} className="text-white" />
-                                    </div>
-                                    <div className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-emerald-500 border-2 border-slate-950 flex items-center justify-center">
-                                        <Sparkles size={11} className="text-white" />
-                                    </div>
-                                </div>
-
-                                <h2 className="text-2xl md:text-3xl font-display font-bold text-white mb-3">
-                                    Hello, {user?.username || 'Learner'}! 👋
-                                </h2>
-                                <p className="text-slate-400 text-base leading-relaxed max-w-md mx-auto mb-10">
-                                    I'm your personal AI study companion. Ask me about concepts, code, study plans, or anything you want to learn.
-                                </p>
-
-                                {/* Suggestion grid */}
-                                <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Try asking me…</p>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-left">
-                                    {SUGGESTIONS.map((s, i) => (
-                                        <button
-                                            key={i}
-                                            onClick={() => setInput(s.text)}
-                                            className="flex items-start gap-3 p-4 bg-slate-800/50 hover:bg-slate-800 border border-slate-700/70 hover:border-slate-600 rounded-xl transition-all duration-200 group active:scale-[0.98]"
-                                        >
-                                            <div
-                                                className={`w-9 h-9 rounded-lg bg-gradient-to-br ${s.gradient} flex items-center justify-center shrink-0 shadow-md group-hover:shadow-lg group-hover:scale-105 transition-all duration-200`}
-                                            >
-                                                <s.icon size={16} className="text-white" />
-                                            </div>
-                                            <p className="text-sm text-slate-300 font-medium leading-snug pt-1 group-hover:text-white transition-colors">
-                                                {s.text}
-                                            </p>
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-                    ) : (
-                        // ─── Chat messages ───
-                        <div className="flex flex-col gap-5 px-5 py-6 max-w-3xl mx-auto w-full">
-                            {messages.map((msg, idx) => (
-                                <ChatBubble key={idx} msg={msg} />
-                            ))}
-                            {isLoading && <TypingDots />}
-                            <div ref={chatEndRef} />
-                        </div>
-                    )}
-                </div>
-              </div>
-            </div>
-          ) : (
-            // ─── Chat messages ───
-            <div className="flex flex-col gap-5 px-5 py-6 max-w-5xl mx-auto w-full">
-              {messages.map((msg, idx) => (
-                <ChatBubble key={idx} msg={msg} />
-              ))}
-              {isLoading && <TypingDots />}
-              <div ref={chatEndRef} />
-            </div>
-          )}
-        </div>
-
-        {/* Input bar */}
-        <div className="relative z-10 border-t border-slate-800 bg-slate-900/80 backdrop-blur-sm px-5 py-4 shrink-0">
-          <form onSubmit={handleSend} className="max-w-5xl mx-auto">
-            <div className="flex items-end gap-2 bg-slate-900/50 border border-white/10 focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500/30 rounded-2xl px-4 py-2.5 transition-all duration-200 shadow-lg">
+        {/* Input Bar */}
+        <div className="px-6 py-6 border-t border-white/5 bg-slate-900/40 backdrop-blur-xl relative z-20">
+          <form 
+            onSubmit={handleSend} 
+            className="max-w-4xl mx-auto relative group"
+          >
+            <div className="relative flex items-end gap-3 p-3 bg-white/5 border border-white/10 rounded-3xl focus-within:border-indigo-500/50 focus-within:ring-4 focus-within:ring-indigo-500/10 transition-all duration-500 shadow-2xl shadow-black/40">
               <textarea
                 ref={textareaRef}
                 rows={1}
-                placeholder="Ask anything — concepts, code, study plans…"
-                className="flex-1 bg-transparent text-white placeholder-slate-500 text-[15px] resize-none outline-none leading-relaxed min-h-[26px] max-h-[150px] py-1"
+                placeholder="Message your tutor..."
+                className="flex-1 bg-transparent text-slate-100 placeholder-slate-600 text-[15px] resize-none outline-none leading-relaxed min-h-[28px] max-h-[180px] px-3 py-2 custom-scrollbar"
                 value={input}
                 onChange={handleTextareaChange}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
-                    handleSend(e);
+                    handleSend();
                   }
                 }}
                 disabled={isLoading}
               />
-              <button
-                type="submit"
-                disabled={!input.trim() || isLoading}
-                className="w-9 h-9 flex items-center justify-center rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-700 disabled:text-slate-500 text-white transition-all duration-150 active:scale-90 shadow-lg shadow-indigo-600/25 disabled:shadow-none shrink-0"
-              >
-                {isLoading ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
-              </button>
+              <div className="flex items-center gap-2 pb-1 pr-1">
+                <button
+                  type="submit"
+                  disabled={!input.trim() || isLoading}
+                  className={twMerge(
+                    "w-11 h-11 flex items-center justify-center rounded-2xl transition-all duration-300 relative overflow-hidden group/btn",
+                    input.trim() && !isLoading
+                      ? "bg-indigo-600 hover:bg-indigo-500 shadow-lg shadow-indigo-600/30 active:scale-95"
+                      : "bg-slate-800 text-slate-600 cursor-not-allowed"
+                  )}
+                >
+                  {isLoading ? (
+                    <Loader2 size={18} className="animate-spin text-indigo-200" />
+                  ) : (
+                    <>
+                      <Send size={18} className="text-white relative z-10 group-hover/btn:translate-x-5 group-hover/btn:-translate-y-5 transition-transform duration-500 ease-in-out opacity-100" />
+                      <Send size={18} className="text-indigo-200 absolute -left-5 bottom-0 translate-y-5 transition-transform duration-500 ease-in-out opacity-0 group-hover/btn:translate-x-5 group-hover/btn:-translate-y-5 group-hover/btn:opacity-100" />
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
-            <p className="text-center text-slate-600 text-[11px] mt-2 font-medium">
-              <kbd className="bg-slate-800 border border-slate-700 rounded px-1 py-0.5 text-slate-400 font-mono text-[10px]">Enter</kbd> to send
-              <span className="mx-1.5">·</span>
-              <kbd className="bg-slate-800 border border-slate-700 rounded px-1 py-0.5 text-slate-400 font-mono text-[10px]">Shift + Enter</kbd> for new line
-            </p>
+            <div className="flex items-center justify-between px-6 mt-3">
+              <div className="flex gap-4">
+                <div className="flex items-center gap-1.5 text-slate-600 group-hover:text-slate-500 transition-colors">
+                  <kbd className="h-5 px-1.5 flex items-center bg-white/5 border border-white/10 rounded text-[9px] font-mono font-bold">ENTER</kbd>
+                  <span className="text-[10px] font-bold uppercase tracking-widest">SEND</span>
+                </div>
+                <div className="flex items-center gap-1.5 text-slate-600 group-hover:text-slate-500 transition-colors">
+                  <kbd className="h-5 px-1.5 flex items-center bg-white/5 border border-white/10 rounded text-[9px] font-mono font-bold">SHIFT+ENTER</kbd>
+                  <span className="text-[10px] font-bold uppercase tracking-widest">NEW LINE</span>
+                </div>
+              </div>
+              <p className="text-[10px] text-slate-700 font-bold uppercase tracking-widest italic">AI can make mistakes. Verify important info.</p>
+            </div>
           </form>
         </div>
-    );
+      </main>
+
+      <style dangerouslySetInnerHTML={{ __html: `
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 5px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: rgba(255, 255, 255, 0.05);
+          border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: rgba(255, 255, 255, 0.1);
+        }
+        @keyframes pulse-slow {
+          0%, 100% { opacity: 0.3; transform: scale(1); }
+          50% { opacity: 0.5; transform: scale(1.1); }
+        }
+      ` }} />
+    </div>
+  );
 };
 
 export default AITutorChat;
