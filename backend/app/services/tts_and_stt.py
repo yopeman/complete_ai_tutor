@@ -2,14 +2,15 @@ import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from app.config import get_llm
+from app.config import get_settings, get_llm
 from langchain_core.prompts import ChatPromptTemplate
 import uuid
 from gtts import gTTS
 import whisper as whisper_lib
 from fastapi import UploadFile
 
-AUDIO_CACHE_DIR = 'audio_cache'
+settings = get_settings()
+AUDIO_CACHE_DIR = settings.audio_cache_dir
 
 TTS_SYSTEM_PROMPT = """
 You are a professional text normalization engine for Text-to-Speech synthesis.
