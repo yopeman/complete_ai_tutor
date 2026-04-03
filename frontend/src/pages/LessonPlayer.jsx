@@ -44,19 +44,6 @@ const LessonPlayer = () => {
 
   const sessionId = `lesson_${lessonId}`;
 
-  useEffect(() => {
-    fetchLesson();
-    fetchChatHistory();
-  }, [fetchLesson, fetchChatHistory]);
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
-  const scrollToBottom = () => {
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
   const fetchLesson = useCallback(async () => {
     setLoading(true);
     try {
@@ -86,6 +73,19 @@ const LessonPlayer = () => {
       console.error('Error fetching chat history:', error);
     }
   }, [sessionId]);
+
+  useEffect(() => {
+    fetchLesson();
+    fetchChatHistory();
+  }, [fetchLesson, fetchChatHistory]);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  const scrollToBottom = () => {
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   const handleSendMessage = async (e) => {
     e.preventDefault();

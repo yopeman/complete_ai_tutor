@@ -65,12 +65,13 @@ const Dashboard = () => {
         setIsGenerating(true);
         try {
             // Include session_id to maintain conversation context
-            const payload = {
-                prompt: prompt,
-                session_id: sessionId
-            };
+            const formData = new FormData();
+            formData.append('prompt', prompt);
+            if (sessionId) {
+                formData.append('session_id', sessionId);
+            }
 
-            const response = await api.post('/courses', payload);
+            const response = await api.post('/courses', formData);
 
             // Set session ID for next turn
             if (response.data.session_id) {
@@ -98,7 +99,7 @@ const Dashboard = () => {
         setAiResponse(null);
         try {
             const formData = new FormData();
-            formData.append('audio', blob, 'voice_input.webm');
+            formData.append('audio_file', blob, 'voice_input.webm');
             if (sessionId) formData.append('session_id', sessionId);
 
             const response = await api.post('/courses', formData);
@@ -209,17 +210,23 @@ const Dashboard = () => {
 
                         <form onSubmit={handleGenerateCourse} className="relative max-w-2xl mx-auto group">
                             <div className="absolute -inset-1 bg-gradient-to-r from-indigo-400 to-indigo-300 rounded-[2rem] blur opacity-20 group-focus-within:opacity-40 transition duration-1000"></div>
-                            <div className="relative">
-                                <input
+                            <div className="relative group">
+                                <textarea
                                     ref={inputRef}
-                                    type="text"
+                                    rows={3}
                                     placeholder={aiResponse ? "Provide more details..." : "e.g. Fullstack Web Development in 3 months..."}
-                                    className="w-full bg-slate-900/50 border border-white/10 backdrop-blur-3xl rounded-[1.5rem] py-6 pl-8 pr-40 text-white text-lg placeholder:text-slate-600 focus:ring-4 focus:ring-indigo-500/20 outline-none transition-all shadow-2xl"
+                                    className="w-full bg-slate-900/50 border border-white/10 backdrop-blur-3xl rounded-[2rem] py-8 pl-8 pr-48 text-white text-lg placeholder:text-slate-600 focus:ring-4 focus:ring-indigo-500/20 outline-none transition-all shadow-2xl resize-y min-h-[120px]"
                                     value={prompt}
                                     onChange={(e) => setPrompt(e.target.value)}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter' && !e.shiftKey) {
+                                            e.preventDefault();
+                                            handleGenerateCourse(e);
+                                        }
+                                    }}
                                     disabled={isGenerating}
                                 />
-                                <div className="absolute right-3 top-3 bottom-3 flex items-center gap-2">
+                                <div className="absolute right-4 bottom-4 flex items-center gap-3">
                                     <VoiceInputButton
                                         onRecordingComplete={handleVoiceComplete}
                                         isDisabled={isGenerating}
@@ -227,7 +234,7 @@ const Dashboard = () => {
                                     <Button
                                         type="submit"
                                         disabled={isGenerating || !prompt.trim()}
-                                        className="h-full bg-white text-slate-900 hover:bg-slate-100 px-8 rounded-2xl flex items-center gap-3 shadow-xl font-bold uppercase tracking-widest text-[10px]"
+                                        className="h-14 bg-white text-slate-900 hover:bg-slate-100 px-8 rounded-2xl flex items-center gap-3 shadow-xl font-bold uppercase tracking-widest text-[10px]"
                                     >
                                         {isGenerating ? <Loader2 className="animate-spin" size={20} /> : <><Sparkles size={16} className="text-indigo-600" /> {sessionId ? 'Continue' : 'Architect'}</>}
                                     </Button>
