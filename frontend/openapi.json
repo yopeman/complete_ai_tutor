@@ -178,11 +178,10 @@
           }
         ],
         "requestBody": {
-          "required": true,
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/ChatCreate"
+                "$ref": "#/components/schemas/Body_create_course_courses_post"
               }
             }
           }
@@ -340,63 +339,6 @@
           }
         }
       },
-      "put": {
-        "tags": [
-          "Courses",
-          "Courses"
-        ],
-        "summary": "Update Course",
-        "description": "Update a course.",
-        "operationId": "update_course_courses__course_id__put",
-        "security": [
-          {
-            "OAuth2PasswordBearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "course_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "Course Id"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CourseUpdate"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CourseResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      },
       "delete": {
         "tags": [
           "Courses",
@@ -464,11 +406,10 @@
           }
         ],
         "requestBody": {
-          "required": true,
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/ChatCreate"
+                "$ref": "#/components/schemas/Body_update_course_plan_ai_courses__course_id__plans_ai_put"
               }
             }
           }
@@ -845,7 +786,7 @@
           "Lessons"
         ],
         "summary": "Create Interaction",
-        "description": "Create a new interaction for a lesson where the TutorAgent answers a student question.",
+        "description": "Create a new interaction for a lesson where TutorAgent answers a student question.",
         "operationId": "create_interaction_lessons__lesson_id__interactions_post",
         "security": [
           {
@@ -864,11 +805,10 @@
           }
         ],
         "requestBody": {
-          "required": true,
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/InteractionCreate"
+                "$ref": "#/components/schemas/Body_create_interaction_lessons__lesson_id__interactions_post"
               }
             }
           }
@@ -1122,7 +1062,7 @@
           "Interactions"
         ],
         "summary": "Get Interactions",
-        "description": "Get all interactions for the current user.",
+        "description": "Get all interactions for current user.",
         "operationId": "get_interactions_interactions_get",
         "security": [
           {
@@ -1249,7 +1189,7 @@
           "Quizzes"
         ],
         "summary": "Get Quizzes",
-        "description": "Get all quizzes for the current user.",
+        "description": "Get all quizzes for current user.",
         "operationId": "get_quizzes_quizzes_get",
         "security": [
           {
@@ -1376,7 +1316,7 @@
           "Progress"
         ],
         "summary": "Get Progress",
-        "description": "Get all progress records for the current user.",
+        "description": "Get all progress records for current user.",
         "operationId": "get_progress_progress_get",
         "security": [
           {
@@ -1833,11 +1773,10 @@
           }
         ],
         "requestBody": {
-          "required": true,
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/ChatCreate"
+                "$ref": "#/components/schemas/Body_create_chat_chats_post"
               }
             }
           }
@@ -1915,6 +1854,88 @@
         }
       }
     },
+    "/text_to_speech": {
+      "post": {
+        "tags": [
+          "TTS and STT"
+        ],
+        "summary": "Text To Speech Endpoint",
+        "operationId": "text_to_speech_endpoint_text_to_speech_post",
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_text_to_speech_endpoint_text_to_speech_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/speech_to_text": {
+      "post": {
+        "tags": [
+          "TTS and STT"
+        ],
+        "summary": "Speech To Text Endpoint",
+        "operationId": "speech_to_text_endpoint_speech_to_text_post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_speech_to_text_endpoint_speech_to_text_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/": {
       "get": {
         "summary": "Root",
@@ -1954,6 +1975,115 @@
   },
   "components": {
     "schemas": {
+      "Body_create_chat_chats_post": {
+        "properties": {
+          "prompt": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prompt"
+          },
+          "session_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Session Id"
+          },
+          "audio_file": {
+            "anyOf": [
+              {
+                "type": "string",
+                "contentMediaType": "application/octet-stream"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Audio File"
+          }
+        },
+        "type": "object",
+        "title": "Body_create_chat_chats_post"
+      },
+      "Body_create_course_courses_post": {
+        "properties": {
+          "prompt": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prompt"
+          },
+          "session_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Session Id"
+          },
+          "audio_file": {
+            "anyOf": [
+              {
+                "type": "string",
+                "contentMediaType": "application/octet-stream"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Audio File"
+          }
+        },
+        "type": "object",
+        "title": "Body_create_course_courses_post"
+      },
+      "Body_create_interaction_lessons__lesson_id__interactions_post": {
+        "properties": {
+          "user_question": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "User Question"
+          },
+          "audio_file": {
+            "anyOf": [
+              {
+                "type": "string",
+                "contentMediaType": "application/octet-stream"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Audio File"
+          }
+        },
+        "type": "object",
+        "title": "Body_create_interaction_lessons__lesson_id__interactions_post"
+      },
       "Body_login_auth_login_post": {
         "properties": {
           "grant_type": {
@@ -2013,32 +2143,72 @@
         ],
         "title": "Body_login_auth_login_post"
       },
-      "ChatCreate": {
+      "Body_speech_to_text_endpoint_speech_to_text_post": {
         "properties": {
-          "session_id": {
+          "audio_file": {
+            "type": "string",
+            "contentMediaType": "application/octet-stream",
+            "title": "Audio File"
+          }
+        },
+        "type": "object",
+        "required": [
+          "audio_file"
+        ],
+        "title": "Body_speech_to_text_endpoint_speech_to_text_post"
+      },
+      "Body_text_to_speech_endpoint_text_to_speech_post": {
+        "properties": {
+          "text": {
+            "type": "string",
+            "title": "Text"
+          }
+        },
+        "type": "object",
+        "required": [
+          "text"
+        ],
+        "title": "Body_text_to_speech_endpoint_text_to_speech_post"
+      },
+      "Body_update_course_plan_ai_courses__course_id__plans_ai_put": {
+        "properties": {
+          "prompt": {
             "anyOf": [
               {
-                "type": "string",
-                "maxLength": 100
+                "type": "string"
               },
               {
                 "type": "null"
               }
             ],
-            "title": "Session Id",
-            "description": "Optional session identifier"
+            "title": "Prompt"
           },
-          "prompt": {
-            "type": "string",
-            "title": "Prompt",
-            "description": "User's prompt or request"
+          "session_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Session Id"
+          },
+          "audio_file": {
+            "anyOf": [
+              {
+                "type": "string",
+                "contentMediaType": "application/octet-stream"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Audio File"
           }
         },
         "type": "object",
-        "required": [
-          "prompt"
-        ],
-        "title": "ChatCreate"
+        "title": "Body_update_course_plan_ai_courses__course_id__plans_ai_put"
       },
       "ChatListResponse": {
         "properties": {
@@ -2312,85 +2482,6 @@
         ],
         "title": "CourseResponse"
       },
-      "CourseUpdate": {
-        "properties": {
-          "title": {
-            "anyOf": [
-              {
-                "type": "string",
-                "maxLength": 255,
-                "minLength": 1
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Title"
-          },
-          "description": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Description"
-          },
-          "difficulty": {
-            "anyOf": [
-              {
-                "type": "string",
-                "maxLength": 50
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Difficulty"
-          },
-          "goal": {
-            "anyOf": [
-              {
-                "type": "string",
-                "maxLength": 500
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Goal"
-          },
-          "objectives": {
-            "anyOf": [
-              {
-                "items": {
-                  "type": "string"
-                },
-                "type": "array"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Objectives"
-          },
-          "estimated_duration_days": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Estimated Duration Days"
-          }
-        },
-        "type": "object",
-        "title": "CourseUpdate"
-      },
       "FlashcardResponse": {
         "properties": {
           "front": {
@@ -2489,19 +2580,6 @@
         },
         "type": "object",
         "title": "HTTPValidationError"
-      },
-      "InteractionCreate": {
-        "properties": {
-          "user_question": {
-            "type": "string",
-            "title": "User Question"
-          }
-        },
-        "type": "object",
-        "required": [
-          "user_question"
-        ],
-        "title": "InteractionCreate"
       },
       "InteractionResponse": {
         "properties": {

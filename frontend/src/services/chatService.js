@@ -17,7 +17,7 @@ const chatService = {
 
   /**
    * Create a new chat and generate an AI response.
-   * @param {Object} data - Request body (session_id, prompt)
+   * @param {Object|FormData} data - Request body (session_id, prompt) or FormData containing audio
    * @returns {Promise} - Resolves to ChatResponse
    */
   createChat: async (data) => {

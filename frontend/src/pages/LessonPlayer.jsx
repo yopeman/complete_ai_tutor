@@ -16,8 +16,10 @@ import {
   Sparkles,
   Send,
   User as UserIcon,
-  RotateCcw
+  RotateCcw,
+  Mic
 } from 'lucide-react';
+import VoiceInputButton from '../components/chat/VoiceInputButton';
 
 const LessonPlayer = () => {
   const { lessonId } = useParams();
@@ -105,6 +107,33 @@ const LessonPlayer = () => {
     } catch (error) {
       console.error('Chat failed:', error);
       setMessages(prev => [...prev, { role: 'assistant', content: "I'm sorry, I'm having trouble connecting right now. Please try again." }]);
+    } finally {
+      setIsTyping(false);
+    }
+  };
+
+  const handleVoiceComplete = async (blob) => {
+    setIsTyping(true);
+    setMessages(prev => [...prev, { role: 'user', content: '🎤 Spoken message...' }]);
+
+    try {
+      const formData = new FormData();
+      formData.append('audio', blob, 'voice_input.webm');
+      formData.append('session_id', sessionId);
+
+      const response = await api.post('/chats', formData);
+      setMessages(prev => [
+        ...prev.filter(m => m.content !== '🎤 Spoken message...'),
+        { role: 'user', content: response.data.prompt },
+        { role: 'assistant', content: response.data.response }
+      ]);
+      fetchChatHistory();
+    } catch (error) {
+      console.error('Voice message failed:', error);
+      setMessages(prev => [
+        ...prev.filter(m => m.content !== '🎤 Spoken message...'),
+        { role: 'assistant', content: '⚠️ Voice processing failed. Please try text.' }
+      ]);
     } finally {
       setIsTyping(false);
     }
@@ -336,22 +365,28 @@ const LessonPlayer = () => {
 
           {/* Chat Input */}
           <div className="p-6 border-t border-white/5 bg-white/[0.01]">
-            <form onSubmit={handleSendMessage} className="relative group">
-              <input
-                type="text"
-                placeholder="Ask your tutor anything..."
-                className="w-full bg-slate-950 border border-white/10 rounded-2xl py-4 pl-5 pr-14 text-white text-sm placeholder:text-slate-600 focus:ring-2 focus:ring-indigo-500 outline-none transition-all shadow-inner"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                disabled={isTyping}
+            <form onSubmit={handleSendMessage} className="flex items-center gap-2">
+              <div className="relative flex-1 group">
+                <input
+                  type="text"
+                  placeholder="Ask your tutor anything..."
+                  className="w-full bg-slate-950 border border-white/10 rounded-2xl py-4 pl-5 pr-14 text-white text-sm placeholder:text-slate-600 focus:ring-2 focus:ring-indigo-500 outline-none transition-all shadow-inner"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  disabled={isTyping}
+                />
+                <button
+                  type="submit"
+                  disabled={!input.trim() || isTyping}
+                  className="absolute right-2 top-2 bottom-2 w-10 h-10 flex items-center justify-center rounded-xl bg-indigo-600 text-white hover:bg-indigo-500 disabled:opacity-50 disabled:bg-slate-800 transition-all shadow-lg"
+                >
+                  <Send size={18} />
+                </button>
+              </div>
+              <VoiceInputButton
+                onRecordingComplete={handleVoiceComplete}
+                isDisabled={isTyping}
               />
-              <button
-                type="submit"
-                disabled={!input.trim() || isTyping}
-                className="absolute right-2 top-2 bottom-2 w-10 h-10 flex items-center justify-center rounded-xl bg-indigo-600 text-white hover:bg-indigo-500 disabled:opacity-50 disabled:bg-slate-800 transition-all shadow-lg"
-              >
-                <Send size={18} />
-              </button>
             </form>
             <p className="mt-3 text-[10px] text-center text-slate-600 font-bold uppercase tracking-widest">
               Contextual AI Assistant Active

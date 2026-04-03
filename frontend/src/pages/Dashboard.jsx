@@ -6,6 +6,7 @@ import { Sparkles, BookOpen, Clock, ChevronRight, Loader2, XCircle, RotateCcw } 
 import { useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import VoiceInputButton from '../components/chat/VoiceInputButton';
 
 const Dashboard = () => {
     const [courses, setCourses] = useState([]);
@@ -80,6 +81,33 @@ const Dashboard = () => {
             }
         } catch (error) {
             console.error('Generation failed:', error);
+        } finally {
+            setIsGenerating(false);
+        }
+    };
+
+    const handleVoiceComplete = async (blob) => {
+        setIsGenerating(true);
+        setAiResponse(null);
+        try {
+            const formData = new FormData();
+            formData.append('audio', blob, 'voice_input.webm');
+            if (sessionId) formData.append('session_id', sessionId);
+
+            const response = await api.post('/courses', formData);
+
+            if (response.data.session_id) {
+                setSessionId(response.data.session_id);
+            }
+
+            if (response.data.course) {
+                navigate(`/courses/${response.data.course.id}`);
+            } else {
+                setAiResponse(response.data.response);
+                setPrompt('');
+            }
+        } catch (error) {
+            console.error('Voice generation failed:', error);
         } finally {
             setIsGenerating(false);
         }
@@ -170,7 +198,11 @@ const Dashboard = () => {
                                     onChange={(e) => setPrompt(e.target.value)}
                                     disabled={isGenerating}
                                 />
-                                <div className="absolute right-3 top-3 bottom-3">
+                                <div className="absolute right-3 top-3 bottom-3 flex items-center gap-2">
+                                    <VoiceInputButton
+                                        onRecordingComplete={handleVoiceComplete}
+                                        isDisabled={isGenerating}
+                                    />
                                     <Button
                                         type="submit"
                                         disabled={isGenerating || !prompt.trim()}

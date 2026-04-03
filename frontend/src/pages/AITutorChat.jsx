@@ -26,6 +26,7 @@ import remarkGfm from 'remark-gfm';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { twMerge } from 'tailwind-merge';
+import VoiceInputButton from '../components/chat/VoiceInputButton';
 
 // ─── Suggestion prompts for empty state ───
 const SUGGESTIONS = [
@@ -199,7 +200,11 @@ const AITutorChat = () => {
       const sid = currentSessionId || `chat_${Date.now()}`;
       if (!currentSessionId) setCurrentSessionId(sid);
 
-      const res = await chatService.createChat({ prompt: text, session_id: sid });
+      const formData = new FormData();
+      formData.append('prompt', text);
+      formData.append('session_id', sid);
+
+      const res = await chatService.createChat(formData);
       setMessages((prev) => [...prev, { role: 'assistant', content: res.response, timestamp: res.created_at }]);
       fetchAllChats();
     } catch (err) {
@@ -207,6 +212,37 @@ const AITutorChat = () => {
       setMessages((prev) => [
         ...prev,
         { role: 'assistant', content: '⚠️ Sorry, something went wrong. Please try again.', timestamp: new Date().toISOString() },
+      ]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleVoiceComplete = async (blob) => {
+    setIsLoading(true);
+    // Optimistic user message for voice
+    setMessages((prev) => [...prev, { role: 'user', content: '🎤 Spoken message...', timestamp: new Date().toISOString() }]);
+
+    try {
+      const formData = new FormData();
+      formData.append('audio_file', blob, 'voice_input.webm');
+
+      const sid = currentSessionId || `chat_${Date.now()}`;
+      if (!currentSessionId) setCurrentSessionId(sid);
+      formData.append('session_id', sid);
+
+      const res = await chatService.createChat(formData);
+      setMessages((prev) => [
+        ...prev.filter(m => m.content !== '🎤 Spoken message...'), // Remove placeholder
+        { role: 'user', content: res.prompt, timestamp: res.created_at }, // Show transcribed text
+        { role: 'assistant', content: res.response, timestamp: res.created_at }
+      ]);
+      fetchAllChats();
+    } catch (err) {
+      console.error('Voice send failed:', err);
+      setMessages((prev) => [
+        ...prev.filter(m => m.content !== '🎤 Spoken message...'),
+        { role: 'assistant', content: '⚠️ Voice processing failed. Please try text input.', timestamp: new Date().toISOString() },
       ]);
     } finally {
       setIsLoading(false);
@@ -504,13 +540,19 @@ const AITutorChat = () => {
                 }}
                 disabled={isLoading}
               />
-              <button
-                type="submit"
-                disabled={!input.trim() || isLoading}
-                className="w-9 h-9 flex items-center justify-center rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-700 disabled:text-slate-500 text-white transition-all duration-150 active:scale-90 shadow-lg shadow-indigo-600/25 disabled:shadow-none shrink-0"
-              >
-                {isLoading ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
-              </button>
+              <div className="flex items-center gap-2 mb-1">
+                <VoiceInputButton
+                  onRecordingComplete={handleVoiceComplete}
+                  isDisabled={isLoading}
+                />
+                <button
+                  type="submit"
+                  disabled={!input.trim() || isLoading}
+                  className="w-9 h-9 flex items-center justify-center rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-700 disabled:text-slate-500 text-white transition-all duration-150 active:scale-90 shadow-lg shadow-indigo-600/25 disabled:shadow-none shrink-0"
+                >
+                  {isLoading ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
+                </button>
+              </div>
             </div>
             <p className="text-center text-slate-600 text-[11px] mt-2 font-medium">
               <kbd className="bg-slate-800 border border-slate-700 rounded px-1 py-0.5 text-slate-400 font-mono text-[10px]">Enter</kbd> to send

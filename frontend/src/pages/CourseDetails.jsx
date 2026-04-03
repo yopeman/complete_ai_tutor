@@ -18,10 +18,12 @@ import {
     Save,
     RotateCcw,
     ChevronDown,
-    ChevronUp
+    ChevronUp,
+    Mic
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import VoiceInputButton from '../components/chat/VoiceInputButton';
 
 const CourseDetails = () => {
     const { courseId } = useParams();
@@ -104,6 +106,25 @@ const CourseDetails = () => {
             // Optionally close editor or keep it open for "again and again"
         } catch (error) {
             console.error('AI Update failed:', error);
+        } finally {
+            setIsUpdating(false);
+        }
+    };
+
+    const handleVoiceComplete = async (blob) => {
+        setIsUpdating(true);
+        try {
+            const formData = new FormData();
+            formData.append('audio', blob, 'voice_input.webm');
+            if (sessionId) formData.append('session_id', sessionId);
+
+            const response = await api.put(`/courses/${courseId}/plans/ai`, formData);
+            setCourse(response.data);
+            setManualPlan(response.data.course_plan);
+            setAiPrompt('');
+            if (response.data.session_id) setSessionId(response.data.session_id);
+        } catch (error) {
+            console.error('Voice AI Update failed:', error);
         } finally {
             setIsUpdating(false);
         }
@@ -233,7 +254,11 @@ const CourseDetails = () => {
                                                     onChange={(e) => setAiPrompt(e.target.value)}
                                                     disabled={isUpdating}
                                                 />
-                                                <div className="absolute right-2 top-2 bottom-2">
+                                                <div className="absolute right-2 top-2 bottom-2 flex items-center gap-2">
+                                                    <VoiceInputButton
+                                                        onRecordingComplete={handleVoiceComplete}
+                                                        isDisabled={isUpdating}
+                                                    />
                                                     <Button type="submit" disabled={isUpdating || !aiPrompt.trim()} className="h-full px-8 rounded-xl gap-2 font-bold uppercase tracking-widest text-xs">
                                                         {isUpdating ? <Loader2 className="animate-spin" size={18} /> : 'Process Update'}
                                                     </Button>
