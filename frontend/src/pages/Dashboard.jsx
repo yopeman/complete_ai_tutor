@@ -76,77 +76,111 @@ const Dashboard = () => {
 
     return (
         <div className="space-y-10">
-            {/* Hero / Generator Section */}
-            <section className="relative overflow-hidden rounded-[2.5rem] bg-indigo-600 p-10 shadow-2xl shadow-indigo-500/20">
-                <div className="relative z-10 max-w-2xl">
-                    <h1 className="text-4xl font-display font-bold text-white mb-4">
-                        {sessionId ? "Architecting your path..." : "What do you want to learn today?"}
-                    </h1>
+            {/* Hero / Command Center Generator */}
+            <section className="relative overflow-hidden rounded-[3rem] bg-slate-900 border border-white/5 shadow-2xl p-1 lg:p-2">
+                {/* Background Decoration */}
+                <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-500/10 rounded-full blur-[120px] -mr-40 -mt-40"></div>
+                <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-indigo-600/10 rounded-full blur-[120px] -ml-40 -mb-40"></div>
 
-                    {!aiResponse && !sessionId && (
-                        <p className="text-indigo-100 mb-8 text-lg">
-                            Tell our AI Tutor what you're interested in, and we'll architect a personalized curriculum just for you.
-                        </p>
-                    )}
+                <div className="relative z-10 bg-slate-950/80 backdrop-blur-2xl rounded-[2.8rem] p-12 lg:p-16 border border-white/10 overflow-hidden shadow-[0_0_50px_-12px_rgba(99,102,241,0.3)]">
+                    {/* Landing Page Gradient Glows */}
+                    <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-indigo-500/10 rounded-full blur-[100px] -mr-20 -mt-20"></div>
+                    <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-emerald-500/10 rounded-full blur-[100px] -ml-20 -mb-20"></div>
 
-                    {/* AI Conversation Display */}
-                    {isGenerating && !aiResponse && (
-                        <div className="mb-8 flex items-center gap-3 text-white/60 animate-pulse bg-white/5 border border-white/10 p-4 rounded-2xl w-fit">
-                            <Loader2 className="animate-spin" size={18} />
-                            <span className="text-sm font-medium">Architect is processing your request...</span>
+                    {/* Animated Beam */}
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-40 h-px bg-gradient-to-r from-transparent via-indigo-200 to-transparent"></div>
+
+                    <div className="max-w-3xl mx-auto text-center space-y-8">
+                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/10 text-indigo-100 text-xs font-bold uppercase tracking-widest backdrop-blur-md">
+                            <Sparkles size={14} className="animate-pulse" /> AI Academic Architect v2.0
                         </div>
-                    )}
 
-                    {aiResponse && (
-                        <div className="mb-8 p-6 bg-white/10 backdrop-blur-md rounded-3xl border border-white/20 animate-in fade-in slide-in-from-bottom-2 duration-500">
-                            <div className="flex items-start gap-4">
-                                <div className="w-10 h-10 rounded-2xl bg-white flex items-center justify-center shrink-0">
-                                    <Sparkles className="text-indigo-600" size={24} />
-                                </div>
-                                <div className="flex-1 text-indigo-50 prose prose-invert max-w-none 
-                                    prose-p:leading-relaxed prose-p:text-indigo-100/80
-                                    prose-headings:text-white prose-headings:font-display
-                                    prose-li:my-1 prose-li:text-indigo-100/70
-                                    prose-strong:text-white prose-strong:font-bold
-                                ">
-                                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{aiResponse}</ReactMarkdown>
+                        <h1 className="text-4xl lg:text-6xl font-display font-bold text-white mb-4 leading-tight">
+                            {sessionId ? "Refining your journey..." : "What do you want to master today?"}
+                        </h1>
+
+                        {!aiResponse && !sessionId && (
+                            <p className="text-indigo-100/70 text-lg lg:text-xl max-w-2xl mx-auto">
+                                Transform any goal into a professional, structured learning path in seconds.
+                            </p>
+                        )}
+
+                        {/* AI Conversation Display */}
+                        {isGenerating && !aiResponse && (
+                            <div className="flex items-center justify-center gap-3 text-white/50 animate-pulse py-4">
+                                <Loader2 className="animate-spin" size={20} />
+                                <span className="text-sm font-bold uppercase tracking-[0.2em]">Architecting Curriculum...</span>
+                            </div>
+                        )}
+
+                        {aiResponse && (
+                            <div className="p-8 bg-white/10 backdrop-blur-2xl rounded-[2rem] border border-white/20 animate-in zoom-in-95 duration-500 shadow-2xl text-left">
+                                <div className="flex gap-6">
+                                    <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center shrink-0 shadow-xl">
+                                        <Sparkles className="text-indigo-600" size={24} />
+                                    </div>
+                                    <div className="flex-1">
+                                        <div className="prose prose-invert prose-indigo max-w-none 
+                                            prose-p:text-lg prose-p:leading-relaxed prose-p:text-indigo-50
+                                            prose-strong:text-white prose-strong:font-bold
+                                            prose-li:text-indigo-100/80
+                                        ">
+                                            <ReactMarkdown remarkPlugins={[remarkGfm]}>{aiResponse}</ReactMarkdown>
+                                        </div>
+                                        <div className="mt-6 pt-6 border-t border-white/10 flex justify-between items-center">
+                                            <span className="text-[10px] font-bold text-indigo-200/50 uppercase tracking-widest italic">Awaiting your response...</span>
+                                            <button
+                                                onClick={resetConversation}
+                                                className="flex items-center gap-2 text-xs font-bold text-white/50 hover:text-white transition-all uppercase tracking-widest group"
+                                            >
+                                                <RotateCcw size={14} className="group-hover:rotate-180 transition-transform duration-500" /> Start Over
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            <div className="mt-4 flex justify-end">
-                                <button
-                                    onClick={resetConversation}
-                                    className="flex items-center gap-2 text-xs font-bold text-white/50 hover:text-white transition-colors uppercase tracking-widest"
-                                >
-                                    <RotateCcw size={14} /> Clear & Restart
-                                </button>
-                            </div>
-                        </div>
-                    )}
+                        )}
 
-                    <form onSubmit={handleGenerateCourse} className="relative group">
-                        <input
-                            ref={inputRef}
-                            type="text"
-                            placeholder={aiResponse ? "Type your answer here..." : "e.g. Master Python for Data Science..."}
-                            className="w-full bg-white/10 border border-white/20 backdrop-blur-md rounded-2xl py-5 pl-6 pr-32 text-white placeholder:text-indigo-200/60 focus:ring-4 focus:ring-white/20 outline-none transition-all"
-                            value={prompt}
-                            onChange={(e) => setPrompt(e.target.value)}
-                            disabled={isGenerating}
-                        />
-                        <div className="absolute right-2 top-2 bottom-2">
-                            <Button
-                                type="submit"
-                                disabled={isGenerating || !prompt.trim()}
-                                className="h-full bg-white text-indigo-600 hover:bg-indigo-50 px-6 rounded-xl flex items-center gap-2 shadow-lg"
-                            >
-                                {isGenerating ? <Loader2 className="animate-spin" size={20} /> : <><Sparkles size={18} /> {sessionId ? 'Reply' : 'Generate'}</>}
-                            </Button>
-                        </div>
-                    </form>
+                        <form onSubmit={handleGenerateCourse} className="relative max-w-2xl mx-auto group">
+                            <div className="absolute -inset-1 bg-gradient-to-r from-indigo-400 to-indigo-300 rounded-[2rem] blur opacity-20 group-focus-within:opacity-40 transition duration-1000"></div>
+                            <div className="relative">
+                                <input
+                                    ref={inputRef}
+                                    type="text"
+                                    placeholder={aiResponse ? "Provide more details..." : "e.g. Fullstack Web Development in 3 months..."}
+                                    className="w-full bg-slate-900/50 border border-white/10 backdrop-blur-3xl rounded-[1.5rem] py-6 pl-8 pr-40 text-white text-lg placeholder:text-slate-600 focus:ring-4 focus:ring-indigo-500/20 outline-none transition-all shadow-2xl"
+                                    value={prompt}
+                                    onChange={(e) => setPrompt(e.target.value)}
+                                    disabled={isGenerating}
+                                />
+                                <div className="absolute right-3 top-3 bottom-3">
+                                    <Button
+                                        type="submit"
+                                        disabled={isGenerating || !prompt.trim()}
+                                        className="h-full bg-white text-slate-900 hover:bg-slate-100 px-8 rounded-2xl flex items-center gap-3 shadow-xl font-bold uppercase tracking-widest text-[10px]"
+                                    >
+                                        {isGenerating ? <Loader2 className="animate-spin" size={20} /> : <><Sparkles size={16} className="text-indigo-600" /> {sessionId ? 'Continue' : 'Architect'}</>}
+                                    </Button>
+                                </div>
+                            </div>
+                        </form>
+
+                        {!sessionId && (
+                            <div className="flex flex-wrap items-center justify-center gap-3 pt-6">
+                                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.3em] w-full mb-2">Architectural Presets</span>
+                                {['React Native', 'Machine Learning', 'UI Design', 'Go Backend'].map(topic => (
+                                    <button
+                                        key={topic}
+                                        onClick={() => setPrompt(`I want to learn ${topic}`)}
+                                        className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-slate-400 text-[10px] font-bold uppercase tracking-widest hover:bg-indigo-600 hover:text-white hover:border-indigo-500 transition-all shadow-lg shadow-black/20"
+                                    >
+                                        + {topic}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                    </div>
                 </div>
-
-                <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full -mr-20 -mt-20 blur-3xl"></div>
-                <div className="absolute bottom-0 right-0 w-64 h-64 bg-emerald-400/20 rounded-full mr-20 -mb-20 blur-3xl"></div>
             </section>
 
             {/* Course Grid */}
