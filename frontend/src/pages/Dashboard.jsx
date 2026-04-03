@@ -25,7 +25,24 @@ const Dashboard = () => {
     const fetchCourses = async () => {
         try {
             const response = await api.get('/courses');
-            setCourses(response.data);
+            const courseList = response.data;
+
+            // Fetch progress for each course concurrently
+            const coursesWithProgress = await Promise.all(courseList.map(async (course) => {
+                try {
+                    const lessonsRes = await api.get(`/courses/${course.id}/lessons`);
+                    const lessons = lessonsRes.data || [];
+                    const total = lessons.length;
+                    const completed = lessons.filter(l => l.status === 'completed').length;
+                    const progress = total > 0 ? Math.round((completed / total) * 100) : 0;
+                    return { ...course, progress };
+                } catch (err) {
+                    console.error(`Error fetching progress for course ${course.id}:`, err);
+                    return { ...course, progress: 0 };
+                }
+            }));
+
+            setCourses(coursesWithProgress);
         } catch (error) {
             console.error('Error fetching courses:', error);
         } finally {

@@ -17,12 +17,14 @@ import {
   RotateCcw,
   ChevronRight,
   Code2,
-  Brain
+  Brain,
+  ArrowLeft
 } from 'lucide-react';
 import chatService from '../services/chatService';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import { twMerge } from 'tailwind-merge';
 
 // ─── Suggestion prompts for empty state ───
@@ -116,6 +118,7 @@ const TypingDots = () => (
 // ═══════════════════════════════════════════════
 const AITutorChat = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [sessions, setSessions] = useState([]);
   const [currentSessionId, setCurrentSessionId] = useState(null);
   const [messages, setMessages] = useState([]);
@@ -256,7 +259,7 @@ const AITutorChat = () => {
   // ─── Render ───
   // ═══════════════════════════════════════════════
   return (
-    <div className="flex rounded-2xl overflow-hidden border border-slate-700/60 shadow-2xl shadow-black/30" style={{ height: 'calc(100vh - 180px)' }}>
+    <div className="flex h-screen bg-slate-950">
 
       {/* ═══ SIDEBAR ═══ */}
       <aside className="w-[280px] bg-slate-900 border-r border-slate-800 flex flex-col shrink-0">
@@ -388,16 +391,26 @@ const AITutorChat = () => {
         <div className="absolute bottom-0 left-0 w-80 h-80 bg-emerald-500/[0.03] rounded-full blur-[100px] pointer-events-none"></div>
 
         {/* Header */}
-        <div className="relative z-10 h-14 border-b border-slate-800 bg-slate-900/60 backdrop-blur-sm px-5 flex items-center justify-between shrink-0">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center">
-              <Sparkles size={15} className="text-white" />
-            </div>
-            <div>
-              <h1 className="text-white font-bold text-sm leading-tight">AI Academic Tutor</h1>
-              <p className="text-slate-500 text-xs">
-                {currentSessionId ? `Active session` : 'Start a new conversation'}
-              </p>
+        <div className="relative z-10 h-16 border-b border-slate-800 bg-slate-900/60 backdrop-blur-sm px-5 flex items-center justify-between shrink-0">
+          <div className="flex items-center gap-6">
+            <button
+              onClick={() => navigate('/dashboard')}
+              className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-all flex items-center gap-2 group"
+            >
+              <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
+              <span className="text-xs font-bold uppercase tracking-widest hidden sm:block">Dashboard</span>
+            </button>
+            <div className="h-6 w-px bg-slate-800"></div>
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-lg">
+                <Sparkles size={15} className="text-white" />
+              </div>
+              <div>
+                <h1 className="text-white font-bold text-sm leading-tight">AI Academic Tutor</h1>
+                <p className="text-slate-500 text-[10px] uppercase font-bold tracking-widest">
+                  {currentSessionId ? `Immersive Session` : 'Studio Mode'}
+                </p>
+              </div>
             </div>
           </div>
           <div className="flex items-center gap-2">
