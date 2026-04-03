@@ -6,7 +6,7 @@ from app.database import get_db
 from app.dependencies import get_current_active_user
 from app.models import User, Chat
 from app.schemas import ChatCreate, ChatResponse, ChatListResponse
-from app.config import get_settings, get_llm
+from app.config import get_llm
 from langchain_core.messages import HumanMessage, AIMessage, BaseMessage
 from langchain.agents import create_agent
 from app.services.tutor_tools import TUTOR_TOOLS
@@ -62,8 +62,7 @@ async def get_chats(
 async def create_chat(
     chat_data: ChatCreate,
     current_user: User = Depends(get_current_active_user),
-    db: AsyncSession = Depends(get_db),
-    settings = Depends(get_settings)
+    db: AsyncSession = Depends(get_db)
 ):
     """Create a new chat and generate an AI response using an AI Agent with tools."""
     

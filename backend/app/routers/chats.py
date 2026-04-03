@@ -6,7 +6,6 @@ from app.database import get_db
 from app.dependencies import get_current_active_user
 from app.models import User
 from app.schemas import ChatCreate, ChatResponse, ChatListResponse
-from app.config import get_settings
 from app.controllers.chats import (
     get_chats as get_chats_controller,
     create_chat as create_chat_controller,
@@ -36,8 +35,7 @@ async def create_chat(
     session_id: Optional[str] = Form(None),
     audio_file: Optional[UploadFile] = File(None),
     current_user: User = Depends(get_current_active_user),
-    db: AsyncSession = Depends(get_db),
-    settings = Depends(get_settings)
+    db: AsyncSession = Depends(get_db)
 ):
     """Create a new chat and generate an AI response using Groq."""
     if not prompt and not audio_file:
