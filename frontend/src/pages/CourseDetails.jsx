@@ -20,7 +20,8 @@ import {
     ChevronUp,
     Mic,
     Trash2,
-    Volume2
+    Volume2,
+    Lock
 } from 'lucide-react';
 import SmartMarkdown from '../components/ui/SmartMarkdown';
 import VoiceInputButton from '../components/chat/VoiceInputButton';
@@ -333,11 +334,17 @@ const CourseDetails = () => {
                             <div className="space-y-4">
                                 {lessons.map((lesson, index) => {
                                     const progress = progressRecords.find(p => p.lesson_id === lesson.id);
+                                    const isLessonLocked = lesson.is_locked && lesson.status !== 'completed';
+                                    
                                     return (
                                         <Card
                                             key={lesson.id}
-                                            className="flex items-center justify-between py-5 px-8 group cursor-pointer hover:bg-white/[0.02]"
-                                            onClick={() => navigate(`/lessons/${lesson.id}`)}
+                                            className={`flex items-center justify-between py-5 px-8 group transition-all ${
+                                                isLessonLocked 
+                                                ? 'opacity-60 cursor-not-allowed' 
+                                                : 'cursor-pointer hover:bg-white/[0.02]'
+                                            }`}
+                                            onClick={() => !isLessonLocked && navigate(`/lessons/${lesson.id}`)}
                                         >
                                             <div className="flex items-center gap-6">
                                                 <div className="w-10 h-10 rounded-2xl bg-slate-900 border border-white/5 flex items-center justify-center text-sm font-bold text-slate-500 group-hover:text-indigo-400 group-hover:border-indigo-500/30 transition-all">
@@ -357,15 +364,22 @@ const CourseDetails = () => {
                                                 </div>
                                             </div>
                                             <div className="flex items-center gap-8">
-                                                {lesson.status === 'completed' ? (
-                                                    <div className="flex items-center gap-2 text-emerald-500 text-xs font-bold uppercase tracking-widest">
-                                                        <CheckCircle2 size={18} /> Passed
-                                                    </div>
-                                                ) : (
-                                                    <Circle className="text-slate-800" size={20} />
-                                                )}
-                                                <div className="w-10 h-10 rounded-full flex items-center justify-center bg-white/5 group-hover:bg-indigo-500 group-hover:text-white transition-all">
-                                                    <Play className="text-slate-400 group-hover:text-white" size={18} fill="currentColor" />
+                                                <div className={`flex items-center gap-2 text-xs font-bold uppercase tracking-widest ${
+                                                    lesson.status === 'completed' ? 'text-emerald-500' :
+                                                    lesson.status === 'in_progress' ? 'text-amber-500' :
+                                                    'text-slate-500'
+                                                }`}>
+                                                    {lesson.status === 'completed' ? <CheckCircle2 size={18} /> : 
+                                                     lesson.status === 'in_progress' ? <Circle size={18} className="fill-amber-500/20" /> :
+                                                     <Circle size={18} />}
+                                                    {lesson.status ? lesson.status.replace('_', ' ') : 'Not Started'}
+                                                </div>
+                                                <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
+                                                    isLessonLocked 
+                                                    ? 'bg-slate-900 border border-white/5 text-slate-600' 
+                                                    : 'bg-white/5 group-hover:bg-indigo-500 group-hover:text-white text-slate-400'
+                                                }`}>
+                                                    {isLessonLocked ? <Lock size={16} /> : <Play className="ml-1" size={18} fill="currentColor" />}
                                                 </div>
                                             </div>
                                         </Card>
