@@ -16,14 +16,15 @@ import {
     Edit3,
     Wand2,
     Save,
-    RotateCcw,
     ChevronDown,
     ChevronUp,
     Mic,
-    Trash2
+    Trash2,
+    Volume2
 } from 'lucide-react';
 import SmartMarkdown from '../components/ui/SmartMarkdown';
 import VoiceInputButton from '../components/chat/VoiceInputButton';
+import TTSButton from '../components/ui/TTSButton';
 
 const CourseDetails = () => {
     const { courseId } = useParams();
@@ -230,7 +231,7 @@ const CourseDetails = () => {
                         {/* Blueprint Visualization */}
                         <div className="p-8 space-y-8">
                             {showPlan && (
-                                <div className="p-8 bg-slate-950/60 rounded-[2rem] border border-white/5 animate-in zoom-in-95 fade-in duration-500 shadow-inner">
+                                <div className="p-8 bg-slate-950/60 rounded-[2rem] border border-white/5 animate-in zoom-in-95 fade-in duration-500 shadow-inner relative group">
                                     <div className="prose prose-invert prose-indigo max-w-none 
                                         prose-headings:font-display prose-headings:font-bold prose-headings:tracking-tight
                                         prose-h2:text-xl prose-h2:mt-10 prose-h2:mb-4 prose-h2:text-indigo-400 prose-h2:pb-2 prose-h2:border-b prose-h2:border-white/5
@@ -241,6 +242,11 @@ const CourseDetails = () => {
                                             {manualPlan || course.course_plan || "*No learning plan available yet.*"}
                                         </SmartMarkdown>
                                     </div>
+                                    {course.course_plan && (
+                                        <div className="flex justify-end mt-6 pt-4 border-t border-white/5">
+                                            <TTSButton text={course.course_plan} />
+                                        </div>
+                                    )}
                                 </div>
                             )}
 

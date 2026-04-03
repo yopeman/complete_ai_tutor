@@ -6,6 +6,7 @@ import { Sparkles, BookOpen, Clock, ChevronRight, Loader2, XCircle, RotateCcw, T
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import SmartMarkdown from '../components/ui/SmartMarkdown';
 import VoiceInputButton from '../components/chat/VoiceInputButton';
+import TTSButton from '../components/ui/TTSButton';
 
 const Dashboard = () => {
     const [courses, setCourses] = useState([]);
@@ -195,12 +196,15 @@ const Dashboard = () => {
                                         </div>
                                         <div className="mt-6 pt-6 border-t border-white/10 flex justify-between items-center">
                                             <span className="text-[10px] font-bold text-indigo-200/50 uppercase tracking-widest italic">Awaiting your response...</span>
-                                            <button
-                                                onClick={resetConversation}
-                                                className="flex items-center gap-2 text-xs font-bold text-white/50 hover:text-white transition-all uppercase tracking-widest group"
-                                            >
-                                                <RotateCcw size={14} className="group-hover:rotate-180 transition-transform duration-500" /> Start Over
-                                            </button>
+                                            <div className="flex items-center gap-4">
+                                                <TTSButton text={aiResponse} />
+                                                <button
+                                                    onClick={resetConversation}
+                                                    className="flex items-center gap-2 text-xs font-bold text-white/50 hover:text-white transition-all uppercase tracking-widest group"
+                                                >
+                                                    <RotateCcw size={14} className="group-hover:rotate-180 transition-transform duration-500" /> Start Over
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
