@@ -422,21 +422,21 @@ const Flashcards = () => {
         </div>
 
         {/* Footer Controls */}
-        <div className="h-24 md:h-28 border-t border-white/5 bg-slate-900/80 backdrop-blur-md px-3 md:px-8 flex items-center justify-center gap-2 md:gap-6 shrink-0 z-20 pb-8 sm:pb-0">
+        <div className="h-24 md:h-28 border-t border-white/5 bg-slate-900/80 backdrop-blur-md px-3 md:px-8 flex items-center justify-center gap-3 md:gap-6 shrink-0 z-20 pb-8 sm:pb-0">
           {/* Previous */}
           <button
             onClick={goPrev}
             disabled={currentIndex === 0}
-            className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-slate-800 border border-white/5 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-700 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+            className="w-28 h-10 md:h-12 rounded-xl md:rounded-2xl bg-slate-800 border border-white/5 flex items-center justify-center gap-2 font-bold text-xs md:text-sm text-slate-400 hover:text-white hover:bg-slate-700 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
             title="Previous Card"
           >
-            <ChevronLeft size={20} />
+            <ChevronLeft size={16} /> Prev
           </button>
 
           {/* Flip button */}
           <button
             onClick={flipCard}
-            className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-indigo-600 text-white flex items-center justify-center shadow-2xl shadow-indigo-500/30 hover:bg-indigo-500 transition-all hover:scale-105 active:scale-95 ring-4 ring-indigo-500/20 shrink-0"
+            className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-indigo-600 text-white flex items-center justify-center shadow-2xl shadow-indigo-500/30 hover:bg-indigo-500 transition-all hover:scale-105 active:scale-95 ring-4 ring-indigo-500/20 shrink-0 mx-2"
             title="Flip Card"
           >
             <RotateCcw size={24} />
@@ -454,7 +454,7 @@ const Flashcards = () => {
             {isLastCard ? (
               <>Finish <Check size={16} /></>
             ) : (
-              <ChevronRight size={20} />
+              <>Next <ChevronRight size={16} /></>
             )}
           </button>
         </div>
