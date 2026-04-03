@@ -88,6 +88,11 @@ async def complete_lesson(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to generate quizzes for the lesson"
         )
+
+    for quiz in quizzes:
+        quiz.explanation = None
+        quiz.correct_answer = None
+        quiz.is_correct = None
     
     return quizzes
 
@@ -172,7 +177,6 @@ async def submit_quizzes(
     submission: QuizBatchSubmission,
     current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db),
-    settings = Depends(get_settings)
 ):
     """Submit quiz answers for evaluation."""
     await verify_lesson_access(lesson_id, current_user.id, db)

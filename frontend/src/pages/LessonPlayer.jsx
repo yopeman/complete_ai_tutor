@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../services/api';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
+import SmartMarkdown from '../components/ui/SmartMarkdown';
 import Button from '../components/ui/Button';
 import {
   ArrowLeft,
@@ -296,14 +295,9 @@ const LessonPlayer = () => {
               prose-pre:bg-slate-950 prose-pre:border prose-pre:border-white/5 prose-pre:rounded-2xl prose-pre:p-8 prose-pre:shadow-2xl
               prose-code:text-indigo-300 prose-code:bg-indigo-500/10 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-md prose-code:before:content-none prose-code:after:content-none
             ">
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              <SmartMarkdown>
                 {lesson.content || '# Generating Content...\n\nPlease wait while the AI Tutor creates your lesson for this topic.'}
-              </ReactMarkdown>
-              {lesson.content && (
-                <div className="flex justify-end mt-8 border-t border-white/5 pt-4">
-                  <TTSButton text={lesson.content} />
-                </div>
-              )}
+              </SmartMarkdown>
             </div>
           </div>
         </div>
@@ -348,12 +342,7 @@ const LessonPlayer = () => {
                   : 'bg-white/[0.03] border border-white/5 backdrop-blur-sm text-slate-300 rounded-tl-none prose prose-invert prose-base max-w-none'
                   }`}>
                   {msg.role === 'assistant' ? (
-                    <>
-                      <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
-                      <div className="flex justify-end mt-3 -mr-2 -mb-1 border-t border-white/5 pt-2">
-                        <TTSButton text={msg.content} />
-                      </div>
-                    </>
+                    <SmartMarkdown>{msg.content}</SmartMarkdown>
                   ) : msg.content}
                 </div>
               </div>

@@ -26,8 +26,7 @@ import {
   Pause
 } from 'lucide-react';
 import chatService from '../services/chatService';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
+import SmartMarkdown from '../components/ui/SmartMarkdown';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { twMerge } from 'tailwind-merge';
@@ -64,7 +63,7 @@ const ChatBubble = ({ msg }) => {
     } else {
       window.speechSynthesis.cancel(); // Cancel any current speech
       const utterance = new SpeechSynthesisUtterance(msg.content);
-      
+
       utterance.onend = () => {
         setIsPlaying(false);
         setIsPaused(false);
@@ -73,7 +72,7 @@ const ChatBubble = ({ msg }) => {
         setIsPlaying(false);
         setIsPaused(false);
       };
-      
+
       window.speechSynthesis.speak(utterance);
       setIsPlaying(true);
       setIsPaused(false);
@@ -127,15 +126,15 @@ const ChatBubble = ({ msg }) => {
                   prose-blockquote:border-indigo-500/50 prose-blockquote:bg-indigo-500/5 prose-blockquote:py-1 prose-blockquote:px-4 prose-blockquote:rounded-r-lg
                   prose-a:text-indigo-400 prose-a:no-underline hover:prose-a:underline"
               >
-                <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
+                <SmartMarkdown>{msg.content}</SmartMarkdown>
               </div>
               <div className="flex justify-end mt-3 -mr-2 -mb-1 border-t border-white/5 pt-2">
                 <button
                   onClick={handleSpeak}
                   className={twMerge(
                     "p-1.5 rounded-md transition-all flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider",
-                    isPlaying 
-                      ? "text-indigo-400 bg-indigo-500/10" 
+                    isPlaying
+                      ? "text-indigo-400 bg-indigo-500/10"
                       : "text-slate-400 hover:text-indigo-300 hover:bg-white/5"
                   )}
                   title={isPlaying ? (isPaused ? "Resume reading" : "Pause reading") : "Listen to response"}

@@ -107,11 +107,10 @@ async def submit_quizzes(
     lesson_id: int,
     submission: QuizBatchSubmission,
     current_user: User = Depends(get_current_active_user),
-    db: AsyncSession = Depends(get_db),
-    settings = Depends(get_settings)
+    db: AsyncSession = Depends(get_db)
 ):
     """Submit quiz answers for evaluation."""
-    return await submit_quizzes_controller(lesson_id, submission, current_user, db, settings)
+    return await submit_quizzes_controller(lesson_id, submission, current_user, db)
 
 # ============== Progress Endpoints ==============
 

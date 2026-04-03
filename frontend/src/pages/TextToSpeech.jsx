@@ -2,8 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Play, Pause, Square, ArrowLeft, Volume2 } from 'lucide-react';
 import { twMerge } from 'tailwind-merge';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
+import SmartMarkdown from '../components/ui/SmartMarkdown';
 
 const TextToSpeech = () => {
   const location = useLocation();
@@ -85,7 +84,7 @@ const TextToSpeech = () => {
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
         <div className="absolute top-[-20%] left-[-10%] w-[70vw] h-[70vw] bg-indigo-600/10 rounded-full blur-[120px] mix-blend-screen"></div>
         <div className="absolute bottom-[-20%] right-[-10%] w-[60vw] h-[60vw] bg-violet-600/10 rounded-full blur-[100px] mix-blend-screen"></div>
-        
+
         {/* Pulsing effect when playing */}
         <div className={twMerge(
           "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80vw] h-[50vh] bg-emerald-500/5 rounded-full blur-[150px] transition-opacity duration-1000",
@@ -118,7 +117,7 @@ const TextToSpeech = () => {
           {!textToRead ? (
             <div className="text-center mt-20">
               <p className="text-slate-400">No text provided to read.</p>
-              <button 
+              <button
                 onClick={handleBack}
                 className="mt-6 px-6 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-medium transition-colors"
               >
@@ -136,7 +135,7 @@ const TextToSpeech = () => {
               prose-blockquote:border-indigo-500 prose-blockquote:bg-indigo-500/10 prose-blockquote:py-2 prose-blockquote:px-6 prose-blockquote:rounded-r-2xl prose-blockquote:text-slate-300
               prose-a:text-indigo-400 md:leading-[1.8]"
             >
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>{textToRead}</ReactMarkdown>
+              <SmartMarkdown>{textToRead}</SmartMarkdown>
             </div>
           )}
         </div>
@@ -146,7 +145,7 @@ const TextToSpeech = () => {
       {textToRead && (
         <div className="absolute bottom-0 left-0 w-full p-6 bg-gradient-to-t from-slate-950 via-slate-950/95 to-transparent z-30">
           <div className="max-w-md mx-auto bg-slate-900/80 backdrop-blur-2xl border border-white/10 rounded-2xl p-4 shadow-2xl flex items-center justify-center gap-6">
-            
+
             <button
               onClick={handleStop}
               disabled={!isPlaying && !isPaused}
@@ -167,7 +166,7 @@ const TextToSpeech = () => {
                 <Play size={28} fill="currentColor" className="ml-1" />
               )}
             </button>
-            
+
           </div>
         </div>
       )}

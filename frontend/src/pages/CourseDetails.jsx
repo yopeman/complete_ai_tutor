@@ -22,8 +22,7 @@ import {
     Trash2,
     Volume2
 } from 'lucide-react';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
+import SmartMarkdown from '../components/ui/SmartMarkdown';
 import VoiceInputButton from '../components/chat/VoiceInputButton';
 import TTSButton from '../components/ui/TTSButton';
 
@@ -239,7 +238,9 @@ const CourseDetails = () => {
                                         prose-p:text-slate-400 prose-p:leading-relaxed
                                         prose-li:text-slate-400 prose-code:text-indigo-300
                                     ">
-                                        <ReactMarkdown remarkPlugins={[remarkGfm]}>{course.course_plan || "*No blueprint drafted.*"}</ReactMarkdown>
+                                        <SmartMarkdown>
+                                            {manualPlan || course.course_plan || "*No learning plan available yet.*"}
+                                        </SmartMarkdown>
                                     </div>
                                     {course.course_plan && (
                                         <div className="flex justify-end mt-6 pt-4 border-t border-white/5">

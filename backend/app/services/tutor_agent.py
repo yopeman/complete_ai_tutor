@@ -340,11 +340,20 @@ class TutorAgent:
                 next_lesson = next_lesson_result.scalar_one_or_none()
                 if next_lesson:
                     next_lesson.is_locked = False
+
+            else:
+                lesson.status = LessonStatus.IN_PROGRESS
             
             await self.db.commit()
             
             # Refresh to get IDs
             await self.db.refresh(lesson)
+
+            if not eval_result.is_passed:
+                for quiz in quizzes:
+                    quiz.explanation = None
+                    quiz.correct_answer = None
+                    quiz.is_correct = None
             
             return {
                 "score": eval_result.score,
