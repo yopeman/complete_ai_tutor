@@ -6,11 +6,11 @@ from app.database import get_db
 from app.dependencies import get_current_active_user
 from app.models import User
 from app.schemas import ChatCreate, ChatResponse, ChatListResponse
-from app.config import get_settings
 from app.controllers.chats import (
     get_chats as get_chats_controller,
     create_chat as create_chat_controller,
     get_chat as get_chat_controller,
+    delete_chat as delete_chat_controller,
 )
 
 router = APIRouter(prefix="/chats", tags=["Chats"])
@@ -35,8 +35,7 @@ async def create_chat(
     session_id: Optional[str] = Form(None),
     audio_file: Optional[UploadFile] = File(None),
     current_user: User = Depends(get_current_active_user),
-    db: AsyncSession = Depends(get_db),
-    settings = Depends(get_settings)
+    db: AsyncSession = Depends(get_db)
 ):
     """Create a new chat and generate an AI response using Groq."""
     if not prompt and not audio_file:
@@ -46,7 +45,7 @@ async def create_chat(
         prompt = await transcribe_uploaded_file(audio_file)
         
     chat_data = ChatCreate(prompt=prompt, session_id=session_id)
-    return await create_chat_controller(chat_data, current_user, db, settings)
+    return await create_chat_controller(chat_data, current_user, db)
 
 
 @router.get("/{chat_id}", response_model=ChatResponse)
@@ -57,3 +56,13 @@ async def get_chat(
 ):
     """Get a specific chat by ID."""
     return await get_chat_controller(chat_id, current_user, db)
+
+
+@router.delete("/sessions/{session_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_chat(
+    session_id: str,
+    current_user: User = Depends(get_current_active_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Delete all chats for a specific session ID."""
+    return await delete_chat_controller(session_id, current_user, db)
