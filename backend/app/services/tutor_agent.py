@@ -10,7 +10,7 @@ from sqlalchemy import select
 import uuid
 from app.models import Course, Lesson, Progress, User, Flashcard, Quiz, Interaction
 from app.models.enums import LessonStatus
-from backend.app.config import get_llm
+from app.config import get_llm
 
 class FlashcardStructure(BaseModel):
     front: str = Field(description="The front of the flashcard (question/term)")

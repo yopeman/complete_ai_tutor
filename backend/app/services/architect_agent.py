@@ -1,5 +1,5 @@
 from typing import List, Dict, Any, Optional, Literal
-from backend.app.config import get_llm
+from app.config import get_llm
 from pydantic import BaseModel, Field
 from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 from langchain.agents import create_agent
