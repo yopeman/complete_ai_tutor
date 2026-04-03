@@ -179,6 +179,8 @@ const LessonPlayer = () => {
       if (response.data.score >= 70) {
         const res = await api.get(`/lessons/${lessonId}`);
         setLesson(res.data);
+        const lessonsRes = await api.get(`/courses/${res.data.course_id}/lessons`);
+        setCourseLessons(lessonsRes.data);
       }
     } catch (error) {
       console.error('Quiz submission failed:', error);
@@ -193,7 +195,13 @@ const LessonPlayer = () => {
       : -1;
 
     if (currentIndex !== -1 && currentIndex < courseLessons.length - 1) {
-      navigate(`/lessons/${courseLessons[currentIndex + 1].id}`);
+      const nextLesson = courseLessons[currentIndex + 1];
+      const isLocked = nextLesson.is_locked && nextLesson.status !== 'completed';
+      if (isLocked) {
+        alert("The next lesson is still locked. Please ensure you have passed all requirements for the current lesson.");
+        return;
+      }
+      navigate(`/lessons/${nextLesson.id}`);
     } else {
       navigate(`/courses/${lesson.course_id}`);
     }
@@ -205,7 +213,13 @@ const LessonPlayer = () => {
       : -1;
 
     if (currentIndex > 0) {
-      navigate(`/lessons/${courseLessons[currentIndex - 1].id}`);
+      const prevLesson = courseLessons[currentIndex - 1];
+      const isLocked = prevLesson.is_locked && prevLesson.status !== 'completed';
+      if (isLocked) {
+        alert("This lesson is locked.");
+        return;
+      }
+      navigate(`/lessons/${prevLesson.id}`);
     }
   };
 
@@ -237,6 +251,8 @@ const LessonPlayer = () => {
   const progressPercent = courseLessons.length > 0 ? Math.round((completedCount / courseLessons.length) * 100) : 0;
   const currentModuleIndex = courseLessons.findIndex(l => l.id === parseInt(lessonId)) + 1;
   const totalModules = courseLessons.length;
+  const isFirstLesson = currentModuleIndex === 1;
+  const isLastLesson = totalModules > 0 && currentModuleIndex === totalModules;
 
   if (!lesson) return <div className="text-white p-10">Lesson not found.</div>;
 
@@ -422,7 +438,8 @@ const LessonPlayer = () => {
       <div className="h-20 border-t border-slate-800 bg-slate-900/80 backdrop-blur-md px-10 flex items-center justify-between shrink-0 z-20">
         <button
           onClick={goToPreviousLesson}
-          className="flex items-center gap-3 text-slate-500 hover:text-white transition-all text-xs font-bold uppercase tracking-widest group"
+          disabled={isFirstLesson}
+          className={`flex items-center gap-3 transition-all text-xs font-bold uppercase tracking-widest group ${isFirstLesson ? 'opacity-50 cursor-not-allowed text-slate-600' : 'text-slate-500 hover:text-white'}`}
         >
           <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center group-hover:bg-indigo-500/20 group-hover:text-indigo-400 transition-all">
             <ChevronLeft size={18} className="group-hover:-translate-x-0.5 transition-transform" />
@@ -438,7 +455,8 @@ const LessonPlayer = () => {
 
         <button
           onClick={goToNextLesson}
-          className="flex items-center gap-3 text-indigo-400 hover:text-indigo-300 transition-all text-xs font-bold uppercase tracking-widest group"
+          disabled={isLastLesson}
+          className={`flex items-center gap-3 transition-all text-xs font-bold uppercase tracking-widest group ${isLastLesson ? 'opacity-50 cursor-not-allowed text-slate-600' : 'text-indigo-400 hover:text-indigo-300'}`}
         >
           Next
           <div className="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center group-hover:bg-indigo-500 group-hover:text-white transition-all">
