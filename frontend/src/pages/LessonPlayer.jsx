@@ -75,7 +75,7 @@ const LessonPlayer = () => {
 
   const fetchChatHistory = useCallback(async () => {
     try {
-      const response = await api.get(`/chats?session_id=${sessionId}`);
+      const response = await api.get(`/chats?session_id=${sessionId}&limit=1000`);
       // The backend returns chats in reverse chronological order
       const history = response.data.reverse().map(chat => ([
         { role: 'user', content: chat.prompt },
@@ -303,7 +303,7 @@ const LessonPlayer = () => {
 
         {/* Right: AI Tutor Chat Sidebar */}
         <div className="w-[450px] border-l border-slate-800 bg-slate-900/50 backdrop-blur-3xl hidden xl:flex flex-col shrink-0">
-          <div className="p-6 border-b border-white/5 bg-white/[0.02] flex items-center justify-between">
+          <div className="p-6 border-b border-white/5 bg-slate-900/80 backdrop-blur-xl flex items-center justify-between sticky top-0 z-20 shrink-0">
             <h3 className="font-bold text-white flex items-center gap-3">
               <div className="w-8 h-8 rounded-xl bg-indigo-500/10 flex items-center justify-center">
                 <BrainCircuit className="text-indigo-400" size={18} />
@@ -316,7 +316,7 @@ const LessonPlayer = () => {
           </div>
 
           {/* Chat Messages */}
-          <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
+          <div className="flex-1 overflow-y-auto p-6 pt-28 space-y-6 custom-scrollbar">
             {messages.length === 0 && !isTyping && (
               <div className="h-full flex flex-col items-center justify-center text-center space-y-4 px-6 opacity-50">
                 <div className="w-16 h-16 bg-slate-800 rounded-[2rem] flex items-center justify-center text-slate-600">

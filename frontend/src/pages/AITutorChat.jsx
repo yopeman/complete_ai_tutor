@@ -18,7 +18,8 @@ import {
   ChevronRight,
   Code2,
   Brain,
-  ArrowLeft
+  ArrowLeft,
+  Trash2
 } from 'lucide-react';
 import chatService from '../services/chatService';
 import ReactMarkdown from 'react-markdown';
@@ -141,24 +142,31 @@ const AITutorChat = () => {
       const chats = await chatService.getChats({ limit: 1000 });
       const grouped = {};
       
-      // Group chats into sessions
-      chats.forEach(chat => {
-        const sid = chat.session_id || 'default_session';
+      // Sort chronologically (oldest first) to build the message history correctly
+      const chronologicalChats = [...chats].sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+
+      chronologicalChats.forEach(chat => {
+        // Normalize session_id from API; treat each null-session chat as its own entry
+        const sid = chat.session_id || `legacy_${chat.id}`;
+        
         if (!grouped[sid]) {
           grouped[sid] = {
             id: sid,
             title: chat.prompt.length > 40 ? chat.prompt.slice(0, 40) + '...' : chat.prompt,
-            lastMessage: chat.response.length > 80 ? chat.response.slice(0, 80) + '...' : chat.response,
+            lastMessage: '',
             timestamp: new Date(chat.created_at),
-            messageCount: 0,
+            messageTotal: 0, // This is the count of records
             messages: []
           };
         }
-        // Chats are usually ordered by ID descending or created_at descending from API
-        // We want them in chronological order for the chat window
+        
+        // Update the last message to be the most recent response
+        grouped[sid].lastMessage = chat.response.length > 80 ? chat.response.slice(0, 80) + '...' : chat.response;
+        grouped[sid].timestamp = new Date(chat.created_at);
+
         grouped[sid].messages.push({ role: 'user', content: chat.prompt, timestamp: chat.created_at });
         grouped[sid].messages.push({ role: 'assistant', content: chat.response, timestamp: chat.created_at });
-        grouped[sid].messageCount += 2;
+        grouped[sid].messageTotal += 1; // Number of prompt/response interactions
       });
 
       const sortedSessions = Object.values(grouped).sort((a, b) => b.timestamp - a.timestamp);
@@ -167,7 +175,7 @@ const AITutorChat = () => {
       // If we have a current session selected, update its messages
       if (currentSessionId && grouped[currentSessionId]) {
         setMessages(grouped[currentSessionId].messages);
-      }
+      } 
     } catch (err) {
       console.error('Failed to fetch chats:', err);
     } finally {
@@ -257,12 +265,59 @@ const AITutorChat = () => {
     setCurrentSessionId(null);
     setMessages([]);
     setInput('');
-    if (textareaRef.current) textareaRef.current.focus();
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.focus();
+    }
   };
 
-  const selectSession = (session) => {
+  const selectSession = async (session) => {
+    if (currentSessionId === session.id) return;
     setCurrentSessionId(session.id);
-    setMessages(session.messages);
+    
+    // Clear messages immediately for clean transition
+    setMessages([]);
+    setInput('');
+    if (textareaRef.current) textareaRef.current.style.height = 'auto';
+
+    try {
+      const history = await chatService.getChats({ session_id: session.id, limit: 1000 });
+      // Sort chronologically (oldest first) to build the message history correctly
+      const sortedHistory = [...history].sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+      
+      const sessionMessages = sortedHistory.flatMap(chat => [
+        { role: 'user', content: chat.prompt, timestamp: chat.created_at },
+        { role: 'assistant', content: chat.response, timestamp: chat.created_at }
+      ]);
+      setMessages(sessionMessages);
+      setTimeout(scrollToBottom, 100);
+    } catch (err) {
+      console.error('Failed to load session history:', err);
+      // Fallback to pre-cached messages if deep fetch fails
+      setMessages(session.messages || []);
+    }
+  };
+
+  const handleDeleteChat = async (e, sessionId) => {
+    e.stopPropagation();
+    if (!window.confirm('Are you sure you want to delete this conversation? This cannot be undone.')) {
+      return;
+    }
+
+    try {
+      await chatService.deleteSession(sessionId);
+      
+      // Update local state
+      setSessions(prev => prev.filter(s => s.id !== sessionId));
+      
+      // If we deleted the current active session, reset state
+      if (currentSessionId === sessionId) {
+        startNewChat();
+      }
+    } catch (err) {
+      console.error('Failed to delete session:', err);
+      alert('Failed to delete the conversation. Please try again.');
+    }
   };
 
   const handleTextareaChange = (e) => {
@@ -371,13 +426,22 @@ const AITutorChat = () => {
                             </span>
                           </div>
                           <span className="w-1 h-1 rounded-full bg-slate-700"></span>
-                          <span className="text-[10px] font-medium">{session.messageCount} messages</span>
+                          <span className="text-[10px] font-medium">{session.messageTotal * 2} messages</span>
                         </div>
                       </div>
-                      <ChevronRight size={14} className={twMerge(
-                        "shrink-0 mt-2 transition-all",
-                        isActive ? "text-indigo-400 translate-x-0" : "text-slate-800 opacity-0 group-hover:opacity-100 group-hover:translate-x-1"
-                      )} />
+                      <div className="flex flex-col items-center gap-2">
+                        <button
+                          onClick={(e) => handleDeleteChat(e, session.id)}
+                          className="p-1.5 rounded-lg text-slate-700 hover:text-red-400 hover:bg-red-400/10 transition-all opacity-0 group-hover:opacity-100"
+                          title="Delete Conversation"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                        <ChevronRight size={14} className={twMerge(
+                          "shrink-0 transition-all",
+                          isActive ? "text-indigo-400 translate-x-0" : "text-slate-800 opacity-0 group-hover:opacity-100 group-hover:translate-x-1"
+                        )} />
+                      </div>
                     </div>
                   </button>
                 );
@@ -407,7 +471,8 @@ const AITutorChat = () => {
         <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-violet-600/5 rounded-full blur-[100px] translate-y-1/4 -translate-x-1/4 pointer-events-none"></div>
 
         {/* Header */}
-        <header className="h-16 flex items-center justify-between px-6 border-b border-white/5 bg-slate-900/40 backdrop-blur-md relative z-20">
+        {/* Header */}
+        <header className="h-16 flex items-center justify-between px-6 border-b border-white/5 bg-slate-950/95 backdrop-blur-xl sticky top-0 z-30 shrink-0">
           <div className="flex items-center gap-4">
             <button 
               onClick={() => navigate('/dashboard')}
@@ -435,7 +500,7 @@ const AITutorChat = () => {
                 onClick={startNewChat}
                 className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold transition-all"
               >
-                <RotateCcw size={12} /> <span className="hidden sm:block">New Chat</span>
+                <RotateCcw size={12} /> <span className="block">New Chat</span>
               </button>
             )}
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 border-dotted">
@@ -499,7 +564,7 @@ const AITutorChat = () => {
                 </div>
               </div>
             ) : (
-              <div className="px-5 py-10 space-y-2">
+              <div className="px-5 pt-28 pb-10 space-y-2">
                 {messages.map((msg, idx) => (
                   <ChatBubble key={idx} msg={msg} />
                 ))}
