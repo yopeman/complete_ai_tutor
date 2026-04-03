@@ -298,12 +298,13 @@ async def install_course_plan(
     # Remove existing lessons to avoid duplication if reinstalling
     await db.execute(delete(Lesson).where(Lesson.course_id == course_id))
     
-    for lesson_data in extraction_result.lessons:
+    for idx, lesson_data in enumerate(extraction_result.lessons):
         new_lesson = Lesson(
             course_id=course_id,
             day_number=lesson_data.day_number,
             title=lesson_data.title,
-            description=lesson_data.description
+            description=lesson_data.description,
+            is_locked=idx > 0  # First lesson is unlocked, others are locked
         )
         db.add(new_lesson)
         
