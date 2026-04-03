@@ -22,7 +22,7 @@ export const AuthProvider = ({ children }) => {
             setUser(response.data);
         } catch (error) {
             console.error('Failed to fetch user:', error);
-            localStorage.removeItem('token');
+            // Let api interceptor handle 401 removal. Removing here on all errors breaks session on network blips.
         } finally {
             setLoading(false);
         }

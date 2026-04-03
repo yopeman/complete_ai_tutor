@@ -23,7 +23,9 @@ import {
   Volume2,
   Square,
   Play,
-  Pause
+  Pause,
+  XCircle,
+  Menu
 } from 'lucide-react';
 import chatService from '../services/chatService';
 import SmartMarkdown from '../components/ui/SmartMarkdown';
@@ -188,6 +190,8 @@ const AITutorChat = () => {
   const navigate = useNavigate();
   const [sessions, setSessions] = useState([]);
   const [currentSessionId, setCurrentSessionId] = useState(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -345,6 +349,7 @@ const AITutorChat = () => {
     setMessages([]);
     setInput('');
     if (textareaRef.current) textareaRef.current.style.height = 'auto';
+    setIsSidebarOpen(false); // Close sidebar automatically on mobile
 
     try {
       const history = await chatService.getChats({ session_id: session.id, limit: 1000 });
@@ -398,21 +403,34 @@ const AITutorChat = () => {
   );
 
   return (
-    <div className="flex h-screen bg-slate-950 text-white overflow-hidden font-inter">
+    <div className="flex h-screen bg-slate-950 text-white overflow-hidden font-inter relative">
+      {/* Mobile Sidebar Overlay */}
+      {isSidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/60 z-40 lg:hidden backdrop-blur-sm transition-opacity"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
       {/* ─── Sidebar ─── */}
-      <aside className="hidden lg:flex w-80 bg-slate-900/50 backdrop-blur-xl border-r border-white/5 flex-col shrink-0">
+      <aside className={`fixed inset-y-0 left-0 transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:relative lg:translate-x-0 transition duration-300 ease-in-out z-50 flex w-80 bg-slate-900/95 lg:bg-slate-900/50 backdrop-blur-xl border-r border-white/5 flex-col shrink-0`}>
         <div className="p-6 border-b border-white/5">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-              <Bot size={22} className="text-white" />
-            </div>
-            <div>
-              <h2 className="font-bold text-lg leading-tight">AI Tutor</h2>
-              <div className="flex items-center gap-1.5 mt-0.5">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span className="text-[10px] uppercase font-bold tracking-widest text-emerald-500/80">Active Learning</span>
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                <Bot size={22} className="text-white" />
+              </div>
+              <div>
+                <h2 className="font-bold text-lg leading-tight">AI Tutor</h2>
+                <div className="flex items-center gap-1.5 mt-0.5">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                  <span className="text-[10px] uppercase font-bold tracking-widest text-emerald-500/80">Active Learning</span>
+                </div>
               </div>
             </div>
+            <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden p-2 text-slate-400 hover:text-white rounded-lg hover:bg-white/5">
+              <XCircle size={20} />
+            </button>
           </div>
 
           <button
@@ -526,12 +544,12 @@ const AITutorChat = () => {
             </div>
           </div>
         </div>
-      </aside>
+      </aside >
 
       {/* ─── Main Chat Area ─── */}
-      <main className="flex-1 flex flex-col relative bg-[#020617]">
+      < main className="flex-1 flex flex-col relative bg-[#020617]" >
         {/* Decorative Background Elements */}
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-600/10 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/4 pointer-events-none"></div>
+        < div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-600/10 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/4 pointer-events-none" ></div >
         <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-violet-600/5 rounded-full blur-[100px] translate-y-1/4 -translate-x-1/4 pointer-events-none"></div>
 
         {/* Header */}
@@ -543,6 +561,13 @@ const AITutorChat = () => {
               title="Back to Dashboard"
             >
               <ArrowLeft size={20} />
+            </button>
+            <button
+              onClick={() => setIsSidebarOpen(true)}
+              className="p-2 lg:hidden hover:bg-white/10 rounded-xl transition-all text-slate-400 hover:text-white hover:scale-105 active:scale-95 flex items-center justify-center bg-white/5 border border-white/10 shadow-sm"
+              title="Toggle History"
+            >
+              <Menu size={20} />
             </button>
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-lg">
@@ -700,7 +725,7 @@ const AITutorChat = () => {
             </div>
           </form>
         </div>
-      </main>
+      </main >
 
       <style dangerouslySetInnerHTML={{
         __html: `
@@ -722,7 +747,7 @@ const AITutorChat = () => {
           50% { opacity: 0.5; transform: scale(1.1); }
         }
       ` }} />
-    </div>
+    </div >
   );
 };
 
