@@ -63,7 +63,7 @@ const Sidebar = ({ onMenuClick }) => {
                         </div>
                         <div className="flex-1 min-w-0">
                             <p className="text-sm font-semibold text-white truncate">{user?.username}</p>
-                            <p className="text-xs text-slate-500 truncate">{user?.native_language}</p>
+                           
                         </div>
                     </div>
                 </div>
