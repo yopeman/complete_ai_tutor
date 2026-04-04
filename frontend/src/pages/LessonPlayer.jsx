@@ -562,7 +562,9 @@ const LessonPlayer = () => {
                         <span className="w-8 h-8 rounded-full bg-slate-800 border border-white/5 flex items-center justify-center text-xs font-bold text-slate-500 shrink-0">
                           {qIdx + 1}
                         </span>
-                        <h4 className="text-xl font-bold text-white leading-relaxed">{quiz.question}</h4>
+                        <div className="text-xl font-bold text-white leading-relaxed w-full prose prose-invert prose-p:my-0 prose-pre:text-sm prose-code:text-indigo-300">
+                          <SmartMarkdown>{quiz.question}</SmartMarkdown>
+                        </div>
                       </div>
 
                       <div className="pl-12">

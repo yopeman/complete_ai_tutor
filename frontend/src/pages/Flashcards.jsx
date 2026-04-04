@@ -28,10 +28,8 @@ import {
   Target,
   Book,
 } from 'lucide-react';
+import SmartMarkdown from '../components/ui/SmartMarkdown';
 
-// ────────────────────────────────────────────
-// Difficulty Config
-// ────────────────────────────────────────────
 const getDifficultyConfig = (diff) => {
   switch (diff?.toLowerCase()) {
     case 'easy':
@@ -374,9 +372,9 @@ const Flashcards = () => {
                     <Brain className="text-indigo-400" size={28} />
                   </div>
 
-                  <p className="text-2xl lg:text-3xl font-bold text-white leading-relaxed max-w-lg">
-                    {currentCard.front}
-                  </p>
+                  <div className="text-2xl lg:text-3xl font-bold text-white leading-relaxed max-w-lg w-full prose prose-invert prose-p:my-0 prose-pre:text-base prose-code:text-indigo-300">
+                    <SmartMarkdown>{currentCard.front}</SmartMarkdown>
+                  </div>
 
                   <div className="absolute bottom-8 left-0 right-0 flex justify-center">
                     <div className="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-slate-500 text-[10px] font-bold uppercase tracking-[0.2em]">
@@ -406,9 +404,9 @@ const Flashcards = () => {
                     <Sparkles className="text-indigo-300" size={28} />
                   </div>
 
-                  <p className="text-xl lg:text-2xl text-indigo-100 leading-relaxed max-w-lg font-medium">
-                    {currentCard.back}
-                  </p>
+                  <div className="text-xl lg:text-2xl text-indigo-100 leading-relaxed max-w-lg font-medium w-full prose prose-invert prose-p:my-0 prose-pre:text-sm prose-code:text-indigo-300">
+                    <SmartMarkdown>{currentCard.back}</SmartMarkdown>
+                  </div>
 
                   <div className="absolute bottom-8 left-0 right-0 flex justify-center">
                     <div className="px-4 py-2 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-[10px] font-bold uppercase tracking-[0.2em]">
@@ -446,8 +444,8 @@ const Flashcards = () => {
           <button
             onClick={isLastCard ? exitStudyMode : goNext}
             className={`w-28 h-10 md:h-12 rounded-xl md:rounded-2xl border flex items-center justify-center gap-2 font-bold text-xs md:text-sm transition-all
-              ${isLastCard 
-                ? 'bg-emerald-600 border-emerald-500 text-white hover:bg-emerald-500' 
+              ${isLastCard
+                ? 'bg-emerald-600 border-emerald-500 text-white hover:bg-emerald-500'
                 : 'bg-slate-800 border-white/5 text-slate-400 hover:text-white hover:bg-slate-700'}`}
             title={isLastCard ? "Finish Session" : "Next Card"}
           >
@@ -729,9 +727,9 @@ const Flashcards = () => {
                       <p className="text-[10px] font-bold text-indigo-400/50 uppercase tracking-[0.2em] mb-2 self-center">
                         Question
                       </p>
-                      <h3 className={`font-bold text-white text-center leading-tight transition-all duration-300 ${isRevealed ? 'text-lg' : 'text-2xl'}`}>
-                        {card.front}
-                      </h3>
+                      <div className={`font-bold text-white text-center leading-tight transition-all duration-300 w-full prose prose-invert prose-p:my-0 prose-pre:text-xs prose-code:text-indigo-300 ${isRevealed ? 'text-lg' : 'text-2xl'}`}>
+                        <SmartMarkdown>{card.front}</SmartMarkdown>
+                      </div>
                     </div>
 
                     {/* Expandable Answer */}
@@ -741,9 +739,9 @@ const Flashcards = () => {
                         The Answer
                       </p>
                       <div className="overflow-y-auto scrollbar-none pb-2">
-                        <p className="text-sm text-indigo-100 font-medium leading-relaxed">
-                          {card.back}
-                        </p>
+                        <div className="text-sm text-indigo-100 font-medium leading-relaxed w-full prose prose-invert prose-p:my-0 prose-pre:text-xs prose-code:text-indigo-300">
+                          <SmartMarkdown>{card.back}</SmartMarkdown>
+                        </div>
                       </div>
                     </div>
                   </div>
