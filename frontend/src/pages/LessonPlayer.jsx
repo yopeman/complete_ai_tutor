@@ -61,7 +61,6 @@ const LessonPlayer = () => {
       const response = await api.get(`/lessons/${lessonId}`);
       setLesson(response.data);
 
-      // Also fetch all lessons for this course to calculate overall progress
       const lessonsRes = await api.get(`/courses/${response.data.course_id}/lessons`);
       setCourseLessons(lessonsRes.data);
     } catch (error) {
