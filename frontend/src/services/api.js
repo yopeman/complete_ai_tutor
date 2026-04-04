@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'https://brittny-reprehensible-joel.ngrok-free.dev';
+const API_BASE_URL = 'https://complete-ai-tutor.onrender.com';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
