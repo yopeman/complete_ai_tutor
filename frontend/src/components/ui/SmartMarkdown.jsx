@@ -9,7 +9,7 @@ const SmartMarkdown = ({ children }) => {
             remarkPlugins={[remarkGfm]}
             rehypePlugins={[rehypeRaw]}
             components={{
-                a: ({ node, ...props }) => {
+                a: ({ ...props }) => {
                     const url = props.href || '';
                     // Regex to match YouTube URLs
                     const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
@@ -57,7 +57,7 @@ const SmartMarkdown = ({ children }) => {
                         </a>
                     );
                 },
-                img: ({ node, ...props }) => {
+                img: ({ ...props }) => {
                     return (
                         <span className="block my-6 rounded-2xl overflow-hidden shadow-xl border border-white/10 bg-slate-900/50 relative group">
                             <img
