@@ -81,7 +81,7 @@ async def create_chat(
     # 3. Build agent and prompt
     system_prompt = (
         f"You are a helpful AI assistant in an AI tutor platform. "
-        f"The user's name is {current_user.username} and their native language is {current_user.native_language or 'English'}. "
+        f"The user's name is {current_user.username}"
         f"Be educational and encouraging. You have access to various tools to help you answer questions."
     )
     

@@ -28,8 +28,7 @@ async def register(user_data: UserCreate, db: AsyncSession = Depends(get_db)):
     # Create new user
     db_user = User(
         username=user_data.username,
-        password_hash=get_password_hash(user_data.password),
-        native_language=user_data.native_language
+        password_hash=get_password_hash(user_data.password)
     )
     
     db.add(db_user)

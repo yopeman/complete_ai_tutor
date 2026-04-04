@@ -159,7 +159,7 @@ class TutorAgent:
         context_message = f"""
         Here is the collected information to generate today's class content:
         ---
-        **User Information**: Username: {user.username}, Native Language: {user.native_language or 'English'}
+        **User Information**: Username: {user.username}
         **Course Information**: Title: {course.title}, Description: {course.description}, Goal: {course.goal}
         **Lesson Target**: Day {lesson.day_number}
         **Lesson Title**: {lesson.title}
@@ -390,7 +390,7 @@ class TutorAgent:
         
         # Compile context for the question
         context_prompt = f"""
-        User Information: Username: {user.username}, Native Language: {user.native_language or 'English'}
+        User Information: Username: {user.username}
         Course Information: Title: {course.title}, Description: {course.description}
         Lesson Information: Title: {lesson.title}, Content: {lesson.content[:4000]}
         ---
