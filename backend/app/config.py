@@ -6,11 +6,7 @@ class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
     
     # Database
-    db_host: str
-    db_port: int
-    db_user: str
-    db_password: str
-    db_name: str
+    database_url: str
     
     # JWT
     secret_key: str
@@ -35,10 +31,6 @@ class Settings(BaseSettings):
 
     # Audio
     audio_cache_dir: str = "audio_cache"
-    
-    @property
-    def database_url(self) -> str:
-        return f"mysql+aiomysql://{self.db_user}:{self.db_password}@{self.db_host}:{self.db_port}/{self.db_name}"
 
     @property
     def chapa_callback_url(self) -> str:
