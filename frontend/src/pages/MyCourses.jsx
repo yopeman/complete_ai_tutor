@@ -234,11 +234,15 @@ const MyCourses = () => {
                             <div className="relative group">
                                 <textarea
                                     ref={inputRef}
-                                    rows={3}
+                                    rows={1}
                                     placeholder={messages.length > 0 ? "Provide more details..." : "e.g. Fullstack Web Development in 3 months..."}
-                                    className="w-full bg-slate-900/50 border border-white/10 backdrop-blur-3xl rounded-[2rem] py-8 pl-8 pr-48 text-white text-lg placeholder:text-slate-600 focus:ring-4 focus:ring-indigo-500/20 outline-none transition-all shadow-2xl resize-y min-h-[120px]"
+                                    className="w-full bg-slate-900/50 border border-white/10 backdrop-blur-3xl rounded-[2rem] py-8 pl-8 pr-48 text-white text-lg placeholder:text-slate-600 focus:ring-4 focus:ring-indigo-500/20 outline-none transition-all shadow-2xl resize-none min-h-[120px] max-h-[400px] custom-scrollbar overflow-y-auto"
                                     value={prompt}
-                                    onChange={(e) => setPrompt(e.target.value)}
+                                    onChange={(e) => {
+                                        setPrompt(e.target.value);
+                                        e.target.style.height = 'auto';
+                                        e.target.style.height = Math.max(120, Math.min(e.target.scrollHeight, 400)) + 'px';
+                                    }}
                                     onKeyDown={(e) => {
                                         if (e.key === 'Enter' && !e.shiftKey) {
                                             e.preventDefault();
