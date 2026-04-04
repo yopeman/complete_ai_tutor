@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import SmartMarkdown from '../components/ui/SmartMarkdown';
 import Button from '../components/ui/Button';
+import PresentationViewer from '../components/ui/PresentationViewer';
 import {
   ArrowLeft,
   ChevronRight,
@@ -18,7 +19,8 @@ import {
   RotateCcw,
   Mic,
   Volume2,
-  Calendar
+  Calendar,
+  Presentation
 } from 'lucide-react';
 import VoiceInputButton from '../components/chat/VoiceInputButton';
 import TTSButton from '../components/ui/TTSButton';
@@ -44,6 +46,11 @@ const LessonPlayer = () => {
   const [quizAnswers, setQuizAnswers] = useState({});
   const [quizResult, setQuizResult] = useState(null);
   const [isSubmittingQuiz, setIsSubmittingQuiz] = useState(false);
+
+  // Presentation States
+  const [presentationSlides, setPresentationSlides] = useState([]);
+  const [showPresentation, setShowPresentation] = useState(false);
+  const [loadingPresentation, setLoadingPresentation] = useState(false);
 
   const sessionId = `lesson_${lessonId}`;
 
@@ -78,14 +85,9 @@ const LessonPlayer = () => {
   }, [sessionId]);
 
   useEffect(() => {
-    // Reset states when navigation between lessons happens
-    setShowQuiz(false);
-    setQuizResult(null);
-    setQuizAnswers({});
-    
     fetchLesson();
     fetchChatHistory();
-  }, [fetchLesson, fetchChatHistory, lessonId]);
+  }, [fetchLesson, fetchChatHistory]);
 
   useEffect(() => {
     scrollToBottom();
@@ -244,6 +246,25 @@ const LessonPlayer = () => {
     }
   };
 
+  const handleOpenPresentation = async () => {
+    setLoadingPresentation(true);
+    try {
+      const response = await api.get(`/lessons/${lessonId}/presentation`);
+      const slides = response.data?.generated_ppt?.slides || [];
+      if (slides.length === 0) {
+        alert('No presentation slides available for this lesson yet.');
+        return;
+      }
+      setPresentationSlides(slides);
+      setShowPresentation(true);
+    } catch (error) {
+      console.error('Failed to load presentation:', error);
+      alert('Failed to load presentation. Please try again.');
+    } finally {
+      setLoadingPresentation(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
@@ -357,15 +378,29 @@ const LessonPlayer = () => {
               </div>
             ) : null}
 
-            {/* ── Main Lesson Content ───────────────────────────────────────── */}
-            <div className="relative group p-8 rounded-[2rem] border border-white/5 bg-slate-900/30 backdrop-blur-sm shadow-xl">
-              <div className="flex items-center gap-3 mb-8 pb-4 border-b border-white/5">
-                <div className="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center">
-                  <BrainCircuit className="text-indigo-400" size={20} />
+            {/* ── Presentation Button ──────────────────────────────────────── */}
+            <button
+              onClick={handleOpenPresentation}
+              disabled={loadingPresentation}
+              className="group flex items-center gap-3 px-6 py-3.5 rounded-2xl bg-gradient-to-r from-indigo-600/20 to-purple-600/20 border border-indigo-500/25 hover:border-indigo-400/40 hover:from-indigo-600/30 hover:to-purple-600/30 transition-all duration-300 shadow-lg shadow-indigo-500/5 hover:shadow-indigo-500/15"
+            >
+              {loadingPresentation ? (
+                <Loader2 className="animate-spin text-indigo-400" size={20} />
+              ) : (
+                <div className="w-9 h-9 rounded-xl bg-indigo-500/20 flex items-center justify-center group-hover:bg-indigo-500/30 transition-all">
+                  <Presentation className="text-indigo-400 group-hover:text-indigo-300 transition-colors" size={18} />
                 </div>
-                <h3 className="text-xl font-bold text-white">Lesson Material</h3>
+              )}
+              <div className="text-left">
+                <p className="text-sm font-bold text-white group-hover:text-indigo-100 transition-colors">
+                  {loadingPresentation ? 'Generating Presentation...' : 'Presentation'}
+                </p>
+                <p className="text-[10px] text-slate-500 font-medium uppercase tracking-widest">Interactive Slides</p>
               </div>
+            </button>
 
+            {/* ── Main Lesson Content ───────────────────────────────────────── */}
+            <div className="relative group">
               <div className="prose prose-invert prose-indigo max-w-none 
                 prose-headings:font-display prose-headings:font-bold prose-headings:tracking-tight
                 prose-h1:text-4xl prose-h1:mb-10 prose-h2:text-2xl prose-h2:mt-12 prose-h2:mb-6 prose-h2:text-indigo-400
@@ -378,51 +413,7 @@ const LessonPlayer = () => {
                   {lesson.content || '# Generating Content...\n\nPlease wait while the AI Tutor creates your lesson for this topic.'}
                 </SmartMarkdown>
               </div>
-
-              {/* Lesson Audio Footer Section (Always Visible) */}
-              {lesson.content && (
-                <div className="mt-10 pt-6 border-t border-white/10 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"></span>
-                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Audio Narrative Ready</span>
-                  </div>
-                  <div className="flex items-center gap-3 bg-indigo-500/5 hover:bg-indigo-500/10 px-4 py-2 rounded-2xl border border-indigo-500/20 transition-all group/audionote">
-                    <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">Listen to Notes</span>
-                    <TTSButton text={lesson.content} />
-                  </div>
-                </div>
-              )}
             </div>
-
-            {/* ── Lesson Summary (Moved to Bottom) ─────────────────────────── */}
-            {lesson.summary && (
-              <div className="mt-16 pt-10 border-t border-slate-800 animate-in fade-in slide-in-from-bottom-4 duration-700">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center">
-                    <Sparkles className="text-indigo-400" size={20} />
-                  </div>
-                  <p className="text-xs font-bold text-indigo-400 uppercase tracking-[0.2em]">Lesson Key Summary</p>
-                </div>
-
-                <div className="relative group/summary p-8 rounded-[2rem] border border-indigo-500/20 bg-gradient-to-br from-indigo-950/40 to-slate-900/60 shadow-xl overflow-hidden">
-                  <p className="text-slate-300 text-lg leading-relaxed italic">
-                    {lesson.summary}
-                  </p>
-
-                  {/* Summary Audio Footer Section (Always Visible) */}
-                  <div className="mt-10 pt-6 border-t border-indigo-500/10 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Sparkles className="text-indigo-400/50" size={12} />
-                      <span className="text-[10px] font-bold text-indigo-400/40 uppercase tracking-widest">Quick Review Audio</span>
-                    </div>
-                    <div className="flex items-center gap-3 bg-indigo-500/10 hover:bg-indigo-500/20 px-4 py-2 rounded-2xl border border-indigo-500/30 transition-all">
-                      <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">Read Summary</span>
-                      <TTSButton text={lesson.summary} />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
         </div>
 
@@ -564,6 +555,14 @@ const LessonPlayer = () => {
         </button>
       </div>
 
+      {/* Presentation Overlay */}
+      {showPresentation && (
+        <PresentationViewer
+          slides={presentationSlides}
+          onExit={() => setShowPresentation(false)}
+        />
+      )}
+
       {/* Quiz Overlay */}
       {showQuiz && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-300">
@@ -694,11 +693,18 @@ const LessonPlayer = () => {
                       )}
 
                       <Button
-                        onClick={() => { setShowQuiz(false); setQuizResult(null); }}
-                        className="px-10 py-5 rounded-[1.5rem] text-base font-bold shadow-2xl shadow-indigo-500/10 gap-3 bg-indigo-600 hover:bg-indigo-500"
+                        onClick={handleRetakeQuiz}
+                        className="px-10 py-5 rounded-[1.5rem] text-base font-bold shadow-2xl shadow-rose-500/10 gap-3 bg-rose-600 hover:bg-rose-500"
                       >
-                        <ArrowLeft size={18} /> Back to Lesson Material
+                        <RotateCcw size={18} /> Retake Quiz
                       </Button>
+
+                      <button
+                        onClick={() => { setShowQuiz(false); setQuizResult(null); }}
+                        className="py-2 text-slate-500 hover:text-white transition-all text-xs font-bold uppercase tracking-widest"
+                      >
+                        Back to Module Content
+                      </button>
                     </div>
                   )}
 
