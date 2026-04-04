@@ -281,20 +281,30 @@ const CourseDetails = () => {
                                     {isEditingAi && (
                                         <div className="p-6 bg-indigo-500/5 border border-indigo-500/10 rounded-3xl animate-in slide-in-from-bottom-4 duration-300">
                                             <form onSubmit={handleAiUpdate} className="relative group">
-                                                <input
-                                                    type="text"
+                                                <textarea
                                                     placeholder="Ask the AI Architect to add, remove, or modify topics..."
-                                                    className="w-full bg-slate-950 border border-white/10 rounded-2xl py-5 pl-6 pr-40 text-white placeholder:text-slate-600 focus:ring-2 focus:ring-indigo-500 outline-none transition-all shadow-xl"
+                                                    className="w-full bg-slate-950 border border-white/10 rounded-2xl py-5 pl-6 pr-40 text-white placeholder:text-slate-600 focus:ring-2 focus:ring-indigo-500 outline-none transition-all shadow-xl resize-none min-h-[64px] max-h-[300px] custom-scrollbar overflow-y-auto"
                                                     value={aiPrompt}
-                                                    onChange={(e) => setAiPrompt(e.target.value)}
+                                                    onChange={(e) => {
+                                                        setAiPrompt(e.target.value);
+                                                        e.target.style.height = 'auto';
+                                                        e.target.style.height = Math.min(e.target.scrollHeight, 300) + 'px';
+                                                    }}
+                                                    onKeyDown={(e) => {
+                                                        if (e.key === 'Enter' && !e.shiftKey) {
+                                                            e.preventDefault();
+                                                            handleAiUpdate(e);
+                                                        }
+                                                    }}
                                                     disabled={isUpdating}
+                                                    rows={1}
                                                 />
-                                                <div className="absolute right-2 top-2 bottom-2 flex items-center gap-2">
+                                                <div className="absolute right-2 bottom-2 flex items-center gap-2">
                                                     <VoiceInputButton
                                                         onRecordingComplete={handleVoiceComplete}
                                                         isDisabled={isUpdating}
                                                     />
-                                                    <Button type="submit" disabled={isUpdating || !aiPrompt.trim()} className="h-full px-8 rounded-xl gap-2 font-bold uppercase tracking-widest text-xs">
+                                                    <Button type="submit" disabled={isUpdating || !aiPrompt.trim()} className="h-10 px-8 rounded-xl gap-2 font-bold uppercase tracking-widest text-xs">
                                                         {isUpdating ? <Loader2 className="animate-spin" size={18} /> : 'Process Update'}
                                                     </Button>
                                                 </div>
@@ -306,9 +316,13 @@ const CourseDetails = () => {
                                     {isEditingDirect && (
                                         <div className="p-6 bg-slate-950/80 border border-white/10 rounded-3xl animate-in slide-in-from-bottom-4 duration-300">
                                             <textarea
-                                                className="w-full h-80 bg-slate-950 border border-white/10 rounded-2xl p-6 text-slate-300 font-mono text-sm focus:ring-2 focus:ring-indigo-500 outline-none transition-all resize-none shadow-xl"
+                                                className="w-full min-h-[320px] bg-slate-950 border border-white/10 rounded-2xl p-6 text-slate-300 font-mono text-sm focus:ring-2 focus:ring-indigo-500 outline-none transition-all resize-none shadow-xl custom-scrollbar overflow-y-auto"
                                                 value={manualPlan}
-                                                onChange={(e) => setManualPlan(e.target.value)}
+                                                onChange={(e) => {
+                                                    setManualPlan(e.target.value);
+                                                    e.target.style.height = 'auto';
+                                                    e.target.style.height = Math.max(320, e.target.scrollHeight) + 'px';
+                                                }}
                                                 disabled={isUpdating}
                                             />
                                             <div className="flex justify-end gap-3 pt-4">
@@ -335,15 +349,14 @@ const CourseDetails = () => {
                                 {lessons.map((lesson, index) => {
                                     const progress = progressRecords.find(p => p.lesson_id === lesson.id);
                                     const isLessonLocked = lesson.is_locked && lesson.status !== 'completed';
-                                    
+
                                     return (
                                         <Card
                                             key={lesson.id}
-                                            className={`flex items-center justify-between py-5 px-8 group transition-all ${
-                                                isLessonLocked 
-                                                ? 'opacity-60 cursor-not-allowed' 
-                                                : 'cursor-pointer hover:bg-white/[0.02]'
-                                            }`}
+                                            className={`flex items-center justify-between py-5 px-8 group transition-all ${isLessonLocked
+                                                    ? 'opacity-60 cursor-not-allowed'
+                                                    : 'cursor-pointer hover:bg-white/[0.02]'
+                                                }`}
                                             onClick={() => !isLessonLocked && navigate(`/lessons/${lesson.id}`)}
                                         >
                                             <div className="flex items-center gap-6">
@@ -364,21 +377,19 @@ const CourseDetails = () => {
                                                 </div>
                                             </div>
                                             <div className="flex items-center gap-8">
-                                                <div className={`flex items-center gap-2 text-xs font-bold uppercase tracking-widest ${
-                                                    lesson.status === 'completed' ? 'text-emerald-500' :
-                                                    lesson.status === 'in_progress' ? 'text-amber-500' :
-                                                    'text-slate-500'
-                                                }`}>
-                                                    {lesson.status === 'completed' ? <CheckCircle2 size={18} /> : 
-                                                     lesson.status === 'in_progress' ? <Circle size={18} className="fill-amber-500/20" /> :
-                                                     <Circle size={18} />}
+                                                <div className={`flex items-center gap-2 text-xs font-bold uppercase tracking-widest ${lesson.status === 'completed' ? 'text-emerald-500' :
+                                                        lesson.status === 'in_progress' ? 'text-amber-500' :
+                                                            'text-slate-500'
+                                                    }`}>
+                                                    {lesson.status === 'completed' ? <CheckCircle2 size={18} /> :
+                                                        lesson.status === 'in_progress' ? <Circle size={18} className="fill-amber-500/20" /> :
+                                                            <Circle size={18} />}
                                                     {lesson.status ? lesson.status.replace('_', ' ') : 'Not Started'}
                                                 </div>
-                                                <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
-                                                    isLessonLocked 
-                                                    ? 'bg-slate-900 border border-white/5 text-slate-600' 
-                                                    : 'bg-white/5 group-hover:bg-indigo-500 group-hover:text-white text-slate-400'
-                                                }`}>
+                                                <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${isLessonLocked
+                                                        ? 'bg-slate-900 border border-white/5 text-slate-600'
+                                                        : 'bg-white/5 group-hover:bg-indigo-500 group-hover:text-white text-slate-400'
+                                                    }`}>
                                                     {isLessonLocked ? <Lock size={16} /> : <Play className="ml-1" size={18} fill="currentColor" />}
                                                 </div>
                                             </div>

@@ -39,6 +39,7 @@ const LessonPlayer = () => {
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const chatEndRef = useRef(null);
+  const textareaRef = useRef(null);
 
   // Quiz States
   const [quizzes, setQuizzes] = useState([]);
@@ -104,6 +105,9 @@ const LessonPlayer = () => {
     const userMessage = { role: 'user', content: input };
     setMessages(prev => [...prev, userMessage]);
     setInput('');
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+    }
     setIsTyping(true);
 
     try {
@@ -121,6 +125,12 @@ const LessonPlayer = () => {
     } finally {
       setIsTyping(false);
     }
+  };
+
+  const handleTextareaChange = (e) => {
+    setInput(e.target.value);
+    e.target.style.height = 'auto';
+    e.target.style.height = Math.min(e.target.scrollHeight, 180) + 'px';
   };
 
   const handleVoiceComplete = useCallback(async (blob) => {
@@ -548,18 +558,25 @@ const LessonPlayer = () => {
           <div className="p-6 border-t border-white/5 bg-white/[0.01]">
             <form onSubmit={handleSendMessage} className="flex items-center gap-2">
               <div className="relative flex-1 group">
-                <input
-                  type="text"
+                <textarea
+                  ref={textareaRef}
+                  rows={1}
                   placeholder="Ask your tutor anything..."
-                  className="w-full bg-slate-950 border border-white/10 rounded-2xl py-4 pl-5 pr-14 text-white text-sm placeholder:text-slate-600 focus:ring-2 focus:ring-indigo-500 outline-none transition-all shadow-inner"
+                  className="w-full bg-slate-950 border border-white/10 rounded-2xl py-3 pl-5 pr-14 text-white text-sm placeholder:text-slate-600 focus:ring-2 focus:ring-indigo-500 outline-none transition-all shadow-inner resize-none max-h-[180px] custom-scrollbar overflow-y-auto"
                   value={input}
-                  onChange={(e) => setInput(e.target.value)}
+                  onChange={handleTextareaChange}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      handleSendMessage(e);
+                    }
+                  }}
                   disabled={isTyping}
                 />
                 <button
                   type="submit"
                   disabled={!input.trim() || isTyping}
-                  className="absolute right-2 top-2 bottom-2 w-10 h-10 flex items-center justify-center rounded-xl bg-indigo-600 text-white hover:bg-indigo-500 disabled:opacity-50 disabled:bg-slate-800 transition-all shadow-lg"
+                  className="absolute right-2 bottom-2 w-10 h-10 flex items-center justify-center rounded-xl bg-indigo-600 text-white hover:bg-indigo-500 disabled:opacity-50 disabled:bg-slate-800 transition-all shadow-lg"
                 >
                   <Send size={18} />
                 </button>
