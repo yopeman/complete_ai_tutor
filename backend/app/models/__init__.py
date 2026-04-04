@@ -10,12 +10,14 @@ from app.models.flashcard import Flashcard
 from app.models.chat import Chat
 from app.models.presentation import Presentation
 from app.models.certificate import Certificate
+from app.models.payment import Payment
 
 
 # Export all models
 __all__ = [
     'CourseStatus', 'LessonStatus', 'QuizType',
     'User', 'Course', 'Lesson', 'Interaction', 
-    'Quiz', 'Progress', 'Flashcard', 'Chat', 'Presentation', 'Certificate'
+    'Quiz', 'Progress', 'Flashcard', 'Chat', 'Presentation', 'Certificate',
+    'Payment'
 ]
 
