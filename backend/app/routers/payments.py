@@ -77,3 +77,33 @@ async def payment_webhook(
         await db.commit()
         
     return {"status": "ok"}
+
+
+@router.get("", response_model=List[PaymentResponse])
+async def list_payments(
+    current_user: User = Depends(get_current_active_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """List all payments for the current user."""
+    result = await db.execute(select(Payment).where(Payment.user_id == current_user.id).order_by(Payment.created_at.desc()))
+    payments = result.scalars().all()
+    return payments
+
+
+@router.get("/{payment_id}", response_model=PaymentResponse)
+async def get_payment(
+    payment_id: int,
+    current_user: User = Depends(get_current_active_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Get a specific payment record."""
+    result = await db.execute(select(Payment).where(Payment.id == payment_id, Payment.user_id == current_user.id))
+    payment = result.scalar_one_or_none()
+    
+    if not payment:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Payment record not found"
+        )
+    
+    return payment
