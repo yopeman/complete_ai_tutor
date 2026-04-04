@@ -10,6 +10,7 @@ import LessonPlayer from './pages/LessonPlayer';
 import AITutorChat from './pages/AITutorChat';
 import Progress from './pages/Progress';
 import Flashcards from './pages/Flashcards';
+import Certificates from './pages/Certificates';
 import AppLayout from './components/layout/AppLayout';
 import TextToSpeech from './pages/TextToSpeech';
 import { useAuth } from './context/AuthContext';
@@ -39,6 +40,7 @@ function App() {
         <Route path="/lessons/:lessonId" element={<LessonPlayer />} />
         <Route path="/flashcards" element={<Flashcards />} />
         <Route path="/progress" element={<Progress />} />
+        <Route path="/certificates" element={<Certificates />} />
       </Route>
 
       {/* Full Screen Immersive Routes */}

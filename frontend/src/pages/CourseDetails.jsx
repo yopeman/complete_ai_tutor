@@ -21,7 +21,8 @@ import {
     Mic,
     Trash2,
     Volume2,
-    Lock
+    Lock,
+    Award
 } from 'lucide-react';
 import SmartMarkdown from '../components/ui/SmartMarkdown';
 import VoiceInputButton from '../components/chat/VoiceInputButton';
@@ -44,6 +45,7 @@ const CourseDetails = () => {
     const [isUpdating, setIsUpdating] = useState(false);
     const [showPlan, setShowPlan] = useState(false);
     const [sessionId, setSessionId] = useState(null);
+    const [isDownloading, setIsDownloading] = useState(false);
 
     useEffect(() => {
         fetchCourseData();
@@ -161,6 +163,35 @@ const CourseDetails = () => {
             console.error('Direct Update failed:', error);
         } finally {
             setIsUpdating(false);
+        }
+    };
+
+    const handleDownloadCertificate = async () => {
+        if (courseProgress < 100) return;
+        setIsDownloading(true);
+        try {
+            const response = await api.get(`/courses/${courseId}/certificates`);
+            // Assuming the response has a content field that might be a link or base64 or HTML
+            // For now, let's try to handle it as an HTML/UI trigger or open in new tab if it's a URL
+            if (response.data.content) {
+                // If it looks like a URL
+                if (response.data.content.startsWith('http')) {
+                    window.open(response.data.content, '_blank');
+                } else {
+                    // Logic to handle content (maybe open a print view)
+                    const printWindow = window.open('', '_blank');
+                    printWindow.document.write(response.data.content);
+                    printWindow.document.close();
+                    printWindow.print();
+                }
+            } else {
+                alert('Certificate generated but no content found. Check the Certificates page.');
+            }
+        } catch (error) {
+            console.error('Download failed:', error);
+            alert('Failed to generate certificate. Please try again.');
+        } finally {
+            setIsDownloading(false);
         }
     };
 
@@ -354,8 +385,8 @@ const CourseDetails = () => {
                                         <Card
                                             key={lesson.id}
                                             className={`flex items-center justify-between py-5 px-8 group transition-all ${isLessonLocked
-                                                    ? 'opacity-60 cursor-not-allowed'
-                                                    : 'cursor-pointer hover:bg-white/[0.02]'
+                                                ? 'opacity-60 cursor-not-allowed'
+                                                : 'cursor-pointer hover:bg-white/[0.02]'
                                                 }`}
                                             onClick={() => !isLessonLocked && navigate(`/lessons/${lesson.id}`)}
                                         >
@@ -378,8 +409,8 @@ const CourseDetails = () => {
                                             </div>
                                             <div className="flex items-center gap-8">
                                                 <div className={`flex items-center gap-2 text-xs font-bold uppercase tracking-widest ${lesson.status === 'completed' ? 'text-emerald-500' :
-                                                        lesson.status === 'in_progress' ? 'text-amber-500' :
-                                                            'text-slate-500'
+                                                    lesson.status === 'in_progress' ? 'text-amber-500' :
+                                                        'text-slate-500'
                                                     }`}>
                                                     {lesson.status === 'completed' ? <CheckCircle2 size={18} /> :
                                                         lesson.status === 'in_progress' ? <Circle size={18} className="fill-amber-500/20" /> :
@@ -387,8 +418,8 @@ const CourseDetails = () => {
                                                     {lesson.status ? lesson.status.replace('_', ' ') : 'Not Started'}
                                                 </div>
                                                 <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${isLessonLocked
-                                                        ? 'bg-slate-900 border border-white/5 text-slate-600'
-                                                        : 'bg-white/5 group-hover:bg-indigo-500 group-hover:text-white text-slate-400'
+                                                    ? 'bg-slate-900 border border-white/5 text-slate-600'
+                                                    : 'bg-white/5 group-hover:bg-indigo-500 group-hover:text-white text-slate-400'
                                                     }`}>
                                                     {isLessonLocked ? <Lock size={16} /> : <Play className="ml-1" size={18} fill="currentColor" />}
                                                 </div>
@@ -415,6 +446,43 @@ const CourseDetails = () => {
                             </div>
                         )}
                     </section>
+
+                    {/* Certificate section requested by user */}
+                    {lessons.length > 0 && (
+                        <Card className={`p-10 border-2 mt-12 overflow-hidden relative transition-all ${courseProgress === 100 ? 'border-emerald-500/30 bg-emerald-500/5 shadow-2xl shadow-emerald-500/10' : 'border-dashed border-slate-800 bg-slate-900/20 opacity-60'}`}>
+                            {courseProgress === 100 && <div className="absolute -right-20 -top-20 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl animate-pulse"></div>}
+                            <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-10">
+                                <div className="flex items-center gap-8">
+                                    <div className={`w-20 h-20 rounded-[2.5rem] flex items-center justify-center transition-all duration-700 ${courseProgress === 100 ? 'bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/40 rotate-12 scale-110' : 'bg-slate-800 text-slate-600'}`}>
+                                        <Award size={40} />
+                                    </div>
+                                    <div className="text-center md:text-left">
+                                        <h3 className="text-2xl font-display font-bold text-white mb-2">Academic Certification</h3>
+                                        <p className="text-slate-400 text-base max-w-sm leading-relaxed font-medium">
+                                            {courseProgress === 100
+                                                ? "Outstanding work! You've successfully mastered this blueprint. Your official certificate is now ready for deployment."
+                                                : `Unlock your official certification by completing all ${lessons.length} mastery units. Current progress: ${courseProgress}%`}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="flex flex-col gap-4 w-full md:w-auto">
+                                    <Button
+                                        onClick={handleDownloadCertificate}
+                                        disabled={courseProgress < 100 || isDownloading}
+                                        className={`group gap-3 px-10 py-6 rounded-2xl font-bold uppercase tracking-[0.2em] text-xs transition-all duration-500 ${courseProgress === 100 ? 'bg-emerald-600 hover:bg-emerald-500 hover:scale-105 shadow-2xl shadow-emerald-500/20 ring-1 ring-white/20' : 'bg-slate-800 text-slate-500 cursor-not-allowed grayscale'}`}
+                                    >
+                                        {isDownloading ? <Loader2 className="animate-spin" size={20} /> : <Download className="group-hover:translate-y-0.5 transition-transform" size={20} />}
+                                        {courseProgress === 100 ? 'Download Certificate' : 'Certificate Locked'}
+                                    </Button>
+                                    {courseProgress < 100 && (
+                                        <p className="text-[10px] text-center text-slate-600 font-bold uppercase tracking-widest leading-none">
+                                            {lessons.length - lessons.filter(l => l.status === 'completed').length} Modules Remaining
+                                        </p>
+                                    )}
+                                </div>
+                            </div>
+                        </Card>
+                    )}
                 </div>
 
                 {/* Sidebar Stats */}

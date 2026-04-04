@@ -8,7 +8,8 @@ import {
     BrainCircuit,
     Settings,
     LogOut,
-    ChevronRight
+    ChevronRight,
+    Award
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
@@ -21,6 +22,7 @@ const Sidebar = ({ onMenuClick }) => {
         { icon: MessageSquare, label: 'AI Tutor Chat', path: '/chat' },
         { icon: Layers, label: 'Flashcards', path: '/flashcards' },
         { icon: BrainCircuit, label: 'Progress', path: '/progress' },
+        { icon: Award, label: 'Certificates', path: '/certificates' },
     ];
 
     return (
