@@ -1,5 +1,6 @@
 from sqlalchemy import Column, Integer, String, DateTime, Text, Boolean, ForeignKey, JSON, Enum
 from sqlalchemy.orm import relationship
+from sqlalchemy.orm import backref
 from datetime import datetime
 from app.database import Base
 from app.models.enums import LessonStatus
@@ -27,3 +28,4 @@ class Lesson(Base):
     quizzes = relationship("Quiz", back_populates="lesson", cascade="all, delete-orphan")
     progress = relationship("Progress", back_populates="lesson", cascade="all, delete-orphan")
     flashcards = relationship("Flashcard", back_populates="lesson", cascade="all, delete-orphan")
+    presentation = relationship("Presentation", back_populates="lesson", cascade="all, delete-orphan", uselist=False)
