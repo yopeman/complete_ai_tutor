@@ -30,12 +30,23 @@ class Settings(BaseSettings):
     frontend_base_url: str
     backend_base_url: str
 
+    # Chapa
+    chapa_api_key: str
+
     # Audio
     audio_cache_dir: str = "audio_cache"
     
     @property
     def database_url(self) -> str:
         return f"mysql+aiomysql://{self.db_user}:{self.db_password}@{self.db_host}:{self.db_port}/{self.db_name}"
+
+    @property
+    def chapa_callback_url(self) -> str:
+        return f"{self.backend_base_url}/payments/callback"
+
+    @property
+    def chapa_return_url(self) -> str:
+        return f"{self.frontend_base_url}/dashboard"
     
     class Config:
         env_file = ".env"
