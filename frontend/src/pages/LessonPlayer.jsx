@@ -314,8 +314,8 @@ const LessonPlayer = () => {
         <div className="flex-1 overflow-y-auto p-12 bg-slate-900/50 bg-[radial-gradient(circle_at_bottom_left,_var(--tw-gradient-stops))] from-indigo-900/10 via-transparent to-transparent custom-scrollbar">
           <div className="max-w-3xl mx-auto space-y-10">
 
-            {/* ── Daily Plan & Summary Card ─────────────────────────────────── */}
-            {(lesson.daily_plan && Object.keys(lesson.daily_plan).length > 0) || lesson.summary ? (
+            {/* ── Daily Plan Card ───────────────────────────────────────────── */}
+            {lesson.daily_plan && Object.keys(lesson.daily_plan).length > 0 ? (
               <div className="rounded-[2rem] border border-indigo-500/20 bg-gradient-to-br from-indigo-950/60 via-slate-900/80 to-slate-900/60 shadow-2xl shadow-indigo-500/5 overflow-hidden">
                 {/* Card header */}
                 <div className="flex items-center gap-3 px-8 py-5 border-b border-indigo-500/10 bg-indigo-500/5">
@@ -324,57 +324,43 @@ const LessonPlayer = () => {
                   </div>
                   <div>
                     <p className="text-[10px] font-bold text-indigo-400/70 uppercase tracking-[0.2em] leading-none mb-0.5">Day {lesson.day_number}</p>
-                    <h3 className="text-base font-bold text-white leading-tight">Today's Plan &amp; Summary</h3>
+                    <h3 className="text-base font-bold text-white leading-tight">Today's Daily Plan</h3>
                   </div>
-                  {lesson.summary && (
-                    <div className="ml-auto">
-                      <TTSButton text={lesson.summary} />
-                    </div>
-                  )}
                 </div>
 
-                <div className="p-8 space-y-8">
-                  {/* Daily Plan */}
-                  {lesson.daily_plan && Object.keys(lesson.daily_plan).length > 0 && (
-                    <div>
-                      <p className="text-[10px] font-bold text-indigo-400 uppercase tracking-[0.18em] mb-4">📅 Daily Plan</p>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        {Object.entries(lesson.daily_plan).map(([key, value]) => (
-                          <div key={key} className="flex items-start gap-3 p-4 rounded-2xl bg-slate-900/60 border border-white/5">
-                            <div className="w-2 h-2 rounded-full bg-indigo-500 mt-1.5 shrink-0" />
-                            <div>
-                              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">
-                                {String(key).replace(/_/g, ' ')}
-                              </p>
-                              <p className="text-sm text-slate-300 leading-relaxed">
-                                {Array.isArray(value)
-                                  ? value.join(', ')
-                                  : typeof value === 'object' && value !== null
-                                  ? JSON.stringify(value)
-                                  : String(value)}
-                              </p>
-                            </div>
-                          </div>
-                        ))}
+                <div className="p-8">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {Object.entries(lesson.daily_plan).map(([key, value]) => (
+                      <div key={key} className="flex items-start gap-3 p-4 rounded-2xl bg-slate-900/60 border border-white/5">
+                        <div className="w-2 h-2 rounded-full bg-indigo-500 mt-1.5 shrink-0" />
+                        <div>
+                          <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">
+                            {String(key).replace(/_/g, ' ')}
+                          </p>
+                          <p className="text-sm text-slate-300 leading-relaxed">
+                            {Array.isArray(value)
+                              ? value.join(', ')
+                              : typeof value === 'object' && value !== null
+                              ? JSON.stringify(value)
+                              : String(value)}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  )}
-
-                  {/* Summary */}
-                  {lesson.summary && (
-                    <div>
-                      <p className="text-[10px] font-bold text-indigo-400 uppercase tracking-[0.18em] mb-4">📝 Lesson Summary</p>
-                      <div className="p-6 rounded-2xl bg-slate-900/60 border border-white/5">
-                        <p className="text-slate-300 text-base leading-relaxed">{lesson.summary}</p>
-                      </div>
-                    </div>
-                  )}
+                    ))}
+                  </div>
                 </div>
               </div>
             ) : null}
 
             {/* ── Main Lesson Content ───────────────────────────────────────── */}
-            <div className="relative group">
+            <div className="relative group p-8 rounded-[2rem] border border-white/5 bg-slate-900/30 backdrop-blur-sm shadow-xl">
+              <div className="flex items-center gap-3 mb-8 pb-4 border-b border-white/5">
+                <div className="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center">
+                  <BrainCircuit className="text-indigo-400" size={20} />
+                </div>
+                <h3 className="text-xl font-bold text-white">Lesson Material</h3>
+              </div>
+              
               <div className="prose prose-invert prose-indigo max-w-none 
                 prose-headings:font-display prose-headings:font-bold prose-headings:tracking-tight
                 prose-h1:text-4xl prose-h1:mb-10 prose-h2:text-2xl prose-h2:mt-12 prose-h2:mb-6 prose-h2:text-indigo-400
@@ -387,7 +373,51 @@ const LessonPlayer = () => {
                   {lesson.content || '# Generating Content...\n\nPlease wait while the AI Tutor creates your lesson for this topic.'}
                 </SmartMarkdown>
               </div>
+
+              {/* Lesson Audio Footer Section (Always Visible) */}
+              {lesson.content && (
+                <div className="mt-10 pt-6 border-t border-white/10 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"></span>
+                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Audio Narrative Ready</span>
+                  </div>
+                  <div className="flex items-center gap-3 bg-indigo-500/5 hover:bg-indigo-500/10 px-4 py-2 rounded-2xl border border-indigo-500/20 transition-all group/audionote">
+                    <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">Listen to Notes</span>
+                    <TTSButton text={lesson.content} />
+                  </div>
+                </div>
+              )}
             </div>
+
+            {/* ── Lesson Summary (Moved to Bottom) ─────────────────────────── */}
+            {lesson.summary && (
+              <div className="mt-16 pt-10 border-t border-slate-800 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center">
+                    <Sparkles className="text-indigo-400" size={20} />
+                  </div>
+                  <p className="text-xs font-bold text-indigo-400 uppercase tracking-[0.2em]">Lesson Key Summary</p>
+                </div>
+                
+                <div className="relative group/summary p-8 rounded-[2rem] border border-indigo-500/20 bg-gradient-to-br from-indigo-950/40 to-slate-900/60 shadow-xl overflow-hidden">
+                  <p className="text-slate-300 text-lg leading-relaxed italic">
+                    {lesson.summary}
+                  </p>
+                  
+                  {/* Summary Audio Footer Section (Always Visible) */}
+                  <div className="mt-10 pt-6 border-t border-indigo-500/10 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Sparkles className="text-indigo-400/50" size={12} />
+                      <span className="text-[10px] font-bold text-indigo-400/40 uppercase tracking-widest">Quick Review Audio</span>
+                    </div>
+                    <div className="flex items-center gap-3 bg-indigo-500/10 hover:bg-indigo-500/20 px-4 py-2 rounded-2xl border border-indigo-500/30 transition-all">
+                      <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">Read Summary</span>
+                      <TTSButton text={lesson.summary} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -659,18 +689,11 @@ const LessonPlayer = () => {
                       )}
 
                       <Button
-                        onClick={handleRetakeQuiz}
-                        className="px-10 py-5 rounded-[1.5rem] text-base font-bold shadow-2xl shadow-rose-500/10 gap-3 bg-rose-600 hover:bg-rose-500"
-                      >
-                        <RotateCcw size={18} /> Retake Quiz
-                      </Button>
-
-                      <button
                         onClick={() => { setShowQuiz(false); setQuizResult(null); }}
-                        className="py-2 text-slate-500 hover:text-white transition-all text-xs font-bold uppercase tracking-widest"
+                        className="px-10 py-5 rounded-[1.5rem] text-base font-bold shadow-2xl shadow-indigo-500/10 gap-3 bg-indigo-600 hover:bg-indigo-500"
                       >
-                        Back to Module Content
-                      </button>
+                        <ArrowLeft size={18} /> Back to Lesson Material
+                      </Button>
                     </div>
                   )}
 
