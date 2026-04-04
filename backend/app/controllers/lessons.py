@@ -96,8 +96,6 @@ async def get_lesson(
                     Payment.status == "PENDING"
                 )
             )
-
-            existing_payment = result_pending.scalar_one_or_none()
             
             # Initialize payment with Chapa
             payment_response = payment_service.accept_payment(
@@ -106,7 +104,7 @@ async def get_lesson(
                 first_name=current_user.username,
                 tx_ref=tx_ref,
                 callback_url=f"{settings.backend_base_url}/payments/callback",
-                return_url=f"{settings.frontend_base_url}/courses/{lesson.course_id}"
+                return_url=f"{settings.frontend_base_url}/lessons/{lesson.id}"
             )
             
             if payment_response.status == "success" and payment_response.data:
