@@ -9,10 +9,11 @@ Traditional online education is built on monoliths — static curriculum, linear
 AI Tutor is a **Multi-Agent Orchestration Platform** that autonomously plans, teaches, evaluates, and certifies.
  Instead of a single LLM trying to do everything, our platform utilizes four specialized AI agents that collaborate in a closed-loop mastery model:
 
-1.  **Architecture First**: It starts by understanding *who* the learner is and builds a custom curriculum from scratch.
-2.  **Adaptive Teaching**: It delivers lessons enriched with real-time web search, visual aids, and interactive chat answering.
-3.  **Mastery-Gated Progression**: It ensures a student cannot move to  next   Lesson until finished the current lesson and evaluated.
- **Assessor** verifies complete comprehension of current Lesson.
+1.  **Architecture First**: It starts by understanding *who* the learner is by asking questions about their background, interests, and goals and builds a custom curriculum from scratch optimally.
+2.  **Adaptive Teaching**: It delivers lessons enriched with documents, real-time web search, youtube videos display in the inside the lesson and chat by iframe, visual aids, and interactive chat answering with voice and text.
+and also present the lesson in a form of presentation with audio narration.direct chat intraction.
+3.  **Mastery-Gated Progression**: It ensures a student cannot move to  next   Lesson until finished the current lesson and evaluated by the Assessor.
+ **Assessor** verifies complete comprehension of current Lesson and gives a pass or fail.
 4.  **Tangible Achievement**: It synthesizes the journey into spaced-repetition flashcards and official certifications upon completion.
 
 
@@ -71,13 +72,13 @@ A critical differentiator of the AI Tutor platform is its **Autonomous Tool Call
       │ SYNTHESIZER ├──────────► CERTIFICATION│
       │ (Summarize) ├──────────►  FLASHCARDS  │
       └─────────────┘          └──────────────┘
+```
 
 
-
-Technical Stack & Architecture
+## Technical Stack & Architecture
 
 - **Frontend**: React 19, Tailwind CSS, Lucide Icons, Framer Motion
-- **Backend**: FastAPI (Python), SQLAlchemy (Async), MySQL/PostgreSQL
+- **Backend**: FastAPI (Python), SQLAlchemy (Async), MySQL
 - **AI Engine**: LangChain Multi-Agent Framework, Multi-modal LLMs (JSON/Multipart), Groq API, 
 - **APIs & Services**: Chapa (Payments), YouTube Search, Google Web Search, Translate
 
