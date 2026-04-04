@@ -1,7 +1,7 @@
 from typing import List, Dict, Any, Optional, Literal
-from app.config import get_llm
+from app.config import get_thinking_llm
 from pydantic import BaseModel, Field
-from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
+from langchain_core.messages import HumanMessage, AIMessage
 from langchain.agents import create_agent
 from langchain.tools import tool
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -26,7 +26,7 @@ class ArchitectAgent:
     """LangChain agent for creating courses based on user prompts."""
     
     def __init__(self, db: AsyncSession, user_id: int):
-        self.llm = get_llm()
+        self.llm = get_thinking_llm()
         self.db = db
         self.user_id = user_id
         self.created_course = None

@@ -23,6 +23,8 @@ class Settings(BaseSettings):
     
     # Groq
     groq_api_key: str
+    groq_thinking_model: str
+    groq_generating_model: str
 
     # Base URL for frontend and backend
     frontend_base_url: str
@@ -45,11 +47,21 @@ def get_settings() -> Settings:
     return Settings()
 
 @lru_cache()
-def get_llm():
+def get_thinking_llm():
     from langchain_groq import ChatGroq
     settings = get_settings()
     return ChatGroq(
-        model="qwen/qwen3-32b",
+        model=settings.groq_thinking_model,
+        temperature=0.7,
+        groq_api_key=settings.groq_api_key
+    )
+
+@lru_cache()
+def get_generating_llm():
+    from langchain_groq import ChatGroq
+    settings = get_settings()
+    return ChatGroq(
+        model=settings.groq_generating_model,
         temperature=0.7,
         groq_api_key=settings.groq_api_key
     )

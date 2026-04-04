@@ -2,7 +2,7 @@ import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from app.config import get_settings, get_llm
+from app.config import get_generating_llm, get_settings
 from langchain_core.prompts import ChatPromptTemplate
 import uuid
 from gtts import gTTS
@@ -93,7 +93,7 @@ def normalize_text_for_tts(text: str) -> str:
         ]
     )
 
-    chain = prompt | get_llm()
+    chain = prompt | get_generating_llm()
     response = chain.invoke({"text": text})
     return response.content.strip()
 

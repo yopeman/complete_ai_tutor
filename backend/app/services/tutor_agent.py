@@ -10,7 +10,7 @@ from sqlalchemy import select
 import uuid
 from app.models import Course, Lesson, Progress, User, Flashcard, Quiz, Interaction
 from app.models.enums import LessonStatus
-from app.config import get_llm
+from app.config import get_thinking_llm
 
 class FlashcardStructure(BaseModel):
     front: str = Field(description="The front of the flashcard (question/term)")
@@ -60,7 +60,7 @@ class TutorAgent:
     """LangChain agent for teaching a student, generating lesson plans and content."""
     
     def __init__(self, db: AsyncSession, user_id: int):
-        self.llm = get_llm()
+        self.llm = get_thinking_llm()
         self.db = db
         self.user_id = user_id
         
