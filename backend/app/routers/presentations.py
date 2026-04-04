@@ -14,7 +14,7 @@ from app.controllers.presentations import (
 router = APIRouter(prefix="/presentations", tags=["Presentations"])
 
 
-@router.get("/", response_model=List[PresentationResponse])
+@router.get("", response_model=List[PresentationResponse])
 async def get_presentations(
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=1000),

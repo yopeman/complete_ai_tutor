@@ -46,14 +46,13 @@ app.add_middleware(
 app.include_router(auth.router, tags=["Authentication"])
 app.include_router(courses.router, tags=["Courses"])
 app.include_router(lessons.router, tags=["Lessons"])
-# ...
+app.include_router(presentations.router, tags=["Presentations"])
 app.include_router(interactions.router, tags=["Interactions"])
 app.include_router(quizzes.router, tags=["Quizzes"])
 app.include_router(progress.router, tags=["Progress"])
 app.include_router(flashcards.router, tags=["Flashcards"])
 app.include_router(chats.router, tags=["Chats"])
 app.include_router(tts_and_stt.router, tags=["TTS and STT"])
-app.include_router(presentations.router, tags=["Presentations"])
 
 
 # Serve static files

@@ -340,8 +340,8 @@ const LessonPlayer = () => {
         <div className="flex-1 overflow-y-auto p-12 bg-slate-900/50 bg-[radial-gradient(circle_at_bottom_left,_var(--tw-gradient-stops))] from-indigo-900/10 via-transparent to-transparent custom-scrollbar">
           <div className="max-w-3xl mx-auto space-y-10">
 
-            {/* ── Daily Plan & Summary Card ─────────────────────────────────── */}
-            {(lesson.daily_plan && Object.keys(lesson.daily_plan).length > 0) || lesson.summary ? (
+            {/* ── Daily Plan Card ───────────────────────────────────────────── */}
+            {lesson.daily_plan && Object.keys(lesson.daily_plan).length > 0 ? (
               <div className="rounded-[2rem] border border-indigo-500/20 bg-gradient-to-br from-indigo-950/60 via-slate-900/80 to-slate-900/60 shadow-2xl shadow-indigo-500/5 overflow-hidden">
                 {/* Card header */}
                 <div className="flex items-center gap-3 px-8 py-5 border-b border-indigo-500/10 bg-indigo-500/5">
@@ -350,51 +350,30 @@ const LessonPlayer = () => {
                   </div>
                   <div>
                     <p className="text-[10px] font-bold text-indigo-400/70 uppercase tracking-[0.2em] leading-none mb-0.5">Day {lesson.day_number}</p>
-                    <h3 className="text-base font-bold text-white leading-tight">Today's Plan &amp; Summary</h3>
+                    <h3 className="text-base font-bold text-white leading-tight">Today's Daily Plan</h3>
                   </div>
-                  {lesson.summary && (
-                    <div className="ml-auto">
-                      <TTSButton text={lesson.summary} />
-                    </div>
-                  )}
                 </div>
 
-                <div className="p-8 space-y-8">
-                  {/* Daily Plan */}
-                  {lesson.daily_plan && Object.keys(lesson.daily_plan).length > 0 && (
-                    <div>
-                      <p className="text-[10px] font-bold text-indigo-400 uppercase tracking-[0.18em] mb-4">📅 Daily Plan</p>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        {Object.entries(lesson.daily_plan).map(([key, value]) => (
-                          <div key={key} className="flex items-start gap-3 p-4 rounded-2xl bg-slate-900/60 border border-white/5">
-                            <div className="w-2 h-2 rounded-full bg-indigo-500 mt-1.5 shrink-0" />
-                            <div>
-                              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">
-                                {String(key).replace(/_/g, ' ')}
-                              </p>
-                              <p className="text-sm text-slate-300 leading-relaxed">
-                                {Array.isArray(value)
-                                  ? value.join(', ')
-                                  : typeof value === 'object' && value !== null
-                                    ? JSON.stringify(value)
-                                    : String(value)}
-                              </p>
-                            </div>
-                          </div>
-                        ))}
+                <div className="p-8">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {Object.entries(lesson.daily_plan).map(([key, value]) => (
+                      <div key={key} className="flex items-start gap-3 p-4 rounded-2xl bg-slate-900/60 border border-white/5">
+                        <div className="w-2 h-2 rounded-full bg-indigo-500 mt-1.5 shrink-0" />
+                        <div>
+                          <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">
+                            {String(key).replace(/_/g, ' ')}
+                          </p>
+                          <p className="text-sm text-slate-300 leading-relaxed">
+                            {Array.isArray(value)
+                              ? value.join(', ')
+                              : typeof value === 'object' && value !== null
+                                ? JSON.stringify(value)
+                                : String(value)}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  )}
-
-                  {/* Summary */}
-                  {lesson.summary && (
-                    <div>
-                      <p className="text-[10px] font-bold text-indigo-400 uppercase tracking-[0.18em] mb-4">📝 Lesson Summary</p>
-                      <div className="p-6 rounded-2xl bg-slate-900/60 border border-white/5">
-                        <p className="text-slate-300 text-base leading-relaxed">{lesson.summary}</p>
-                      </div>
-                    </div>
-                  )}
+                    ))}
+                  </div>
                 </div>
               </div>
             ) : null}
