@@ -26,6 +26,7 @@ from app.schemas.flashcard import (
 from app.schemas.chat import (
     ChatBase, ChatCreate, ChatResponse, ChatListResponse, ChatWithCourseResponse
 )
+from app.schemas.certificate import CertificateResponse, CertificateListResponse
 
 # Export all schemas
 __all__ = [
@@ -46,5 +47,7 @@ __all__ = [
     # Flashcard schemas
     'FlashcardBase', 'FlashcardCreate', 'FlashcardUpdate', 'FlashcardResponse',
     # Chat schemas
-    'ChatBase', 'ChatCreate', 'ChatResponse', 'ChatListResponse', 'ChatWithCourseResponse'
+    'ChatBase', 'ChatCreate', 'ChatResponse', 'ChatListResponse', 'ChatWithCourseResponse',
+    # Certificate schemas
+    'CertificateResponse', 'CertificateListResponse'
 ]

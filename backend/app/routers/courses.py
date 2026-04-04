@@ -17,6 +17,7 @@ from app.schemas import (
     ChatCreate,
     ChatResponse,
     ChatWithCourseResponse,
+    CertificateResponse,
 )
 from app.controllers.courses import (
     create_course as create_course_controller,
@@ -27,6 +28,7 @@ from app.controllers.courses import (
     delete_course as delete_course_controller,
     install_course_plan as install_course_plan_controller,
     get_course_lessons as get_course_lessons_controller,
+    get_course_certificate as get_course_certificate_controller,
 )
 
 router = APIRouter(prefix="/courses", tags=["Courses"])
@@ -132,3 +134,13 @@ async def get_course_lessons(
 ):
     """Get all lessons for a specific course."""
     return await get_course_lessons_controller(course_id, current_user, db)
+
+
+@router.get("/{course_id}/certificates", response_model=CertificateResponse)
+async def get_course_certificate(
+    course_id: int,
+    current_user: User = Depends(get_current_active_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Generate and return a certificate for a completed course."""
+    return await get_course_certificate_controller(course_id, current_user, db)
