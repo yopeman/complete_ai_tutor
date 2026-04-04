@@ -17,7 +17,8 @@ import {
   User as UserIcon,
   RotateCcw,
   Mic,
-  Volume2
+  Volume2,
+  Calendar
 } from 'lucide-react';
 import VoiceInputButton from '../components/chat/VoiceInputButton';
 import TTSButton from '../components/ui/TTSButton';
@@ -311,18 +312,81 @@ const LessonPlayer = () => {
       <div className="flex-1 flex overflow-hidden">
         {/* Left: Content Area */}
         <div className="flex-1 overflow-y-auto p-12 bg-slate-900/50 bg-[radial-gradient(circle_at_bottom_left,_var(--tw-gradient-stops))] from-indigo-900/10 via-transparent to-transparent custom-scrollbar">
-          <div className="max-w-3xl mx-auto relative group">
-            <div className="prose prose-invert prose-indigo max-w-none 
-              prose-headings:font-display prose-headings:font-bold prose-headings:tracking-tight
-              prose-h1:text-4xl prose-h1:mb-10 prose-h2:text-2xl prose-h2:mt-12 prose-h2:mb-6 prose-h2:text-indigo-400
-              prose-p:text-slate-300 prose-p:text-lg prose-p:leading-relaxed prose-p:mb-8
-              prose-ul:list-disc prose-ul:pl-6 prose-li:text-slate-300 prose-li:my-3
-              prose-pre:bg-slate-950 prose-pre:border prose-pre:border-white/5 prose-pre:rounded-2xl prose-pre:p-8 prose-pre:shadow-2xl
-              prose-code:text-indigo-300 prose-code:bg-indigo-500/10 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-md prose-code:before:content-none prose-code:after:content-none
-            ">
-              <SmartMarkdown>
-                {lesson.content || '# Generating Content...\n\nPlease wait while the AI Tutor creates your lesson for this topic.'}
-              </SmartMarkdown>
+          <div className="max-w-3xl mx-auto space-y-10">
+
+            {/* ── Daily Plan & Summary Card ─────────────────────────────────── */}
+            {(lesson.daily_plan && Object.keys(lesson.daily_plan).length > 0) || lesson.summary ? (
+              <div className="rounded-[2rem] border border-indigo-500/20 bg-gradient-to-br from-indigo-950/60 via-slate-900/80 to-slate-900/60 shadow-2xl shadow-indigo-500/5 overflow-hidden">
+                {/* Card header */}
+                <div className="flex items-center gap-3 px-8 py-5 border-b border-indigo-500/10 bg-indigo-500/5">
+                  <div className="w-8 h-8 rounded-xl bg-indigo-500/15 flex items-center justify-center shrink-0">
+                    <Calendar className="text-indigo-400" size={16} />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-bold text-indigo-400/70 uppercase tracking-[0.2em] leading-none mb-0.5">Day {lesson.day_number}</p>
+                    <h3 className="text-base font-bold text-white leading-tight">Today's Plan &amp; Summary</h3>
+                  </div>
+                  {lesson.summary && (
+                    <div className="ml-auto">
+                      <TTSButton text={lesson.summary} />
+                    </div>
+                  )}
+                </div>
+
+                <div className="p-8 space-y-8">
+                  {/* Daily Plan */}
+                  {lesson.daily_plan && Object.keys(lesson.daily_plan).length > 0 && (
+                    <div>
+                      <p className="text-[10px] font-bold text-indigo-400 uppercase tracking-[0.18em] mb-4">📅 Daily Plan</p>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {Object.entries(lesson.daily_plan).map(([key, value]) => (
+                          <div key={key} className="flex items-start gap-3 p-4 rounded-2xl bg-slate-900/60 border border-white/5">
+                            <div className="w-2 h-2 rounded-full bg-indigo-500 mt-1.5 shrink-0" />
+                            <div>
+                              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">
+                                {String(key).replace(/_/g, ' ')}
+                              </p>
+                              <p className="text-sm text-slate-300 leading-relaxed">
+                                {Array.isArray(value)
+                                  ? value.join(', ')
+                                  : typeof value === 'object' && value !== null
+                                  ? JSON.stringify(value)
+                                  : String(value)}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Summary */}
+                  {lesson.summary && (
+                    <div>
+                      <p className="text-[10px] font-bold text-indigo-400 uppercase tracking-[0.18em] mb-4">📝 Lesson Summary</p>
+                      <div className="p-6 rounded-2xl bg-slate-900/60 border border-white/5">
+                        <p className="text-slate-300 text-base leading-relaxed">{lesson.summary}</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ) : null}
+
+            {/* ── Main Lesson Content ───────────────────────────────────────── */}
+            <div className="relative group">
+              <div className="prose prose-invert prose-indigo max-w-none 
+                prose-headings:font-display prose-headings:font-bold prose-headings:tracking-tight
+                prose-h1:text-4xl prose-h1:mb-10 prose-h2:text-2xl prose-h2:mt-12 prose-h2:mb-6 prose-h2:text-indigo-400
+                prose-p:text-slate-300 prose-p:text-lg prose-p:leading-relaxed prose-p:mb-8
+                prose-ul:list-disc prose-ul:pl-6 prose-li:text-slate-300 prose-li:my-3
+                prose-pre:bg-slate-950 prose-pre:border prose-pre:border-white/5 prose-pre:rounded-2xl prose-pre:p-8 prose-pre:shadow-2xl
+                prose-code:text-indigo-300 prose-code:bg-indigo-500/10 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-md prose-code:before:content-none prose-code:after:content-none
+              ">
+                <SmartMarkdown>
+                  {lesson.content || '# Generating Content...\n\nPlease wait while the AI Tutor creates your lesson for this topic.'}
+                </SmartMarkdown>
+              </div>
             </div>
           </div>
         </div>
@@ -564,80 +628,107 @@ const LessonPlayer = () => {
                 </form>
               ) : (
                 <div className="max-w-3xl mx-auto space-y-12 animate-in zoom-in-95 duration-500 pb-10">
+                  {/* Score circle + title */}
                   <div className="text-center relative">
-                    <div className="absolute -inset-4 bg-indigo-500/10 blur-3xl rounded-full"></div>
-                    <div className={`w-32 h-32 rounded-full border-4 flex items-center justify-center mx-auto mb-6 relative transition-all duration-1000 ${quizResult.score >= 70 ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-rose-500/10 border-rose-500/30'
-                      }`}>
+                    <div className={`absolute -inset-4 blur-3xl rounded-full ${quizResult.is_passed ? 'bg-emerald-500/10' : 'bg-rose-500/10'}`}></div>
+                    <div className={`w-32 h-32 rounded-full border-4 flex items-center justify-center mx-auto mb-6 relative transition-all duration-1000 ${quizResult.is_passed ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-rose-500/10 border-rose-500/30'}`}>
                       <div>
                         <p className="text-4xl font-display font-bold text-white mb-0">{quizResult.score}%</p>
                         <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest leading-tight">Mastery</p>
                       </div>
                     </div>
                     <h3 className="text-3xl font-bold text-white mb-4">
-                      {quizResult.score >= 70 ? 'Excellent Progress!' : 'Knowledge Gap Detected'}
+                      {quizResult.is_passed ? 'Excellent Progress!' : 'Knowledge Gap Detected'}
                     </h3>
-                    <div className="text-slate-400 text-lg leading-relaxed italic max-w-xl mx-auto w-full prose prose-invert prose-p:my-0 prose-pre:text-sm prose-code:text-indigo-300">
-                      <SmartMarkdown>{quizResult.feedback}</SmartMarkdown>
+
+                    {/* Feedback message — always visible */}
+                    <p className="text-slate-400 text-lg leading-relaxed italic max-w-xl mx-auto">
+                      "{quizResult.feedback}"
+                    </p>
+                  </div>
+
+                  {/* ── FAILED: show only feedback + retake ──────────────────── */}
+                  {!quizResult.is_passed && (
+                    <div className="flex flex-col items-center gap-5 pt-6 border-t border-white/5">
+                      {/* Student status badge */}
+                      {quizResult.student_status && (
+                        <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs font-bold uppercase tracking-widest">
+                          <XCircle size={14} />
+                          {quizResult.student_status}
+                        </span>
+                      )}
+
+                      <Button
+                        onClick={handleRetakeQuiz}
+                        className="px-10 py-5 rounded-[1.5rem] text-base font-bold shadow-2xl shadow-rose-500/10 gap-3 bg-rose-600 hover:bg-rose-500"
+                      >
+                        <RotateCcw size={18} /> Retake Quiz
+                      </Button>
+
+                      <button
+                        onClick={() => { setShowQuiz(false); setQuizResult(null); }}
+                        className="py-2 text-slate-500 hover:text-white transition-all text-xs font-bold uppercase tracking-widest"
+                      >
+                        Back to Module Content
+                      </button>
                     </div>
-                  </div>
+                  )}
 
-                  {/* Detailed Question Review */}
-                  <div className="space-y-6 pt-6 border-t border-white/5">
-                    <h4 className="text-xs font-bold text-slate-500 uppercase tracking-[0.2em] mb-8 text-center">Architectural Review</h4>
-                    {quizResult.quizzes && quizResult.quizzes.map((q, idx) => (
-                      <div key={idx} className={`p-8 rounded-3xl border transition-all ${q.is_correct ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-rose-500/5 border-rose-500/20'
-                        }`}>
-                        <div className="flex items-start gap-4 mb-6">
-                          <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 border ${q.is_correct ? 'bg-emerald-500 border-emerald-400 text-white' : 'bg-rose-500 border-rose-400 text-white'
-                            }`}>
-                            {q.is_correct ? <CheckCircle2 size={16} /> : <XCircle size={16} />}
-                          </div>
-                          <div className="text-lg font-bold text-white leading-tight mt-1 w-full prose prose-invert prose-p:my-0 prose-pre:text-xs prose-code:text-indigo-300">
-                            <SmartMarkdown>{q.question}</SmartMarkdown>
-                          </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pl-12 mb-6">
-                          <div className="p-4 rounded-2xl bg-slate-900 border border-white/5">
-                            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Your Answer</p>
-                            <p className={`text-sm font-bold ${q.is_correct ? 'text-emerald-400' : 'text-rose-400'}`}>{q.student_answer || 'No answer'}</p>
-                          </div>
-                          {!q.is_correct && (
-                            <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20">
-                              <p className="text-[10px] font-bold text-emerald-500/50 uppercase tracking-widest mb-1">Correct Answer</p>
-                              <p className="text-sm font-bold text-emerald-400">{q.correct_answer}</p>
+                  {/* ── PASSED: show full detailed review ────────────────────── */}
+                  {quizResult.is_passed && (
+                    <>
+                      <div className="space-y-6 pt-6 border-t border-white/5">
+                        <h4 className="text-xs font-bold text-slate-500 uppercase tracking-[0.2em] mb-8 text-center">Architectural Review</h4>
+                        {quizResult.quizzes && quizResult.quizzes.map((q, idx) => (
+                          <div key={idx} className={`p-8 rounded-3xl border transition-all ${q.is_correct ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-rose-500/5 border-rose-500/20'}`}>
+                            <div className="flex items-start gap-4 mb-6">
+                              <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 border ${q.is_correct ? 'bg-emerald-500 border-emerald-400 text-white' : 'bg-rose-500 border-rose-400 text-white'}`}>
+                                {q.is_correct ? <CheckCircle2 size={16} /> : <XCircle size={16} />}
+                              </div>
+                              <h5 className="text-lg font-bold text-white leading-tight mt-1">{q.question}</h5>
                             </div>
-                          )}
-                        </div>
 
-                        {q.explanation && (
-                          <div className="pl-12 pt-4 border-t border-white/5">
-                            <div className="text-xs text-slate-400 leading-relaxed w-full prose prose-invert prose-p:my-0 prose-sm prose-pre:text-xs prose-code:text-indigo-300">
-                              <span className="font-bold text-indigo-400 uppercase tracking-widest mr-2 text-[10px]">Tutor Note:</span>
-                              <SmartMarkdown>{q.explanation}</SmartMarkdown>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pl-12 mb-6">
+                              <div className="p-4 rounded-2xl bg-slate-900 border border-white/5">
+                                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Your Answer</p>
+                                <p className={`text-sm font-bold ${q.is_correct ? 'text-emerald-400' : 'text-rose-400'}`}>{q.student_answer || 'No answer'}</p>
+                              </div>
+                              {!q.is_correct && (
+                                <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20">
+                                  <p className="text-[10px] font-bold text-emerald-500/50 uppercase tracking-widest mb-1">Correct Answer</p>
+                                  <p className="text-sm font-bold text-emerald-400">{q.correct_answer}</p>
+                                </div>
+                              )}
                             </div>
+
+                            {q.explanation && (
+                              <div className="pl-12 pt-4 border-t border-white/5">
+                                <p className="text-xs text-slate-400 leading-relaxed">
+                                  <span className="font-bold text-indigo-400 uppercase tracking-widest mr-2 text-[10px]">Tutor Note:</span>
+                                  {q.explanation}
+                                </p>
+                              </div>
+                            )}
                           </div>
-                        )}
+                        ))}
                       </div>
-                    ))}
-                  </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-10">
-                    <Button
-                      onClick={goToNextLesson}
-                      disabled={quizResult.score < 70}
-                      className={`py-6 rounded-[1.5rem] text-lg font-bold shadow-2xl gap-3 ${quizResult.score >= 70 ? 'bg-indigo-600 shadow-indigo-500/20' : 'opacity-50 grayscale'
-                        }`}
-                    >
-                      Next Lesson <ChevronRight size={22} />
-                    </Button>
-                    <button
-                      onClick={() => { setShowQuiz(false); setQuizResult(null); }}
-                      className="py-4 text-slate-500 hover:text-white transition-all text-xs font-bold uppercase tracking-widest"
-                    >
-                      Back to Module Content
-                    </button>
-                  </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-10">
+                        <Button
+                          onClick={goToNextLesson}
+                          className="py-6 rounded-[1.5rem] text-lg font-bold shadow-2xl gap-3 bg-indigo-600 shadow-indigo-500/20"
+                        >
+                          Next Lesson <ChevronRight size={22} />
+                        </Button>
+                        <button
+                          onClick={() => { setShowQuiz(false); setQuizResult(null); }}
+                          className="py-4 text-slate-500 hover:text-white transition-all text-xs font-bold uppercase tracking-widest"
+                        >
+                          Back to Module Content
+                        </button>
+                      </div>
+                    </>
+                  )}
                 </div>
               )}
             </div>
