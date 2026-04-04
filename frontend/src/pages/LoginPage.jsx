@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
-import { Lock, User, ArrowRight, Loader2 } from 'lucide-react';
+import { Lock, User, ArrowRight, Loader2, ArrowLeft } from 'lucide-react';
 
 const LoginPage = () => {
     const [formData, setFormData] = useState({ username: '', password: '' });
@@ -35,6 +35,12 @@ const LoginPage = () => {
 
     return (
         <div className="min-h-screen bg-slate-900 flex items-center justify-center p-6 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-indigo-900/20 via-slate-900 to-slate-900">
+            <button
+                onClick={() => navigate(-1)}
+                className="absolute top-6 left-6 p-3 bg-slate-800/50 backdrop-blur-xl border border-slate-700 rounded-xl text-slate-400 hover:text-white hover:bg-slate-700/50 transition-all group"
+            >
+                <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
+            </button>
             <div className="w-full max-w-md">
                 <div className="text-center mb-10">
                     <Link to="/" className="text-3xl font-display font-bold text-indigo-400 mb-2 block">AI Tutor</Link>

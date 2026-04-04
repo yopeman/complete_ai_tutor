@@ -80,7 +80,7 @@ const Navbar = ({ onMenuClick }) => {
                 <div className="flex items-center gap-3">
                     <div className="text-right">
                         <p className="text-sm font-semibold text-white">{user?.username}</p>
-                        <p className="text-xs text-slate-500 capitalize">{user?.native_language} Learner</p>
+                       
                     </div>
                     <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-500 to-emerald-500 p-[2px] shadow-lg shadow-indigo-500/20">
                         <div className="w-full h-full rounded-[14px] bg-slate-900 flex items-center justify-center text-sm font-bold text-indigo-400">

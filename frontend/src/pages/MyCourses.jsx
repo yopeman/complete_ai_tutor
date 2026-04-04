@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import api from '../services/api';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
-import { Sparkles, BookOpen, Clock, ChevronRight, Loader2, XCircle, RotateCcw, Trash2 } from 'lucide-react';
+import { Sparkles, BookOpen, Clock, ChevronRight, Loader2, XCircle, RotateCcw, Trash2, ArrowLeft } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import SmartMarkdown from '../components/ui/SmartMarkdown';
 import VoiceInputButton from '../components/chat/VoiceInputButton';
@@ -151,6 +151,12 @@ const MyCourses = () => {
 
     return (
         <div className="space-y-10">
+            <button
+                onClick={() => navigate(-1)}
+                className="fixed top-6 left-6 z-50 p-3 bg-slate-800/50 backdrop-blur-xl border border-slate-700 rounded-xl text-slate-400 hover:text-white hover:bg-slate-700/50 transition-all group"
+            >
+                <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
+            </button>
             {/* Hero / Course Generator */}
             <section className="relative overflow-hidden rounded-[3rem] bg-slate-900 border border-white/5 shadow-2xl p-1 lg:p-2">
                 <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-500/10 rounded-full blur-[120px] -mr-40 -mt-40"></div>
