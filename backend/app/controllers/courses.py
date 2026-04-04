@@ -4,7 +4,7 @@ from sqlalchemy import select, desc
 from typing import List, Optional
 from app.database import get_db
 from app.dependencies import get_current_active_user
-from app.models import User, Course, Lesson, CourseStatus, Chat
+from app.models import User, Course, Lesson, CourseStatus, Chat, Certificate, LessonStatus
 from app.schemas import (
     CourseCreate,
     CourseUpdate,
@@ -17,9 +17,11 @@ from app.schemas import (
     ChatCreate,
     ChatResponse,
     ChatWithCourseResponse,
+    CertificateResponse
 )
 from app.services.architect_agent import ArchitectAgent
 from app.config import get_generating_llm
+from app.services.certificate_service import CertificateService
 
 
 async def create_course(
@@ -342,3 +344,58 @@ async def get_course_lessons(
     lessons = lessons_result.scalars().all()
     
     return lessons
+
+
+# ============== Certificate Endpoints ==============
+
+async def get_course_certificate(
+    course_id: int,
+    current_user: User = Depends(get_current_active_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Generate and return a certificate for a completed course."""
+    # Verify course belongs to user
+    result = await db.execute(
+        select(Course).where(Course.id == course_id, Course.user_id == current_user.id)
+    )
+    course = result.scalar_one_or_none()
+    
+    if not course:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Course not found"
+        )
+    
+    # Fetch all lessons for the course
+    lessons_result = await db.execute(
+        select(Lesson).where(Lesson.course_id == course_id)
+    )
+    lessons = lessons_result.scalars().all()
+    
+    if not lessons:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No lessons found for this course"
+        )
+    
+    # Check if all lessons are completed
+    all_completed = all(lesson.status == LessonStatus.COMPLETED for lesson in lessons)
+    
+    if not all_completed:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Complete all lessons before to get certificate"
+        )
+    
+    # Check if certificate already exists
+    cert_result = await db.execute(
+        select(Certificate).where(Certificate.course_id == course_id, Certificate.user_id == current_user.id)
+    )
+    certificate = cert_result.scalar_one_or_none()
+    
+    if not certificate:
+        # Generate new certificate
+        service = CertificateService()
+        certificate = await service.generate_certificate(current_user, course, db)
+    
+    return certificate

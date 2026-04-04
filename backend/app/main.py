@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
 from app.database import engine, Base
-from app.routers import auth, courses, lessons, interactions, quizzes, progress, flashcards, chats, tts_and_stt, presentations
+from app.routers import auth, courses, lessons, interactions, quizzes, progress, flashcards, chats, tts_and_stt, presentations, certificates
 from app.config import get_settings
 import sys
 import os
@@ -53,6 +53,7 @@ app.include_router(progress.router, tags=["Progress"])
 app.include_router(flashcards.router, tags=["Flashcards"])
 app.include_router(chats.router, tags=["Chats"])
 app.include_router(tts_and_stt.router, tags=["TTS and STT"])
+app.include_router(certificates.router, tags=["Certificates"])
 
 
 # Serve static files

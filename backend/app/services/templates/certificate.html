@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Certificate of Completion</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .certificate-container {
+            width: 800px;
+            padding: 50px;
+            background: white;
+            border: 15px solid #2c3e50;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .certificate-container::after {
+            content: "";
+            position: absolute;
+            top: 5px;
+            bottom: 5px;
+            left: 5px;
+            right: 5px;
+            border: 2px solid #34495e;
+        }
+        .header {
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 50px;
+            margin: 0;
+            color: #2c3e50;
+            text-transform: uppercase;
+        }
+        .header h2 {
+            font-size: 24px;
+            font-weight: 300;
+            margin: 10px 0;
+            color: #7f8c8d;
+        }
+        .content {
+            text-align: center;
+            margin-top: 50px;
+        }
+        .content p {
+            font-size: 20px;
+            color: #34495e;
+        }
+        .user-name {
+            font-size: 36px;
+            font-weight: bold;
+            color: #2c3e50;
+            border-bottom: 2px solid #2c3e50;
+            display: inline-block;
+            margin: 20px 0;
+            padding: 0 20px;
+        }
+        .course-title {
+            font-size: 28px;
+            font-weight: bold;
+            color: #2980b9;
+        }
+        .footer {
+            margin-top: 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+        .signature {
+            text-align: center;
+            width: 200px;
+        }
+        .signature-line {
+            border-top: 2px solid #2c3e50;
+            margin-top: 10px;
+        }
+        .signature p {
+            margin: 5px 0 0;
+            font-size: 16px;
+            color: #7f8c8d;
+        }
+        .metadata {
+            text-align: left;
+            font-size: 14px;
+            color: #95a5a6;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="certificate-container">
+        <div class="header">
+            <div class="logo">PROMPT LAB</div>
+            <h1>Certificate</h1>
+            <h2>of Completion</h2>
+        </div>
+        
+        <div class="content">
+            <p>This is to certify that</p>
+            <div class="user-name">{{ user_name }}</div>
+            <p>has successfully completed the course</p>
+            <div class="course-title">{{ course_title }}</div>
+        </div>
+        
+        <div class="footer">
+            <div class="metadata">
+                <div>Issue Date: {{ issue_date }}</div>
+                <div>Certificate ID: {{ certificate_code }}</div>
+            </div>
+            
+            <div class="signature">
+                <div style="font-family: 'Brush Script MT', cursive; font-size: 30px;">AI Tutor</div>
+                <div class="signature-line"></div>
+                <p>AI Instructor</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
