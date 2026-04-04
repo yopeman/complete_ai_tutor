@@ -1,89 +1,88 @@
-# AI Tutor — Multi-Agent Autonomous Learning System
+# AI Tutor: Multi-Agent Autonomous Learning System
 
-> Four specialized AI agents collaborate to plan, teach, evaluate, and synthesize — creating a fully adaptive, closed-loop learning experience from a single prompt.
+## The Problem: The "One-Size-Fits-All" Learning Barrier
+Traditional online education is built on monoliths — static curriculum, linear paths, and non-adaptive evaluation.
+ Learners often find themselves either overwhelmed by advanced topics they aren't prepared for or bored by basic concepts they already know. 
+ Accessing specialized tutors is expensive, and most AI solutions are simple "chat-wrappers" that lack a structured educational pedagogical flow.
 
-AI Tutor dynamically generates entire courses, lessons, quizzes, and flashcards tailored to each learner's goals, pace, and knowledge level — powered by **LangChain multi-agent orchestration**, **FastAPI**, and **React 19**.
+## The Solution: A Decentralized Educational Ecosystem
+AI Tutor is a **Multi-Agent Orchestration Platform** that autonomously plans, teaches, evaluates, and certifies.
+ Instead of a single LLM trying to do everything, our platform utilizes four specialized AI agents that collaborate in a closed-loop mastery model:
+
+1.  **Architecture First**: It starts by understanding *who* the learner is and builds a custom curriculum from scratch.
+2.  **Adaptive Teaching**: It delivers lessons enriched with real-time web search, visual aids, and interactive chat answering.
+3.  **Mastery-Gated Progression**: It ensures a student cannot move to  next   Lesson until finished the current lesson and evaluated.
+ **Assessor** verifies complete comprehension of current Lesson.
+4.  **Tangible Achievement**: It synthesizes the journey into spaced-repetition flashcards and official certifications upon completion.
+
+
+##  Core Agent Capabilities & Tool Calling
+
+A critical differentiator of the AI Tutor platform is its **Autonomous Tool Calling** system. Agents aren't limited to their training data; they actively interact with the digital world to provide up-to-date and accurate information:
+
+- **Web Search Tool**: The Tutor autonomously queries live documentation and academic sources to ensure content accuracy.
+- **YouTube Integration**: Finds and embeds relevant video tutorials directly into the lesson for a multi-modal experience.
+- **Image Intelligence**: Automatically retrieves diagrams, charts, and visual aids to explain complex STEM concepts.
+- **Translation Engine**: Explains difficult terms or provides entire lesson summaries in the learner's native language when needed.
+- **State Persistence**: The system maintains a "Knowledge Profile" for every user, adjusting the difficulty and tone based on past quiz performance and interaction history.
+
+##  Key Innovation Highlights
+
+### Interactive Multi-Modal Learning
+- **Presentation Mode**: Click a button to transform any lesson into a full-screen slide deck with synchronized AI audio narration (TTS).
+- **Voice-to-Voice**: Full Speech-to-Text (STT) interaction for a completely hands-free learning experience.
+
+### Commercial-Grade Payment Integration
+- **Transaction Gating**: Integrated with **Chapa Payment Gateway** to handle premium unlocking of advanced course modules.
+- **Master Log**: Students can track their transaction history and status through a secure financial dashboard.
+
+### Automated Academic Certification
+- **Mastery Validation**: The system auto-generates certificates of achievement once the learner reaches 100% completion verified by the Assessor.
+- **Reference Tracking**: Each certificate includes unique reference codes for external verification.
+
+### Spaced Repetition Synthesizer
+- **Smart Flashcards**: Automatically generates difficulty-rated flashcards from lesson content to ensure long-term retention.
+- **Progress Command Center**: A unified dashboard tracking streaks, mastery scores, and recent activity.
+
+
+## 🧠 System Hierarchy & Flow
+
+```text
+       ┌───────────┐
+       │   USER    │
+       └─────┬─────┘
+             │
+      ┌──────▼──────┐          ┌──────────────┐
+      │  ARCHITECT  ├──────────►   AI CHAT    │
+      │(Plan & Goal)│          │ (General Q&A)│
+      └──────┬──────┘          └──────────────┘
+             │
+      ┌──────▼──────┐          ┌──────────────┐
+      │    TUTOR    ├──────────► PRESENTATION │
+      │(Teach & Ask)│          │ & AUDIO (TTS)│
+      └──────┬──────┘          └──────────────┘
+             │
+      ┌──────▼──────┐          ┌──────────────┐
+      │   ASSESSOR  │◄─────────┤   PAYMENTS   │
+      │(Quiz & Gate)│          │ (402 Limits) │
+      └──────┬──────┘          └──────────────┘
+             │
+      ┌──────▼──────┐          ┌──────────────┐
+      │ SYNTHESIZER ├──────────► CERTIFICATION│
+      │ (Summarize) ├──────────►  FLASHCARDS  │
+      └─────────────┘          └──────────────┘
+
+
+
+Technical Stack & Architecture
+
+- **Frontend**: React 19, Tailwind CSS, Lucide Icons, Framer Motion
+- **Backend**: FastAPI (Python), SQLAlchemy (Async), MySQL/PostgreSQL
+- **AI Engine**: LangChain Multi-Agent Framework, Multi-modal LLMs (JSON/Multipart), Groq API, 
+- **APIs & Services**: Chapa (Payments), YouTube Search, Google Web Search, Translate
+
+
 
 ---
-
-## Key Features
-
-### Personalized Course Architecture
-- The AI Architect engages in an **iterative conversation** to understand the learner's current skill level, goals, available time (e.g. "3 months, 3 days/week"), and preferred learning style
-- Generates a **complete day-by-day curriculum** adapted to the learner's starting point — not a one-size-fits-all template
-- The learner can **review and refine** the plan collaboratively with the AI before committing
-
-### Rich Adaptive Lesson Content
-- Each lesson is **dynamically generated** with in-depth explanations, real code examples, diagrams, and embedded YouTube tutorial videos
-- Content is **context-aware** — the Tutor considers previous lesson summaries and the student's recorded strengths/weaknesses when generating new material
-- Learners can ask **follow-up questions** mid-lesson and receive answers grounded in the current lesson context
-
-### Locked Lesson Progression
-- Lessons follow a **sequential mastery model** — each lesson is locked until the previous one is completed and evaluated
-- Progression is **gated by quiz performance**, not just completion — the Assessor must confirm the learner has achieved sufficient understanding before unlocking the next lesson
-- This prevents skipping ahead and ensures **genuine comprehension** at every stage
-
-### Intelligent Multi-Format Evaluation
-- The Assessor generates **contextual quizzes** in multiple formats: Multiple Choice, True/False, Fill-in-the-blank, and Short Answer
-- Each response is **evaluated with detailed explanations** — the learner understands *why* an answer is correct or incorrect
-- The system records the **student's performance profile** (e.g. "strong theoretical understanding, weak in practical application") and feeds this back into future teaching
-
-### Smart Flashcard Generation
-- The Synthesizer auto-generates **spaced-repetition flashcards** from each completed lesson with difficulty ratings (Easy, Medium, Hard)
-- Flashcards feature a full **study mode** with card flipping, confidence rating, and progress tracking
-
-### Progress Analytics Dashboard
-- Tracks mastery scores, completed lessons, average quiz performance, and activity timelines across all courses
-- Provides a **command center view** with continue-learning shortcuts, recent activity, and quick-access actions
-
-### Voice Interaction
-- Full **speech-to-text** input — ask questions, create courses, and refine plans using voice
-- **Text-to-speech** output — listen to AI responses and lesson content hands-free
-
-### Live Agent Tools
-- Agents autonomously use **5 real-time tools** during content generation:
-  - **Web Search** — current information and documentation
-  - **YouTube Search** — finds and embeds relevant tutorial videos
-  - **Image Search** — retrieves visual aids and diagrams
-  - **Google Translate** — explains concepts in the learner's native language
-  - **Calculator** — performs computations for STEM content
-
----
-
-## Multi-Agent Architecture
-
-```
-  USER ─────────┬──────────────────────────┐
-                │                          │
-         ┌──────▼──────┐           ┌───────▼───────┐
-         │  ARCHITECT  │           │   AI CHAT     │
-         │  Plans &    │           │  (Free-form)  │
-         │  curricula  │           │   Any topic   │
-         └──────┬──────┘           └───────────────┘
-                │
-         ┌──────▼──────┐
-         │   TUTOR     │  ← Web Search, YouTube,
-         │  Teaches &  │    Images, Translate
-         │  answers    │
-         └──────┬──────┘
-                │
-         ┌──────▼──────┐
-         │  ASSESSOR   │
-         │  Quizzes &  │
-         │  evaluates  │
-         └──────┬──────┘
-                │
-         ┌──────▼──────┐
-         │ SYNTHESIZER │
-         │ Summarizes, │
-         │ flashcards, │
-         │ unlocks next│
-         └─────────────┘
-```
-
-**How they collaborate:**
-
-1. **Architect** — Iteratively converses with the learner to understand goals, skill level, and time constraints, then generates a structured course plan tailored to their current status.
-2. **Tutor** — Generates lesson content using live tools (web, YouTube, images, translation), considers the student's performance history, and answers questions in context.
-3. **Assessor** — Creates quizzes, evaluates responses with explanations, records the student's skill profile, and gates progression — only unlocking the next lesson upon demonstrated mastery.
-4. **Synthesizer** — Summarizes lessons, generates difficulty-rated flashcards, records progress analytics, and manages the lesson unlock sequence.
+*Developed for the Future of Autonomous Education*  
+© 2026 AI Tutor Platform.
