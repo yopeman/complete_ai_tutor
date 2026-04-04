@@ -223,6 +223,8 @@ const LessonPlayer = () => {
     } else {
       navigate(`/courses/${lesson.course_id}`);
     }
+    setShowQuiz(false);
+    setQuizResult(null);
   };
 
   const goToPreviousLesson = async () => {
@@ -239,6 +241,8 @@ const LessonPlayer = () => {
       }
       navigate(`/lessons/${prevLesson.id}`);
     }
+    setShowQuiz(false);
+    setQuizResult(null);
   };
 
   const handleBackToLesson = () => {
