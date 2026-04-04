@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
-import { Mail, Lock, User, ArrowRight, Loader2 } from 'lucide-react';
+import { Mail, Lock, User, ArrowRight, Loader2, ArrowLeft } from 'lucide-react';
 
 const RegisterPage = () => {
-    const [formData, setFormData] = useState({ username: '', password: '', native_language: 'Turkish' });
+    const [formData, setFormData] = useState({ username: '', password: ''});
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const { login } = useAuth();
@@ -39,6 +39,12 @@ const RegisterPage = () => {
 
     return (
         <div className="min-h-screen bg-slate-900 flex items-center justify-center p-6 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-indigo-900/20 via-slate-900 to-slate-900">
+            <button
+                onClick={() => navigate(-1)}
+                className="absolute top-6 left-6 p-3 bg-slate-800/50 backdrop-blur-xl border border-slate-700 rounded-xl text-slate-400 hover:text-white hover:bg-slate-700/50 transition-all group"
+            >
+                <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
+            </button>
             <div className="w-full max-w-md">
                 <div className="text-center mb-10">
                     <Link to="/" className="text-3xl font-display font-bold text-indigo-400 mb-2 block">AI Tutor</Link>
@@ -67,23 +73,6 @@ const RegisterPage = () => {
                                     placeholder="johndoe"
                                     value={formData.username}
                                     onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                                />
-                            </div>
-                        </div>
-
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-slate-300 ml-1">Native Language</label>
-                            <div className="relative group">
-                                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-500 group-focus-within:text-indigo-400 transition-colors">
-                                    <span className="text-xs font-bold">LN</span>
-                                </div>
-                                <input
-                                    type="text"
-                                    required
-                                    className="w-full bg-slate-900/50 border border-slate-700 text-white pl-11 pr-4 py-3 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none"
-                                    placeholder="e.g. English, Turkish"
-                                    value={formData.native_language}
-                                    onChange={(e) => setFormData({ ...formData, native_language: e.target.value })}
                                 />
                             </div>
                         </div>

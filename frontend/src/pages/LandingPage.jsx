@@ -101,12 +101,36 @@ const LandingPage = () => {
                                 </div>
                                 <span className="text-xs font-bold font-mono tracking-wider">yimermarelign@gmail.com</span>
                             </a>
-                            <a href="tel:0945342453" className="flex items-center gap-2.5 text-slate-400 hover:text-white transition-colors group">
+                          
+                        </div>
+                         <div className="flex flex-wrap justify-center gap-6 md:gap-8">
+                            <a href="https://github.com/hawaz318" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2.5 text-slate-400 hover:text-white transition-colors group">
                                 <div className="w-8 h-8 rounded-lg bg-slate-900 border border-white/10 flex items-center justify-center group-hover:border-indigo-500/50 transition-all">
-                                    <Phone size={16} />
+                                    <GithubLogo size={16} />
                                 </div>
-                                <span className="text-xs font-bold font-mono tracking-wider">0945342453</span>
+                                <span className="text-xs font-bold font-mono tracking-wider">hawaz318</span>
                             </a>
+                            <a href="mailto:melkamuayal21@gmail.com" className="flex items-center gap-2.5 text-slate-400 hover:text-white transition-colors group">
+                                <div className="w-8 h-8 rounded-lg bg-slate-900 border border-white/10 flex items-center justify-center group-hover:border-indigo-500/50 transition-all">
+                                    <Mail size={16} />
+                                </div>
+                                <span className="text-xs font-bold font-mono tracking-wider">melkamuayal21@gmail.com</span>
+                            </a>
+                        </div>
+                         <div className="flex flex-wrap justify-center gap-6 md:gap-8">
+                            <a href="https://github.com/yopeman" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2.5 text-slate-400 hover:text-white transition-colors group">
+                                <div className="w-8 h-8 rounded-lg bg-slate-900 border border-white/10 flex items-center justify-center group-hover:border-indigo-500/50 transition-all">
+                                    <GithubLogo size={16} />
+                                </div>
+                                <span className="text-xs font-bold font-mono tracking-wider">yopeman</span>
+                            </a>
+                            <a href="mailto:yopeman318@gmail.com" className="flex items-center gap-2.5 text-slate-400 hover:text-white transition-colors group">
+                                <div className="w-8 h-8 rounded-lg bg-slate-900 border border-white/10 flex items-center justify-center group-hover:border-indigo-500/50 transition-all">
+                                    <Mail size={16} />
+                                </div>
+                                <span className="text-xs font-bold font-mono tracking-wider">yopeman318@gmail.com</span>
+                            </a>
+                           
                         </div>
                     </div>
 
