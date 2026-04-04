@@ -603,6 +603,55 @@
         }
       }
     },
+    "/courses/{course_id}/certificates": {
+      "get": {
+        "tags": [
+          "Courses",
+          "Courses"
+        ],
+        "summary": "Get Course Certificate",
+        "description": "Generate and return a certificate for a completed course.",
+        "operationId": "get_course_certificate_courses__course_id__certificates_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "course_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Course Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CertificateResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/lessons/{lesson_id}": {
       "get": {
         "tags": [
@@ -1038,6 +1087,171 @@
                     "$ref": "#/components/schemas/FlashcardResponse"
                   },
                   "title": "Response Get Lesson Flashcards Lessons  Lesson Id  Flashcards Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/lessons/{lesson_id}/presentation": {
+      "get": {
+        "tags": [
+          "Lessons",
+          "Lessons"
+        ],
+        "summary": "Get Lesson Presentation",
+        "description": "Retrieve an existing presentation for a lesson, or generate it if it doesn't exist.",
+        "operationId": "get_lesson_presentation_lessons__lesson_id__presentation_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "lesson_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Lesson Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PresentationResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/presentations": {
+      "get": {
+        "tags": [
+          "Presentations",
+          "Presentations"
+        ],
+        "summary": "Get Presentations",
+        "description": "Retrieve all presentations belonging to the current user.",
+        "operationId": "get_presentations_presentations_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Skip"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 1000,
+              "minimum": 1,
+              "default": 100,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PresentationResponse"
+                  },
+                  "title": "Response Get Presentations Presentations Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/presentations/{presentation_id}": {
+      "get": {
+        "tags": [
+          "Presentations",
+          "Presentations"
+        ],
+        "summary": "Get Presentation By Id",
+        "description": "Retrieve a specific presentation by ID.",
+        "operationId": "get_presentation_by_id_presentations__presentation_id__get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "presentation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Presentation Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PresentationResponse"
                 }
               }
             }
@@ -1918,7 +2132,9 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+
+                }
               }
             }
           },
@@ -1957,7 +2173,125 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/certificates": {
+      "get": {
+        "tags": [
+          "Certificates",
+          "Certificates"
+        ],
+        "summary": "Get Certificates",
+        "description": "Fetch all stored certificates for the current user.",
+        "operationId": "get_certificates_certificates_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Skip"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 1000,
+              "minimum": 1,
+              "default": 100,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CertificateResponse"
+                  },
+                  "title": "Response Get Certificates Certificates Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/certificates/{certificate_id}": {
+      "get": {
+        "tags": [
+          "Certificates",
+          "Certificates"
+        ],
+        "summary": "Get Certificate",
+        "description": "Fetch a specific certificate by ID.",
+        "operationId": "get_certificate_certificates__certificate_id__get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "certificate_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Certificate Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CertificateResponse"
+                }
               }
             }
           },
@@ -1983,7 +2317,9 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+
+                }
               }
             }
           }
@@ -1999,7 +2335,9 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+
+                }
               }
             }
           }
@@ -2243,6 +2581,45 @@
         },
         "type": "object",
         "title": "Body_update_course_plan_ai_courses__course_id__plans_ai_put"
+      },
+      "CertificateResponse": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "user_id": {
+            "type": "integer",
+            "title": "User Id"
+          },
+          "course_id": {
+            "type": "integer",
+            "title": "Course Id"
+          },
+          "certificate_code": {
+            "type": "string",
+            "title": "Certificate Code"
+          },
+          "issue_date": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Issue Date"
+          },
+          "content": {
+            "type": "string",
+            "title": "Content"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "user_id",
+          "course_id",
+          "certificate_code",
+          "issue_date",
+          "content"
+        ],
+        "title": "CertificateResponse"
       },
       "ChatListResponse": {
         "properties": {
@@ -2773,6 +3150,56 @@
         ],
         "title": "LessonResponse"
       },
+      "PPT": {
+        "properties": {
+          "slides": {
+            "items": {
+              "$ref": "#/components/schemas/Slide"
+            },
+            "type": "array",
+            "title": "Slides"
+          }
+        },
+        "type": "object",
+        "required": [
+          "slides"
+        ],
+        "title": "PPT"
+      },
+      "PresentationResponse": {
+        "properties": {
+          "lesson_id": {
+            "type": "integer",
+            "title": "Lesson Id"
+          },
+          "generated_ppt": {
+            "$ref": "#/components/schemas/PPT"
+          },
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "lesson_id",
+          "generated_ppt",
+          "id",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "PresentationResponse"
+      },
       "ProgressResponse": {
         "properties": {
           "quiz_score": {
@@ -3009,6 +3436,29 @@
         ],
         "title": "QuizSubmission"
       },
+      "Slide": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "content": {
+            "type": "string",
+            "title": "Content"
+          },
+          "audio_path": {
+            "type": "string",
+            "title": "Audio Path"
+          }
+        },
+        "type": "object",
+        "required": [
+          "title",
+          "content",
+          "audio_path"
+        ],
+        "title": "Slide"
+      },
       "Token": {
         "properties": {
           "access_token": {
@@ -3168,7 +3618,9 @@
         "type": "oauth2",
         "flows": {
           "password": {
-            "scopes": {},
+            "scopes": {
+
+            },
             "tokenUrl": "/auth/login"
           }
         }
@@ -3176,3 +3628,85 @@
     }
   }
 }
+Chat
+
+New Conversation
+
+🤓 Explain a complex thing
+
+Explain Artificial Intelligence so that I can explain it to my six-year-old child.
+
+
+🧠 Get suggestions and create new ideas
+
+Please give me the best 10 travel ideas around the world
+
+
+💭 Translate, summarize, fix grammar and more…
+
+Translate "I love you" French
+
+
+
+AITOPIA
+Hello, how can I help you today?
+
+
+
+Respond in the English language.You are a YouTube video analysis assistant. Your task is to summarize the content of the video and generate a summary includes highlights with key moments and topics discussed in the video. Follow these steps to execute the task:
+
+1. Analyze the video content:
+   Review the video content provided in the webpage. Identify the main themes, topics, and key moments that are discussed throughout the video.
+  2. Create a summary:
+   Write a concise summary of the video, capturing the essence of the content in 3-5 sentences. Focus on the main points and any significant conclusions drawn in the video.
+
+3. Identify highlights:
+   List key moments in the video that are particularly noteworthy as a list in the table. For each highlight, give the timestamp second first and next to it provide a brief description of what happens in that timestamp second and why it is significant. Do not change the second format or value, Do NOT convert to seconds to hours format, just give it as second. Aim for 5-10 highlights.
+
+4. Format the response:
+   Organize the summary and highlights into a visually appealing sidebar format. Include headings for 'Summary' and 'Highlights', and ensure that the highlights are easy to read and navigate.
+
+5. Output the results:
+   Present the summary and highlights in a clear and structured manner, ready to be displayed next to the video.
+
+Notes:
+- Ensure that the summary is informative and engaging, encouraging viewers to watch the video.
+- The highlights should be specific and provide enough context for viewers to understand the significance of each moment.
+- Avoid including any personal opinions or unnecessary commentary; focus solely on the content of the video.
+
+Video content: 
+
+
+
+
+
+AITOPIA
+It appears there was no video content provided for analysis. Please provide the video details or specific content you would like me to summarize, and I will be happy to assist you!
+
+
+
+
+AITOPIA
+
+10
+Upgrade
+
+
+
+
+
+Ask me anything...
+
+
+
+Make a Review & Earn Credit ❤
+Chat
+Ask
+Search
+Write
+Image
+ChatFile
+Vision
+Agent
+Full Page
+Invite & Earn
