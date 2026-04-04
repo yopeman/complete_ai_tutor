@@ -1,13 +1,17 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Request
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
-from typing import List, Dict, Any
+from typing import List
 from app.database import get_db
 from app.dependencies import get_current_active_user
 from app.config import get_settings
-from app.models import User, Payment, Course
-from app.schemas.payment import PaymentResponse, ChapaCallback
-from app.services.payment_service import PaymentService
+from app.models import User
+from app.schemas.payment import PaymentResponse
+from app.controllers.payments import (
+    verify_payment as verify_payment_controller,
+    payment_webhook as payment_webhook_controller,
+    list_payments as list_payments_controller,
+    get_payment as get_payment_controller,
+)
 
 
 router = APIRouter(prefix="/payments", tags=["Payments"])
@@ -21,31 +25,7 @@ async def verify_payment(
     settings = Depends(get_settings)
 ):
     """Verify a payment status with Chapa."""
-    # Find the payment record
-    result = await db.execute(select(Payment).where(Payment.tx_ref == tx_ref, Payment.user_id == current_user.id))
-    payment = result.scalar_one_or_none()
-    
-    if not payment:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Payment record not found"
-        )
-    
-    # Check with Chapa
-    payment_service = PaymentService(chapa_api_key=settings.chapa_api_key)
-    verification = payment_service.verify_payment(tx_ref)
-    
-    if verification.status == "success":
-        payment.status = "COMPLETED"
-        payment.payment_data = verification.data.model_dump() if verification.data else None
-        await db.commit()
-        await db.refresh(payment)
-    elif verification.status == "failed":
-        payment.status = "FAILED"
-        await db.commit()
-        await db.refresh(payment)
-        
-    return payment
+    return await verify_payment_controller(tx_ref, current_user, db, settings)
 
 
 @router.get("/callback")
@@ -55,28 +35,7 @@ async def payment_webhook(
     db: AsyncSession = Depends(get_db)
 ):
     """Handle Chapa webhook callback."""
-    print(f"Received Chapa webhook: status={status}, trx_ref={trx_ref}")
-    
-    if not trx_ref:
-        return {"status": "error", "message": "Missing trx_ref"}
-    
-    # Find the payment record
-    result = await db.execute(select(Payment).where(Payment.tx_ref == trx_ref))
-    payment = result.scalar_one_or_none()
-
-    print("Payment found: ", payment)
-    
-    if payment:
-        if status == "success":
-            payment.status = "COMPLETED"
-        else:
-            payment.status = "FAILED"
-        
-        # Store metadata about the update
-        payment.payment_data = {"webhook_status": status, "trx_ref": trx_ref}
-        await db.commit()
-        
-    return {"status": "ok"}
+    return await payment_webhook_controller(status, trx_ref, db)
 
 
 @router.get("", response_model=List[PaymentResponse])
@@ -85,9 +44,7 @@ async def list_payments(
     db: AsyncSession = Depends(get_db)
 ):
     """List all payments for the current user."""
-    result = await db.execute(select(Payment).where(Payment.user_id == current_user.id).order_by(Payment.created_at.desc()))
-    payments = result.scalars().all()
-    return payments
+    return await list_payments_controller(current_user, db)
 
 
 @router.get("/{payment_id}", response_model=PaymentResponse)
@@ -97,13 +54,4 @@ async def get_payment(
     db: AsyncSession = Depends(get_db)
 ):
     """Get a specific payment record."""
-    result = await db.execute(select(Payment).where(Payment.id == payment_id, Payment.user_id == current_user.id))
-    payment = result.scalar_one_or_none()
-    
-    if not payment:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Payment record not found"
-        )
-    
-    return payment
+    return await get_payment_controller(payment_id, current_user, db)
