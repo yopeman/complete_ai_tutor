@@ -498,7 +498,9 @@ const LessonPlayer = () => {
                         <span className="w-8 h-8 rounded-full bg-slate-800 border border-white/5 flex items-center justify-center text-xs font-bold text-slate-500 shrink-0">
                           {qIdx + 1}
                         </span>
-                        <h4 className="text-xl font-bold text-white leading-relaxed">{quiz.question}</h4>
+                        <div className="text-xl font-bold text-white leading-relaxed w-full prose prose-invert prose-p:my-0 prose-pre:text-sm prose-code:text-indigo-300">
+                          <SmartMarkdown>{quiz.question}</SmartMarkdown>
+                        </div>
                       </div>
 
                       <div className="pl-12">
@@ -574,9 +576,9 @@ const LessonPlayer = () => {
                     <h3 className="text-3xl font-bold text-white mb-4">
                       {quizResult.score >= 70 ? 'Excellent Progress!' : 'Knowledge Gap Detected'}
                     </h3>
-                    <p className="text-slate-400 text-lg leading-relaxed italic max-w-xl mx-auto">
-                      "{quizResult.feedback}"
-                    </p>
+                    <div className="text-slate-400 text-lg leading-relaxed italic max-w-xl mx-auto w-full prose prose-invert prose-p:my-0 prose-pre:text-sm prose-code:text-indigo-300">
+                      <SmartMarkdown>{quizResult.feedback}</SmartMarkdown>
+                    </div>
                   </div>
 
                   {/* Detailed Question Review */}
@@ -590,7 +592,9 @@ const LessonPlayer = () => {
                             }`}>
                             {q.is_correct ? <CheckCircle2 size={16} /> : <XCircle size={16} />}
                           </div>
-                          <h5 className="text-lg font-bold text-white leading-tight mt-1">{q.question}</h5>
+                          <div className="text-lg font-bold text-white leading-tight mt-1 w-full prose prose-invert prose-p:my-0 prose-pre:text-xs prose-code:text-indigo-300">
+                            <SmartMarkdown>{q.question}</SmartMarkdown>
+                          </div>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pl-12 mb-6">
@@ -608,10 +612,10 @@ const LessonPlayer = () => {
 
                         {q.explanation && (
                           <div className="pl-12 pt-4 border-t border-white/5">
-                            <p className="text-xs text-slate-400 leading-relaxed">
+                            <div className="text-xs text-slate-400 leading-relaxed w-full prose prose-invert prose-p:my-0 prose-sm prose-pre:text-xs prose-code:text-indigo-300">
                               <span className="font-bold text-indigo-400 uppercase tracking-widest mr-2 text-[10px]">Tutor Note:</span>
-                              {q.explanation}
-                            </p>
+                              <SmartMarkdown>{q.explanation}</SmartMarkdown>
+                            </div>
                           </div>
                         )}
                       </div>
