@@ -44,32 +44,61 @@ class PPTAgent:
         # Using with_structured_output for cleaner JSON generation
         llm_with_structure = self.llm.with_structured_output(PPTStructure)
         
-        system_prompt = """You are an expert Presentation Designer. 
-        Your goal is to create a structured educational presentation (6 slides) based on the lesson content provided.
+        system_prompt = """You are an expert Educational Presentation Designer with deep expertise in instructional design and visual communication.
+
+Your goal is to create a compelling 6-slide educational presentation that transforms lesson content into an engaging, memorable learning experience.
+
+=== SLIDE STRUCTURE REQUIREMENTS ===
+You MUST create exactly 6 slides in this order:
+1. Hero Slide: Attention-grabbing title with a compelling subtitle that sparks curiosity
+2. Outline: Clear roadmap of what learners will discover (3-4 key topics)
+3. Introduction: Hook the learner with the "why" and core concept foundation
+4. Detail: Rich, structured deep-dive into the main content with concrete examples
+5. Summary: 3-4 actionable key takeaways that reinforce learning
+6. Thanks!: Professional closing with a forward-looking call to action
+
+=== CONTENT QUALITY GUIDELINES ===
+- **Concise**: Each slide should have 3-5 bullet points max, 15-25 words per bullet
+- **Scannable**: Use clear hierarchy, key terms in bold, and logical flow
+- **Actionable**: Focus on "what to know" and "why it matters"
+- **Engaging**: Use active voice, varied sentence structure, and educational tone
+- **Consistent**: Maintain terminology and style across all slides
+
+=== FORMATTING RULES ===
+- Use bullet points (•) for all content, never paragraphs
+- Bold (**term**) key concepts, terminology, and important takeaways
+- Use numbered lists (1., 2., 3.) only for sequential processes
+- Include 1-2 concrete examples or analogies in the Detail slide
+- Avoid filler words: "very", "really", "just", "thing"
+
+=== AUDIENCE AWARENESS ===
+Assume the audience is adult learners seeking practical knowledge. Balance accessibility with depth—explain technical terms briefly in context."""
         
-        SLIDE STRUCTURE REQUIRED:
-        1. Hero Slide: Catchy title and subtitle.
-        2. Outline: What will be covered.
-        3. Introduction: Core concept introduction.
-        4. Detail: Deep dive into the main content.
-        5. Summary: Key takeaways.
-        6. Thanks!: A polite closing slide.
-        
-        For each slide, provide a 'title' and 'content'. The 'content' should be concise and bulleted where appropriate, optimized for a slide deck.
-        """
-        
-        user_prompt = f"""
-        Generate a presentation for the following lesson:
-        ---
-        Title: {lesson.title}
-        Course name: {course.title}
-        Class: day {lesson.day_number} class
-        Description: {lesson.description}
-        Outlines: {lesson.daily_plan}
-        Content: {lesson.content}
-        Summary: {lesson.summary}
-        ---
-        """
+        user_prompt = f"""=== LESSON CONTEXT ===
+COURSE: {course.title}
+LESSON: {lesson.title} (Day {lesson.day_number})
+
+=== LESSON DESCRIPTION ===
+{lesson.description}
+
+=== LEARNING ROADMAP (Daily Plan) ===
+{lesson.daily_plan}
+
+=== CORE CONTENT TO TEACH ===
+{lesson.content}
+
+=== KEY TAKEAWAYS TO REINFORCE ===
+{lesson.summary}
+
+=== YOUR TASK ===
+Transform the above content into a 6-slide educational presentation following the structure and quality guidelines in your instructions.
+
+Requirements:
+- Ensure each slide title is descriptive and engaging (5-8 words max)
+- Cover ALL key points from the lesson content in the Detail slide
+- Make the Summary slide reinforce the most important concepts
+- Use formatting (bullet points, bold text) consistently throughout
+- The presentation should feel cohesive—like a complete learning journey"""
         
         try:
             # Generate the content
