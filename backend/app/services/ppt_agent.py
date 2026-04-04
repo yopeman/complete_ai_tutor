@@ -2,10 +2,8 @@ import os
 from typing import List, Dict, Any, Optional
 from pydantic import BaseModel, Field
 from langchain_core.messages import HumanMessage, SystemMessage
-from langchain.agents import create_agent
-from langchain.tools import tool
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.config import get_llm, get_settings
+from app.config import get_settings, get_generating_llm
 from app.services.tts_and_stt import text_to_speech
 from app.models import Course, Lesson, Presentation
 from app.schemas.presentation import PPT, Slide
@@ -27,7 +25,7 @@ class PPTAgent:
     """LangChain agent for generating educational presentations for lessons."""
     
     def __init__(self, db: AsyncSession, user_id: int):
-        self.llm = get_llm()
+        self.llm = get_generating_llm()
         self.db = db
         self.user_id = user_id
         self.settings = get_settings()

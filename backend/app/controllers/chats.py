@@ -6,7 +6,7 @@ from app.database import get_db
 from app.dependencies import get_current_active_user
 from app.models import User, Chat
 from app.schemas import ChatCreate, ChatResponse, ChatListResponse
-from app.config import get_llm
+from app.config import get_thinking_llm
 from langchain_core.messages import HumanMessage, AIMessage, BaseMessage
 from langchain.agents import create_agent
 from app.services.tutor_tools import TUTOR_TOOLS
@@ -67,7 +67,7 @@ async def create_chat(
     """Create a new chat and generate an AI response using an AI Agent with tools."""
     
     # 1. Initialize Groq LLM
-    llm = get_llm()
+    llm = get_thinking_llm()
     
     # 2. Fetch conversation history from the same session
     history_query = select(Chat).where(
