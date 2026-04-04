@@ -190,6 +190,13 @@ const PresentationViewer = ({ slides = [], onExit }) => {
         setIsPlaying(false);
         setAudioProgress(0);
         if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
+
+        // Auto-advance to next slide after audio finishes
+        if (currentSlide < totalSlides - 1) {
+            setTimeout(() => {
+                goNext();
+            }, 1000); // 1s delay for a smoother cinematic feel
+        }
     };
 
     const handleProgressClick = (e) => {
