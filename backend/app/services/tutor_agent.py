@@ -290,9 +290,6 @@ class TutorAgent:
             "correct_answer": q.correct_answer,
             "student_answer": student_submissions.get(str(q.id), "No answer provided")
         } for q in quizzes]
-
-        print('\n'*10, student_submissions,'\n'*10)
-        print('\n'*10, quiz_data,'\n'*10)
         
         prompt = f"""
         Evaluate the student's performance on the following quizzes for the lesson '{lesson.title}'.
@@ -335,14 +332,14 @@ class TutorAgent:
                 next_lesson_result = await self.db.execute(
                     select(Lesson).where(
                         Lesson.course_id == lesson.course_id,
-                        Lesson.day_number == lesson.day_number + 1
+                        Lesson.id == lesson.id + 1
                     )
                 )
                 next_lesson = next_lesson_result.scalar_one_or_none()
                 if next_lesson:
                     next_lesson.is_locked = False
 
-            else:
+            elif lesson.status != LessonStatus.COMPLETED:
                 lesson.status = LessonStatus.IN_PROGRESS
             
             await self.db.commit()
