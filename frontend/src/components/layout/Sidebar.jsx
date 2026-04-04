@@ -9,7 +9,8 @@ import {
     Settings,
     LogOut,
     ChevronRight,
-    Award
+    Award,
+    History
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
@@ -23,6 +24,7 @@ const Sidebar = ({ onMenuClick }) => {
         { icon: Layers, label: 'Flashcards', path: '/flashcards' },
         { icon: BrainCircuit, label: 'Progress', path: '/progress' },
         { icon: Award, label: 'Certificates', path: '/certificates' },
+        { icon: History, label: 'Payments', path: '/payments' },
     ];
 
     return (

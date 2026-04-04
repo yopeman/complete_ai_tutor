@@ -11,6 +11,7 @@ import AITutorChat from './pages/AITutorChat';
 import Progress from './pages/Progress';
 import Flashcards from './pages/Flashcards';
 import Certificates from './pages/Certificates';
+import Payments from './pages/Payments';
 import Terms from './pages/Terms';
 import Privacy from './pages/Privacy';
 import AppLayout from './components/layout/AppLayout';
@@ -45,6 +46,7 @@ function App() {
         <Route path="/flashcards" element={<Flashcards />} />
         <Route path="/progress" element={<Progress />} />
         <Route path="/certificates" element={<Certificates />} />
+        <Route path="/payments" element={user ? <Payments /> : <Navigate to="/login" />} />
       </Route>
 
       {/* Full Screen Immersive Routes */}
