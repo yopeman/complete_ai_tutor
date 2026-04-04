@@ -11,6 +11,8 @@ import AITutorChat from './pages/AITutorChat';
 import Progress from './pages/Progress';
 import Flashcards from './pages/Flashcards';
 import Certificates from './pages/Certificates';
+import Terms from './pages/Terms';
+import Privacy from './pages/Privacy';
 import AppLayout from './components/layout/AppLayout';
 import TextToSpeech from './pages/TextToSpeech';
 import { useAuth } from './context/AuthContext';
@@ -31,6 +33,8 @@ function App() {
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={!user ? <LoginPage /> : <Navigate to="/dashboard" />} />
       <Route path="/register" element={!user ? <RegisterPage /> : <Navigate to="/dashboard" />} />
+      <Route path="/terms" element={<Terms />} />
+      <Route path="/privacy" element={<Privacy />} />
 
       {/* Authenticated Routes */}
       <Route element={user ? <AppLayout /> : <Navigate to="/login" />}>
