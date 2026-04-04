@@ -231,19 +231,10 @@ const LessonPlayer = () => {
     }
   };
 
-  const handleRetakeQuiz = async () => {
-    setCompleting(true);
-    try {
-      const response = await api.get(`/lessons/${lessonId}/quizzes`);
-      setQuizzes(response.data);
-      setQuizAnswers({});
-      setQuizResult(null);
-      setShowQuiz(true);
-    } catch (error) {
-      console.error('Failed to get quizzes:', error);
-    } finally {
-      setCompleting(false);
-    }
+  const handleBackToLesson = () => {
+    setShowQuiz(false);
+    setQuizResult(null);
+    setShowPresentation(false);
   };
 
   const handleOpenPresentation = async () => {
@@ -315,9 +306,9 @@ const LessonPlayer = () => {
               variant="outline"
               size="sm"
               className="gap-2 h-9 border-indigo-500/30 text-indigo-400 hover:bg-indigo-500/10 rounded-xl"
-              onClick={handleRetakeQuiz}
+              onClick={handleBackToLesson}
             >
-              <BrainCircuit size={16} /> Retake Quiz
+              <ArrowLeft size={16} /> Back to Lesson
             </Button>
           )}
           <Button
@@ -732,10 +723,9 @@ const LessonPlayer = () => {
                     </p>
                   </div>
 
-                  {/* ── FAILED: show only feedback + retake ──────────────────── */}
+                  {/* ── FAILED: feedback + return to lesson ───────────────────── */}
                   {!quizResult.is_passed && (
                     <div className="flex flex-col items-center gap-5 pt-6 border-t border-white/5">
-                      {/* Student status badge */}
                       {quizResult.student_status && (
                         <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs font-bold uppercase tracking-widest">
                           <XCircle size={14} />
@@ -744,18 +734,11 @@ const LessonPlayer = () => {
                       )}
 
                       <Button
-                        onClick={handleRetakeQuiz}
-                        className="px-10 py-5 rounded-[1.5rem] text-base font-bold shadow-2xl shadow-rose-500/10 gap-3 bg-rose-600 hover:bg-rose-500"
+                        onClick={handleBackToLesson}
+                        className="px-10 py-5 rounded-[1.5rem] text-base font-bold shadow-2xl shadow-indigo-500/10 gap-3 bg-indigo-600 hover:bg-indigo-500"
                       >
-                        <RotateCcw size={18} /> Retake Quiz
+                        <ArrowLeft size={18} /> Back to Lesson
                       </Button>
-
-                      <button
-                        onClick={() => { setShowQuiz(false); setQuizResult(null); }}
-                        className="py-2 text-slate-500 hover:text-white transition-all text-xs font-bold uppercase tracking-widest"
-                      >
-                        Back to Module Content
-                      </button>
                     </div>
                   )}
 
