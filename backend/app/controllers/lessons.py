@@ -86,7 +86,7 @@ async def get_lesson(
         if lesson.status == LessonStatus.NOT_STARTED and accessed_count >= free_limit:
             # Payment required - trigger Chapa initialization
             payment_service = PaymentService(chapa_api_key=settings.chapa_api_key)
-            tx_ref = f"TX-{current_user.id}-{lesson.course_id}-{uuid.uuid4().hex[:8]}"
+            tx_ref = f"TX-{uuid.uuid4()}"
             
             # Check for existing PENDING payment to reuse tx_ref
             result_pending = await db.execute(

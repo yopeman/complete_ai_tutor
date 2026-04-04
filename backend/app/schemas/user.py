@@ -5,7 +5,6 @@ from pydantic import BaseModel, Field, ConfigDict
 
 class UserBase(BaseModel):
     username: str = Field(..., min_length=3, max_length=255)
-    native_language: Optional[str] = Field(None, max_length=50)
 
 
 class UserCreate(UserBase):
@@ -13,7 +12,7 @@ class UserCreate(UserBase):
 
 
 class UserUpdate(BaseModel):
-    native_language: Optional[str] = Field(None, max_length=50)
+    pass
 
 
 class UserResponse(UserBase):

@@ -143,14 +143,35 @@ async def update_course_plan_ai(
     llm = get_generating_llm()
     
     system_message = (
-        "You are an expert educational content designer. Your task is to update "
-        "an existing course plan based on the user's instructions. "
-        "Return ONLY the updated course plan in markdown format. Do not include any extra conversational text."
+        "You are an expert educational content designer specializing in structured course planning. "
+        "Your task is to analyze the user's course plan update request and produce a comprehensive, "
+        "well-structured markdown document.\n\n"
+        "## Output Requirements:\n"
+        "- Return ONLY the complete updated course plan in markdown format\n"
+        "- Use clear hierarchical headings (# for title, ## for modules/units, ### for lessons)\n"
+        "- Include learning objectives, prerequisites, and estimated duration where relevant\n"
+        "- Maintain all existing content unless explicitly modified by the user's instructions\n"
+        "- Do NOT include conversational text, explanations, or meta-commentary\n\n"
+        "## Structure Guidelines:\n"
+        "- Start with a clear course title as H1\n"
+        "- Organize content into logical modules or weeks\n"
+        "- Each lesson should have: title, brief description, key topics\n"
+        "- Include a course overview/summary section\n\n"
+        "Respond with valid markdown only."
     )
     
     human_message = (
-        f"Current course plan:\n{course.course_plan or 'No existing plan.'}\n\n"
-        f"User instruction for update:\n{chat_data.prompt}"
+        f"## Current Course Plan:\n"
+        f"```markdown\n"
+        f"{course.course_plan or 'No existing plan yet.'}"
+        f"\n```\n\n"
+        f"## User's Update Request:\n"
+        f"{chat_data.prompt}\n\n"
+        f"## Instructions:\n"
+        f"- Apply the user's requested changes to the current plan\n"
+        f"- Preserve all existing content that is not being modified\n"
+        f"- Ensure the updated plan remains well-structured and complete\n"
+        f"- Return the full updated plan as a single markdown document"
     )
     
     try:
@@ -275,9 +296,23 @@ async def install_course_plan(
     structured_llm = llm.with_structured_output(LessonsExtraction)
     
     system_message = (
-        "You are an expert AI instructional assistant. "
-        "Your task is to extract lessons from the provided course plan. "
-        "Extract the day number, title, and description for each lesson exactly as they appear in the plan."
+        "You are an expert instructional designer specializing in course content extraction. "
+        "Your task is to parse a course plan and extract structured lesson data.\n\n"
+        "## Extraction Rules:\n"
+        "1. Identify ALL lessons in the plan - be thorough and complete\n"
+        "2. Extract day_number as the sequential order (1, 2, 3...) from the plan structure\n"
+        "3. Extract title as the exact lesson heading from the markdown\n"
+        "4. Extract description as a concise 1-2 sentence summary of lesson content\n\n"
+        "## Output Format:\n"
+        "Return a JSON object with a 'lessons' array containing objects with:\n"
+        "- day_number: integer (sequential lesson number)\n"
+        "- title: string (exact lesson title from source)\n"
+        "- description: string (brief summary of what the lesson covers)\n\n"
+        "## Important:\n"
+        "- Include EVERY lesson found in the plan\n"
+        "- Maintain the original order as presented\n"
+        "- If day numbers aren't explicit, infer from sequence (1, 2, 3...)\n"
+        "- Descriptions should be informative but concise (50-150 characters)"
     )
     
     try:
