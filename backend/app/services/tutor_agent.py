@@ -213,7 +213,8 @@ class TutorAgent:
         context = f"""
         Lesson Title: {lesson.title}
         Lesson Description: {lesson.description}
-        Lesson Content: {lesson.content[:2000]}  # Use first 2000 chars for context
+        Lesson Content: {lesson.content[:2000]}
+        Lesson Summary: {lesson.summary}
         Course Goal: {course.goal}
         """
         
