@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import SmartMarkdown from '../components/ui/SmartMarkdown';
 import Button from '../components/ui/Button';
+import PresentationViewer from '../components/ui/PresentationViewer';
 import {
   ArrowLeft,
   ChevronRight,
@@ -18,7 +19,8 @@ import {
   RotateCcw,
   Mic,
   Volume2,
-  Calendar
+  Calendar,
+  Presentation
 } from 'lucide-react';
 import VoiceInputButton from '../components/chat/VoiceInputButton';
 import TTSButton from '../components/ui/TTSButton';
@@ -44,6 +46,11 @@ const LessonPlayer = () => {
   const [quizAnswers, setQuizAnswers] = useState({});
   const [quizResult, setQuizResult] = useState(null);
   const [isSubmittingQuiz, setIsSubmittingQuiz] = useState(false);
+
+  // Presentation States
+  const [presentationSlides, setPresentationSlides] = useState([]);
+  const [showPresentation, setShowPresentation] = useState(false);
+  const [loadingPresentation, setLoadingPresentation] = useState(false);
 
   const sessionId = `lesson_${lessonId}`;
 
@@ -239,6 +246,25 @@ const LessonPlayer = () => {
     }
   };
 
+  const handleOpenPresentation = async () => {
+    setLoadingPresentation(true);
+    try {
+      const response = await api.get(`/lessons/${lessonId}/presentation`);
+      const slides = response.data?.generated_ppt?.slides || [];
+      if (slides.length === 0) {
+        alert('No presentation slides available for this lesson yet.');
+        return;
+      }
+      setPresentationSlides(slides);
+      setShowPresentation(true);
+    } catch (error) {
+      console.error('Failed to load presentation:', error);
+      alert('Failed to load presentation. Please try again.');
+    } finally {
+      setLoadingPresentation(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
@@ -350,8 +376,8 @@ const LessonPlayer = () => {
                                 {Array.isArray(value)
                                   ? value.join(', ')
                                   : typeof value === 'object' && value !== null
-                                  ? JSON.stringify(value)
-                                  : String(value)}
+                                    ? JSON.stringify(value)
+                                    : String(value)}
                               </p>
                             </div>
                           </div>
@@ -372,6 +398,27 @@ const LessonPlayer = () => {
                 </div>
               </div>
             ) : null}
+
+            {/* ── Presentation Button ──────────────────────────────────────── */}
+            <button
+              onClick={handleOpenPresentation}
+              disabled={loadingPresentation}
+              className="group flex items-center gap-3 px-6 py-3.5 rounded-2xl bg-gradient-to-r from-indigo-600/20 to-purple-600/20 border border-indigo-500/25 hover:border-indigo-400/40 hover:from-indigo-600/30 hover:to-purple-600/30 transition-all duration-300 shadow-lg shadow-indigo-500/5 hover:shadow-indigo-500/15"
+            >
+              {loadingPresentation ? (
+                <Loader2 className="animate-spin text-indigo-400" size={20} />
+              ) : (
+                <div className="w-9 h-9 rounded-xl bg-indigo-500/20 flex items-center justify-center group-hover:bg-indigo-500/30 transition-all">
+                  <Presentation className="text-indigo-400 group-hover:text-indigo-300 transition-colors" size={18} />
+                </div>
+              )}
+              <div className="text-left">
+                <p className="text-sm font-bold text-white group-hover:text-indigo-100 transition-colors">
+                  {loadingPresentation ? 'Generating Presentation...' : 'Presentation'}
+                </p>
+                <p className="text-[10px] text-slate-500 font-medium uppercase tracking-widest">Interactive Slides</p>
+              </div>
+            </button>
 
             {/* ── Main Lesson Content ───────────────────────────────────────── */}
             <div className="relative group">
@@ -528,6 +575,14 @@ const LessonPlayer = () => {
           </div>
         </button>
       </div>
+
+      {/* Presentation Overlay */}
+      {showPresentation && (
+        <PresentationViewer
+          slides={presentationSlides}
+          onExit={() => setShowPresentation(false)}
+        />
+      )}
 
       {/* Quiz Overlay */}
       {showQuiz && (
