@@ -4,6 +4,7 @@ import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import Dashboard from './pages/Dashboard';
+import MyCourses from './pages/MyCourses';
 import CourseDetails from './pages/CourseDetails';
 import LessonPlayer from './pages/LessonPlayer';
 import AITutorChat from './pages/AITutorChat';
@@ -33,7 +34,7 @@ function App() {
       {/* Authenticated Routes */}
       <Route element={user ? <AppLayout /> : <Navigate to="/login" />}>
         <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/courses" element={<Dashboard />} /> {/* Use Dashboard as the course list too */}
+        <Route path="/courses" element={<MyCourses />} />
         <Route path="/courses/:courseId" element={<CourseDetails />} />
         <Route path="/lessons/:lessonId" element={<LessonPlayer />} />
         <Route path="/flashcards" element={<Flashcards />} />
