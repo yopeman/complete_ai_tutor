@@ -525,7 +525,13 @@ const LessonPlayer = () => {
                   : 'bg-white/[0.03] border border-white/5 backdrop-blur-sm text-slate-300 rounded-tl-none prose prose-invert prose-base max-w-none'
                   }`}>
                   {msg.role === 'assistant' ? (
-                    <SmartMarkdown>{msg.content}</SmartMarkdown>
+                    <>
+                      <SmartMarkdown>{msg.content}</SmartMarkdown>
+                      {/* TTS Button for Assistant Messages */}
+                      <div className="mt-3 pt-3 border-t border-white/5 flex items-center justify-end">
+                        <TTSButton text={msg.content} />
+                      </div>
+                    </>
                   ) : msg.content}
                 </div>
               </div>
