@@ -78,9 +78,14 @@ const LessonPlayer = () => {
   }, [sessionId]);
 
   useEffect(() => {
+    // Reset states when navigation between lessons happens
+    setShowQuiz(false);
+    setQuizResult(null);
+    setQuizAnswers({});
+    
     fetchLesson();
     fetchChatHistory();
-  }, [fetchLesson, fetchChatHistory]);
+  }, [fetchLesson, fetchChatHistory, lessonId]);
 
   useEffect(() => {
     scrollToBottom();
@@ -341,8 +346,8 @@ const LessonPlayer = () => {
                             {Array.isArray(value)
                               ? value.join(', ')
                               : typeof value === 'object' && value !== null
-                              ? JSON.stringify(value)
-                              : String(value)}
+                                ? JSON.stringify(value)
+                                : String(value)}
                           </p>
                         </div>
                       </div>
@@ -360,7 +365,7 @@ const LessonPlayer = () => {
                 </div>
                 <h3 className="text-xl font-bold text-white">Lesson Material</h3>
               </div>
-              
+
               <div className="prose prose-invert prose-indigo max-w-none 
                 prose-headings:font-display prose-headings:font-bold prose-headings:tracking-tight
                 prose-h1:text-4xl prose-h1:mb-10 prose-h2:text-2xl prose-h2:mt-12 prose-h2:mb-6 prose-h2:text-indigo-400
@@ -398,12 +403,12 @@ const LessonPlayer = () => {
                   </div>
                   <p className="text-xs font-bold text-indigo-400 uppercase tracking-[0.2em]">Lesson Key Summary</p>
                 </div>
-                
+
                 <div className="relative group/summary p-8 rounded-[2rem] border border-indigo-500/20 bg-gradient-to-br from-indigo-950/40 to-slate-900/60 shadow-xl overflow-hidden">
                   <p className="text-slate-300 text-lg leading-relaxed italic">
                     {lesson.summary}
                   </p>
-                  
+
                   {/* Summary Audio Footer Section (Always Visible) */}
                   <div className="mt-10 pt-6 border-t border-indigo-500/10 flex items-center justify-between">
                     <div className="flex items-center gap-2">
