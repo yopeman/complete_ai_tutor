@@ -13,8 +13,9 @@ const MyCourses = () => {
     const [loading, setLoading] = useState(true);
     const [isGenerating, setIsGenerating] = useState(false);
     const [prompt, setPrompt] = useState('');
-    const [aiResponse, setAiResponse] = useState(null);
+    const [messages, setMessages] = useState([]);
     const [sessionId, setSessionId] = useState(null);
+    const messagesEndRef = useRef(null);
 
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
@@ -29,6 +30,12 @@ const MyCourses = () => {
     useEffect(() => {
         fetchCourses();
     }, []);
+
+    useEffect(() => {
+        if (messagesEndRef.current) {
+            messagesEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+    }, [messages]);
 
     const fetchCourses = async () => {
         try {
@@ -69,6 +76,10 @@ const MyCourses = () => {
                 formData.append('session_id', sessionId);
             }
 
+            const userMessage = { role: 'user', content: prompt };
+            setMessages(prev => [...prev, userMessage]);
+            setPrompt('');
+
             const response = await api.post('/courses', formData);
 
             if (response.data.session_id) {
@@ -78,8 +89,8 @@ const MyCourses = () => {
             if (response.data.course) {
                 navigate(`/courses/${response.data.course.id}`);
             } else {
-                setAiResponse(response.data.response);
-                setPrompt('');
+                const aiMessage = { role: 'assistant', content: response.data.response };
+                setMessages(prev => [...prev, aiMessage]);
                 fetchCourses();
             }
         } catch (error) {
@@ -91,7 +102,6 @@ const MyCourses = () => {
 
     const handleVoiceComplete = async (blob) => {
         setIsGenerating(true);
-        setAiResponse(null);
         try {
             const formData = new FormData();
             formData.append('audio_file', blob, 'voice_input.webm');
@@ -106,8 +116,11 @@ const MyCourses = () => {
             if (response.data.course) {
                 navigate(`/courses/${response.data.course.id}`);
             } else {
-                setAiResponse(response.data.response);
-                setPrompt('');
+                if (response.data.prompt) {
+                    setMessages(prev => [...prev, { role: 'user', content: response.data.prompt }]);
+                }
+                const aiMessage = { role: 'assistant', content: response.data.response };
+                setMessages(prev => [...prev, aiMessage]);
             }
         } catch (error) {
             console.error('Voice generation failed:', error);
@@ -131,7 +144,7 @@ const MyCourses = () => {
 
     const resetConversation = () => {
         setSessionId(null);
-        setAiResponse(null);
+        setMessages([]);
         setPrompt('');
     };
 
@@ -152,51 +165,66 @@ const MyCourses = () => {
                             <Sparkles size={14} className="animate-pulse" /> AI Academic Architect v2.0
                         </div>
 
-                        <h1 className="text-4xl lg:text-6xl font-display font-bold text-white mb-4 leading-tight">
+                        <h1 className={`${sessionId ? 'text-2xl lg:text-4xl' : 'text-4xl lg:text-6xl'} font-display font-bold text-white mb-4 leading-tight transition-all duration-500`}>
                             {sessionId ? "Refining your journey..." : "What do you want to master today?"}
                         </h1>
 
-                        {!aiResponse && !sessionId && (
+                        {!messages.length && !sessionId && (
                             <p className="text-indigo-100/70 text-lg lg:text-xl max-w-2xl mx-auto">
                                 Transform any goal into a professional, structured learning path in seconds.
                             </p>
                         )}
 
-                        {isGenerating && !aiResponse && (
+                        {isGenerating && (
                             <div className="flex items-center justify-center gap-3 text-white/50 animate-pulse py-4">
                                 <Loader2 className="animate-spin" size={20} />
                                 <span className="text-sm font-bold uppercase tracking-[0.2em]">Architecting Curriculum...</span>
                             </div>
                         )}
 
-                        {aiResponse && (
-                            <div className="p-8 bg-white/10 backdrop-blur-2xl rounded-[2rem] border border-white/20 animate-in zoom-in-95 duration-500 shadow-2xl text-left">
-                                <div className="flex gap-6">
-                                    <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center shrink-0 shadow-xl">
-                                        <Sparkles className="text-indigo-600" size={24} />
-                                    </div>
-                                    <div className="flex-1">
-                                        <div className="prose prose-invert prose-indigo max-w-none 
-                                            prose-p:text-lg prose-p:leading-relaxed prose-p:text-indigo-50
-                                            prose-strong:text-white prose-strong:font-bold
-                                            prose-li:text-indigo-100/80
-                                        ">
-                                            <SmartMarkdown>{aiResponse}</SmartMarkdown>
-                                        </div>
-                                        <div className="mt-6 pt-6 border-t border-white/10 flex justify-between items-center">
-                                            <span className="text-[10px] font-bold text-indigo-200/50 uppercase tracking-widest italic">Awaiting your response...</span>
-                                            <div className="flex items-center gap-4">
-                                                <TTSButton text={aiResponse} />
-                                                <button
-                                                    onClick={resetConversation}
-                                                    className="flex items-center gap-2 text-xs font-bold text-white/50 hover:text-white transition-all uppercase tracking-widest group"
-                                                >
-                                                    <RotateCcw size={14} className="group-hover:rotate-180 transition-transform duration-500" /> Start Over
-                                                </button>
+                        {messages.length > 0 && (
+                            <div className="max-h-[600px] overflow-y-auto py-8 px-4 custom-scrollbar space-y-6 mb-8 scroll-smooth border-y border-white/5 bg-slate-900/20 rounded-4xl">
+                                {messages.map((msg, index) => (
+                                    <div key={index} className={`animate-in fade-in slide-in-from-bottom-4 duration-500 ${msg.role === 'user' ? 'flex justify-end' : 'flex justify-start'}`}>
+                                        {msg.role === 'user' ? (
+                                            <div className="max-w-[80%] bg-indigo-500/10 backdrop-blur-xl rounded-[2rem] rounded-tr-none border border-indigo-500/20 p-6 text-right">
+                                                <p className="text-indigo-50 text-lg">{msg.content}</p>
                                             </div>
-                                        </div>
+                                        ) : (
+                                            <div className="max-w-[90%] p-8 bg-white/10 backdrop-blur-2xl rounded-[2.8rem] rounded-tl-none border border-white/20 shadow-2xl text-left">
+                                                <div className="flex gap-6">
+                                                    <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center shrink-0 shadow-xl">
+                                                        <Sparkles className="text-indigo-600" size={24} />
+                                                    </div>
+                                                    <div className="flex-1">
+                                                        <div className="prose prose-invert prose-indigo max-w-none 
+                                                            prose-p:text-lg prose-p:leading-relaxed prose-p:text-indigo-50
+                                                            prose-strong:text-white prose-strong:font-bold
+                                                            prose-li:text-indigo-100/80
+                                                        ">
+                                                            <SmartMarkdown>{msg.content}</SmartMarkdown>
+                                                        </div>
+                                                        <div className="mt-6 pt-6 border-t border-white/10 flex justify-between items-center">
+                                                            <span className="text-[10px] font-bold text-indigo-200/50 uppercase tracking-widest italic">Ready for next steps...</span>
+                                                            <div className="flex items-center gap-4">
+                                                                <TTSButton text={msg.content} />
+                                                                {index === messages.length - 1 && (
+                                                                    <button
+                                                                        onClick={resetConversation}
+                                                                        className="flex items-center gap-2 text-xs font-bold text-white/50 hover:text-white transition-all uppercase tracking-widest group"
+                                                                    >
+                                                                        <RotateCcw size={14} className="group-hover:rotate-180 transition-transform duration-500" /> Start Over
+                                                                    </button>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
-                                </div>
+                                ))}
+                                <div ref={messagesEndRef} />
                             </div>
                         )}
 
@@ -206,7 +234,7 @@ const MyCourses = () => {
                                 <textarea
                                     ref={inputRef}
                                     rows={3}
-                                    placeholder={aiResponse ? "Provide more details..." : "e.g. Fullstack Web Development in 3 months..."}
+                                    placeholder={messages.length > 0 ? "Provide more details..." : "e.g. Fullstack Web Development in 3 months..."}
                                     className="w-full bg-slate-900/50 border border-white/10 backdrop-blur-3xl rounded-[2rem] py-8 pl-8 pr-48 text-white text-lg placeholder:text-slate-600 focus:ring-4 focus:ring-indigo-500/20 outline-none transition-all shadow-2xl resize-y min-h-[120px]"
                                     value={prompt}
                                     onChange={(e) => setPrompt(e.target.value)}
