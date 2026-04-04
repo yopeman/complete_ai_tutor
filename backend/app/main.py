@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
 from app.database import engine, Base
-from app.routers import auth, courses, lessons, interactions, quizzes, progress, flashcards, chats, tts_and_stt
+from app.routers import auth, courses, lessons, interactions, quizzes, progress, flashcards, chats, tts_and_stt, presentations
 from app.config import get_settings
 import sys
 import os
@@ -53,6 +53,8 @@ app.include_router(progress.router, tags=["Progress"])
 app.include_router(flashcards.router, tags=["Flashcards"])
 app.include_router(chats.router, tags=["Chats"])
 app.include_router(tts_and_stt.router, tags=["TTS and STT"])
+app.include_router(presentations.router, tags=["Presentations"])
+
 
 # Serve static files
 app.mount("/audio_cache", StaticFiles(directory=settings.audio_cache_dir), name=settings.audio_cache_dir)

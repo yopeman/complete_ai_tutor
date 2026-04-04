@@ -23,6 +23,8 @@ from app.schemas import (
     FlashcardCreate,
     FlashcardResponse,
 )
+from app.schemas.presentation import PresentationResponse
+
 from app.controllers.lessons import (
     get_lesson as get_lesson_controller,
     complete_lesson as complete_lesson_controller,
@@ -33,6 +35,10 @@ from app.controllers.lessons import (
     get_lesson_progress as get_lesson_progress_controller,
     get_lesson_flashcards as get_lesson_flashcards_controller,
 )
+from app.controllers.presentations import (
+    get_or_create_presentation as get_or_create_presentation_controller,
+)
+
 
 router = APIRouter(prefix="/lessons", tags=["Lessons"])
 
@@ -134,3 +140,15 @@ async def get_lesson_flashcards(
 ):
     """Get all flashcards for a lesson."""
     return await get_lesson_flashcards_controller(lesson_id, current_user, db)
+
+
+# ============== Presentations Endpoints ==============
+
+@router.get("/{lesson_id}/presentation", response_model=PresentationResponse)
+async def get_lesson_presentation(
+    lesson_id: int,
+    current_user: User = Depends(get_current_active_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Retrieve an existing presentation for a lesson, or generate it if it doesn't exist."""
+    return await get_or_create_presentation_controller(lesson_id, current_user, db)

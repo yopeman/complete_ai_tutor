@@ -8,10 +8,13 @@ from app.models.quiz import Quiz
 from app.models.progress import Progress
 from app.models.flashcard import Flashcard
 from app.models.chat import Chat
+from app.models.presentation import Presentation
+
 
 # Export all models
 __all__ = [
     'CourseStatus', 'LessonStatus', 'QuizType',
     'User', 'Course', 'Lesson', 'Interaction', 
-    'Quiz', 'Progress', 'Flashcard', 'Chat'
+    'Quiz', 'Progress', 'Flashcard', 'Chat', 'Presentation'
 ]
+
