@@ -19,8 +19,9 @@ const MyCourses = () => {
 
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
-    const searchQuery = searchParams.get('search') || '';
     const inputRef = useRef(null);
+
+    const searchQuery = searchParams.get('search') || '';
 
     const filteredCourses = courses.filter(course =>
         course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
