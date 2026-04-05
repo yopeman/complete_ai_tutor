@@ -20,7 +20,7 @@ from app.schemas import (
     CertificateResponse
 )
 from app.services.architect_agent import ArchitectAgent
-from app.config import get_generating_llm
+from app.config import get_thinking_llm
 from app.services.certificate_service import CertificateService
 
 
@@ -140,7 +140,7 @@ async def update_course_plan_ai(
     from langchain_core.messages import SystemMessage, HumanMessage
     import uuid
     
-    llm = get_generating_llm()
+    llm = get_thinking_llm()
     
     system_message = (
         "You are an expert educational content designer specializing in structured course planning. "
@@ -291,7 +291,7 @@ async def install_course_plan(
     class LessonsExtraction(BaseModel):
         lessons: List[LessonExtraction]
         
-    llm = get_generating_llm()
+    llm = get_thinking_llm()
     
     structured_llm = llm.with_structured_output(LessonsExtraction)
     

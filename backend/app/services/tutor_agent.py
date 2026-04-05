@@ -374,7 +374,6 @@ Generate exactly {num_quizzes} questions following these guidelines."""
 
 ## Lesson Context:
 - Lesson: '{lesson.title}'
-- Course Goal: {course.goal if course else 'General learning'}
 
 ## Student Submissions to Evaluate:
 {quiz_data}
