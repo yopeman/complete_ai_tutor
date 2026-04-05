@@ -95,9 +95,8 @@ We use a **Multi-Agent closed-loop system**:
 **Logo**: [AI Tutor Logo]
 **Content**: 
 **Join the Revolution in Autonomous Education.**
-- **Website**: [Project Link]
-- **Contact**: yimermarelign@gmail.com
-- **GitHub**: @mareligncode
+- **Website**: https://complete-ai-tutor.vercel.app/
+- **GitHub**: https://github.com/yopeman/complete_ai_tutor
 
 ---
 
@@ -105,5 +104,4 @@ We use a **Multi-Agent closed-loop system**:
 **Logo**: [AI Tutor Logo]
 **Content**: 
 - **Tech Stack**: React 19, FastAPI, LangChain, Groq API, Chapa Gateway.
-- **Scalability**: Can handle 10,000+ concurrent specialized agent simulations.
 - **Future Roadmap**: Integration with AR/VR for immersive 3D learning environments.
